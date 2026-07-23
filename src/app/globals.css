@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
+/*
+  Norma design tokens — Remote sandbox product chrome.
+  Brand cues: Royal Blue, Prussian Blue, Spray.
+  Forced light product surface (OS dark mode must not hide text).
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --norma-royal: #624de3;
+  --norma-prussian: #00234b;
+  --norma-spray: #75e8f0;
+
+  /* Surfaces */
+  --norma-canvas: #eef1f8;
+  --norma-surface: #ffffff;
+  --norma-surface-muted: #f5f6fb;
+  --norma-overlay: rgb(0 35 75 / 0.48);
+
+  /* Text */
+  --norma-ink: #00234b;
+  --norma-ink-muted: #4a5d73;
+  --norma-ink-subtle: #7a8ba0;
+  --norma-ink-inverse: #ffffff;
+
+  /* Borders & focus */
+  --norma-border: #d5dce8;
+  --norma-border-strong: #b8c3d6;
+  --norma-ring: #624de3;
+
+  /* Semantic */
+  --norma-accent: var(--norma-royal);
+  --norma-accent-hover: #5139d4;
+  --norma-accent-soft: color-mix(in srgb, var(--norma-royal) 12%, white);
+  --norma-highlight: var(--norma-spray);
+  --norma-highlight-soft: color-mix(in srgb, var(--norma-spray) 28%, white);
+  --norma-danger: #c81e1e;
+  --norma-danger-soft: #fde8e8;
+  --norma-success: #0f7a4c;
+  --norma-success-soft: #e3f6ee;
+
+  /* Type scale */
+  --norma-text-xs: 0.75rem;
+  --norma-text-sm: 0.875rem;
+  --norma-text-base: 1rem;
+  --norma-text-lg: 1.125rem;
+  --norma-text-xl: 1.35rem;
+  --norma-text-2xl: 1.75rem;
+  --norma-text-3xl: 2.25rem;
+  --norma-leading-tight: 1.2;
+  --norma-leading-snug: 1.35;
+  --norma-leading-normal: 1.5;
+  --norma-tracking-label: 0.14em;
+
+  /* Radius & elevation */
+  --norma-radius-sm: 0.375rem;
+  --norma-radius-md: 0.625rem;
+  --norma-radius-lg: 0.875rem;
+  --norma-shadow-sm: 0 1px 2px rgb(0 35 75 / 0.06);
+  --norma-shadow-md: 0 8px 24px rgb(0 35 75 / 0.08);
+
+  /* App aliases */
+  --background: var(--norma-canvas);
+  --foreground: var(--norma-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-norma-royal: var(--norma-royal);
+  --color-norma-prussian: var(--norma-prussian);
+  --color-norma-spray: var(--norma-spray);
+  --color-norma-canvas: var(--norma-canvas);
+  --color-norma-surface: var(--norma-surface);
+  --color-norma-surface-muted: var(--norma-surface-muted);
+  --color-norma-ink: var(--norma-ink);
+  --color-norma-ink-muted: var(--norma-ink-muted);
+  --color-norma-ink-subtle: var(--norma-ink-subtle);
+  --color-norma-ink-inverse: var(--norma-ink-inverse);
+  --color-norma-border: var(--norma-border);
+  --color-norma-border-strong: var(--norma-border-strong);
+  --color-norma-accent: var(--norma-accent);
+  --color-norma-accent-hover: var(--norma-accent-hover);
+  --color-norma-accent-soft: var(--norma-accent-soft);
+  --color-norma-highlight: var(--norma-highlight);
+  --color-norma-highlight-soft: var(--norma-highlight-soft);
+  --color-norma-danger: var(--norma-danger);
+  --color-norma-danger-soft: var(--norma-danger-soft);
+  --color-norma-success: var(--norma-success);
+  --color-norma-success-soft: var(--norma-success-soft);
+
+  --font-sans: var(--font-norma-sans);
+  --font-display: var(--font-norma-display);
+  --font-mono: var(--font-norma-mono);
+
+  --radius-norma-sm: var(--norma-radius-sm);
+  --radius-norma-md: var(--norma-radius-md);
+  --radius-norma-lg: var(--norma-radius-lg);
+
+  --shadow-norma-sm: var(--norma-shadow-sm);
+  --shadow-norma-md: var(--norma-shadow-md);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    color-scheme: light;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-norma-sans), ui-sans-serif, sans-serif;
+    font-size: var(--norma-text-base);
+    line-height: var(--norma-leading-normal);
+  }
+
+  ::selection {
+    background: var(--norma-highlight-soft);
+    color: var(--norma-prussian);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--norma-ring);
+    outline-offset: 2px;
+  }
 }
