@@ -1,57 +1,43 @@
+import { AppShell } from "@/components/shell/AppShell";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col gap-8 px-8 py-12 md:px-12">
-      <header className="flex flex-col gap-3">
-        <p className="font-mono text-[var(--norma-text-xs)] uppercase tracking-[var(--norma-tracking-label)] text-norma-royal">
-          Remote · Acme Sandbox Corp
-        </p>
-        <h1 className="font-[family-name:var(--font-norma-display)] text-[length:var(--norma-text-3xl)] leading-[var(--norma-leading-tight)] text-norma-prussian">
-          Org chart
-        </h1>
-        <p className="max-w-xl text-[length:var(--norma-text-lg)] leading-[var(--norma-leading-snug)] text-norma-ink-muted">
-          Norma tokens are live. Royal, Prussian, and Spray drive the product
-          chrome for the chart UI next.
-        </p>
-      </header>
-
-      <section
-        aria-label="Norma token swatches"
-        className="grid max-w-3xl gap-4 sm:grid-cols-3"
-      >
-        <Swatch name="Royal Blue" hex="#624DE3" className="bg-norma-royal" />
-        <Swatch
-          name="Prussian Blue"
-          hex="#00234B"
-          className="bg-norma-prussian"
-        />
-        <Swatch name="Spray" hex="#75E8F0" className="bg-norma-spray" ink />
-      </section>
-    </main>
-  );
-}
-
-function Swatch({
-  name,
-  hex,
-  className,
-  ink = false,
-}: {
-  name: string;
-  hex: string;
-  className: string;
-  ink?: boolean;
-}) {
-  return (
-    <div className="overflow-hidden rounded-norma-md border border-norma-border bg-norma-surface shadow-norma-sm">
-      <div className={`h-24 ${className}`} />
-      <div className="flex flex-col gap-0.5 px-3 py-2.5">
-        <span
-          className={`text-sm font-medium ${ink ? "text-norma-prussian" : "text-norma-ink"}`}
-        >
-          {name}
+    <AppShell
+      status={
+        <span>
+          Tokens + chrome ready · chart canvas lands with React Flow
         </span>
-        <span className="font-mono text-xs text-norma-ink-subtle">{hex}</span>
+      }
+    >
+      <div className="flex flex-1 flex-col gap-6 p-6 md:p-8">
+        <div className="max-w-2xl">
+          <h1 className="font-[family-name:var(--font-norma-display)] text-[length:var(--norma-text-2xl)] text-norma-prussian">
+            Organization
+          </h1>
+          <p className="mt-2 text-norma-ink-muted">
+            Product shell for Acme Sandbox Corp. The chart fills this canvas
+            next.
+          </p>
+        </div>
+
+        <div
+          className="relative flex min-h-[420px] flex-1 items-center justify-center overflow-hidden rounded-norma-lg border border-dashed border-norma-border-strong bg-norma-surface shadow-norma-sm"
+          data-slot="chart-canvas"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-40"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--norma-prussian) 12%, transparent) 1px, transparent 0)",
+              backgroundSize: "20px 20px",
+            }}
+          />
+          <p className="relative z-[1] max-w-sm text-center text-sm text-norma-ink-subtle">
+            Chart canvas slot
+          </p>
+        </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
