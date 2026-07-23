@@ -2,7 +2,10 @@
 
 Headless HRIS org chart against the **Remote sandbox** REST API. Built as an interview assessment deliverable: interactive reporting hierarchy, edge-case UI, public deploy, and clear documentation.
 
-> **Status:** Planning complete. Implementation has not started. See Linear project [Remote Org Chart Assessment](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) and GitHub Issues for the work breakdown.
+> **Status:** Planning complete. Implementation has not started.  
+> **Issues:** [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) (Tier 0–3)  
+> **Decisions (living):** [DECISIONS.md](./DECISIONS.md) — update whenever we lock or reverse a choice  
+> **Linear:** [project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) · [backlog doc](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) · [decision log mirror](https://linear.app/orbit-linear/document/decision-log-living-950e21cfce96)
 
 ## What this ships
 
@@ -76,12 +79,41 @@ Feature and UX/UI work stay on **separate** branches. One PR per issue where pra
 | [#15](https://github.com/chikoshire/remote-org-chart/issues/15) | `ui/responsive-interaction` |
 | [#16](https://github.com/chikoshire/remote-org-chart/issues/16) | `ui/motion-polish` |
 
+### Stretch — Tier 1 (wow UX, no DB)
+
+| Issue | Branch |
+|-------|--------|
+| [#17](https://github.com/chikoshire/remote-org-chart/issues/17) | `feat/org-insights` |
+| [#18](https://github.com/chikoshire/remote-org-chart/issues/18) | `feat/person-detail-drawer` |
+| [#19](https://github.com/chikoshire/remote-org-chart/issues/19) | `feat/org-filters` |
+| [#20](https://github.com/chikoshire/remote-org-chart/issues/20) | `feat/deep-links` |
+| [#21](https://github.com/chikoshire/remote-org-chart/issues/21) | `feat/collapse-density` |
+| [#22](https://github.com/chikoshire/remote-org-chart/issues/22) | `feat/export-keyboard` |
+| [#23](https://github.com/chikoshire/remote-org-chart/issues/23) | `feat/reporting-distance` |
+
+### Stretch — Tier 2 (Cloudflare KV/D1)
+
+| Issue | Branch |
+|-------|--------|
+| [#24](https://github.com/chikoshire/remote-org-chart/issues/24) | `feat/employment-snapshot-cache` |
+| [#25](https://github.com/chikoshire/remote-org-chart/issues/25) | `feat/manual-remote-refresh` |
+| [#26](https://github.com/chikoshire/remote-org-chart/issues/26) | `feat/sync-run-log` |
+
+### Stretch — Tier 3 (webhooks / live; Supabase only if we commit)
+
+| Issue | Branch |
+|-------|--------|
+| [#27](https://github.com/chikoshire/remote-org-chart/issues/27) | `feat/remote-webhooks` |
+| [#28](https://github.com/chikoshire/remote-org-chart/issues/28) | `feat/live-org-updates` |
+| [#29](https://github.com/chikoshire/remote-org-chart/issues/29) | `feat/event-history-ui` |
+
 ## Tracking
 
 | Surface | Purpose |
 |---------|---------|
-| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | **Executable backlog** (16 issues + comments) |
-| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project + [backlog document](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) (issue create blocked by free-tier limit) |
+| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | **Executable backlog** (#1–#29 + comments) |
+| [DECISIONS.md](./DECISIONS.md) | Living “why we chose X” log (update as we go) |
+| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project + [backlog](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) + [decision mirror](https://linear.app/orbit-linear/document/decision-log-living-950e21cfce96) (issue create blocked by free-tier limit) |
 | Orbit Kanban | Day-to-day board — **pending** Orbit Main JWT refresh |
 
 Comments are written in first person as project notes — no tooling slash-commands or agent branding.
