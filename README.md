@@ -29,7 +29,11 @@ The brief lists **Vercel** in a *suggested* stack — it is **not** a hard requi
 
 ### Supabase
 
-**Optional, not required.** Remote remains the source of truth for employments. We only add a free Supabase project if we invent a real need (e.g. lightweight deploy metadata, optional response cache). Default plan: no Supabase.
+**Default: off.** Remote is the source of truth for employments.
+
+Use a free Supabase project only if we commit to **webhook ingest + queryable event/sync history + Realtime fanout**. For a simple employment snapshot/cache, prefer **Cloudflare KV or D1** (same vendor as hosting).
+
+See the planning canvas “Brief + wow” tiers for the full stretch list.
 
 ## Environment
 
