@@ -2,10 +2,10 @@
 
 Headless HRIS org chart against the **Remote sandbox** REST API. Built as an interview assessment deliverable: interactive reporting hierarchy, edge-case UI, public deploy, and clear documentation.
 
-> **Status:** Planning complete. Implementation has not started.  
-> **Issues:** [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) (Tier 0–3)  
+> **Status:** Building — **GH#1–#2** In Review; next **GH#3** (branch `feat/remote-api-proxy`).  
+> **Issues:** [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) · [ISSUES.md](./ISSUES.md) serial build order  
 > **Decisions (living):** [DECISIONS.md](./DECISIONS.md) — update whenever we lock or reverse a choice  
-> **Linear:** [project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) · [backlog doc](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) · [decision log mirror](https://linear.app/orbit-linear/document/decision-log-living-950e21cfce96)
+> **Linear:** [project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) · search `GH#N`
 
 ## What this ships
 

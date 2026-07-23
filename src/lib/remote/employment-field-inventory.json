@@ -1,0 +1,36 @@
+{
+  "source": "GET /v1/employments sandbox sample (keys only, no PII values)",
+  "list_employment_keys": [
+    "country",
+    "department",
+    "department_id",
+    "employment_lifecycle_stage",
+    "employment_model",
+    "external_id",
+    "full_name",
+    "id",
+    "job_title",
+    "login_email",
+    "personal_email",
+    "short_id",
+    "status",
+    "type",
+    "work_address_details",
+    "work_email"
+  ],
+  "list_omits_manager_fields": true,
+  "detail_manager_keys": [
+    "manager",
+    "manager_email",
+    "manager_employment_id",
+    "manager_id"
+  ],
+  "paging": {
+    "data.total_count": "number",
+    "data.current_page": "number",
+    "data.total_pages": "number",
+    "data.employments": "array"
+  },
+  "status_policy": "Default org-chart fetch uses active_only (active|hired|employed). Pass statusPolicy=all to include every status.",
+  "implication": "Hierarchy requires per-id GET /v1/employments/:id enrichment for manager_employment_id."
+}
