@@ -47,20 +47,39 @@ Token is a **read-only** customer API token from Company settings → Integratio
 
 Feature and UX/UI work stay on **separate** branches. One PR per issue where practical.
 
-See **GitHub Issues** / Linear for the full list. High-level lanes:
+### Feature / ship (`feat/*`, `chore/*`, `docs/*`)
 
-- `feat/*` — data, API, hierarchy, chart behavior, deploy
-- `ui/*` — Norma tokens, chrome, node design, states, motion
-- `docs/*` — README / handoff polish
-- `chore/*` — scaffolding and tooling
+| Issue | Branch |
+|-------|--------|
+| [#1](https://github.com/chikoshire/remote-org-chart/issues/1) | `chore/scaffold-next-app` |
+| [#2](https://github.com/chikoshire/remote-org-chart/issues/2) | `feat/remote-api-proxy` |
+| [#3](https://github.com/chikoshire/remote-org-chart/issues/3) | `feat/employments-client` |
+| [#4](https://github.com/chikoshire/remote-org-chart/issues/4) | `feat/org-hierarchy` |
+| [#5](https://github.com/chikoshire/remote-org-chart/issues/5) | `feat/org-chart-react-flow` |
+| [#6](https://github.com/chikoshire/remote-org-chart/issues/6) | `feat/edge-case-handling` |
+| [#7](https://github.com/chikoshire/remote-org-chart/issues/7) | `feat/search-and-focus` |
+| [#8](https://github.com/chikoshire/remote-org-chart/issues/8) | `feat/deploy-vercel` |
+| [#9](https://github.com/chikoshire/remote-org-chart/issues/9) | `docs/readme-and-handoff` |
+
+### UX / UI (`ui/*`) — separate from feature work
+
+| Issue | Branch |
+|-------|--------|
+| [#10](https://github.com/chikoshire/remote-org-chart/issues/10) | `ui/norma-design-tokens` |
+| [#11](https://github.com/chikoshire/remote-org-chart/issues/11) | `ui/app-chrome` |
+| [#12](https://github.com/chikoshire/remote-org-chart/issues/12) | `ui/person-node` |
+| [#13](https://github.com/chikoshire/remote-org-chart/issues/13) | `ui/reporting-edges` |
+| [#14](https://github.com/chikoshire/remote-org-chart/issues/14) | `ui/state-surfaces` |
+| [#15](https://github.com/chikoshire/remote-org-chart/issues/15) | `ui/responsive-interaction` |
+| [#16](https://github.com/chikoshire/remote-org-chart/issues/16) | `ui/motion-polish` |
 
 ## Tracking
 
 | Surface | Purpose |
 |---------|---------|
-| Linear (`TUXX` / Remote Org Chart Assessment) | Source of truth for issue detail |
-| Orbit Kanban | Day-to-day board |
-| GitHub Issues + PR comments | Visible history on the public repo |
+| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | **Executable backlog** (16 issues + comments) |
+| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project + [backlog document](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) (issue create blocked by free-tier limit) |
+| Orbit Kanban | Day-to-day board — **pending** Orbit Main JWT refresh |
 
 Comments are written in first person as project notes — no tooling slash-commands or agent branding.
 
