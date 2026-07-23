@@ -196,6 +196,27 @@ Linear quota restored or Orbit session healthy — then mirror issue IDs into th
 
 ---
 
+## 2026-07-23 — Git identity: personal GitHub author only
+
+**Status:** Accepted  
+
+**Context:**  
+Early commits on `main` were authored as “Night Shift Agent” (`nightshift@openclaw.ai`) and included a `Co-authored-by: Cursor <cursoragent@cursor.com>` trailer. That surfaced on the GitHub repo as agent activity, which we do not want for this assessment.
+
+**Decision:**  
+- Rewrite existing `main` history so every commit is **Chiko Shire** `<97911688+chikoshire@users.noreply.github.com>`, with Cursor co-author trailers removed.  
+- Future commits in this repo must use that same author/committer identity (via per-command env overrides if the machine gitconfig still points at an agent).  
+- Do not add `Co-authored-by: Cursor` (or similar agent trailers) to commit messages.
+
+**Consequences:**  
+History was force-pushed once to correct attribution. Machine-level `~/.gitconfig` may still name an agent — fix that locally so everyday `git commit` stays clean without overrides.
+
+**Revisit when:**  
+Never for agent branding; only if the GitHub noreply address should be replaced with a verified personal email.
+
+---
+
 ## Template for future entries
+
 
 Copy from the top of this file. Keep tone first-person / team voice. No tooling slash-commands. Link related issues and PRs.
