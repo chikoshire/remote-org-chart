@@ -21,16 +21,15 @@ Headless HRIS org chart against the **Remote sandbox** REST API. Built as an int
 | **React Flow + Dagre** | Interactive pan/zoom tree with automatic hierarchical layout — standard for org charts |
 | **Zod** | Runtime validation of Remote responses so UI never trusts raw JSON |
 | **Vitest** | Unit-test hierarchy builder (cycles, orphans, missing fields) without a browser |
-| **Vercel** | Brief-aligned public host; env secrets for `REMOTE_API_*` |
+| **Cloudflare (Pages / Workers via Wrangler)** | **Chosen public host** — secrets for `REMOTE_API_*`; preferred over Vercel |
 
-### Explicit non-goals for v1
+### Hosting note
 
-| Skipped | Why |
-|---------|-----|
-| **Cloudflare / Wrangler** | Hosting is covered by Vercel; no Workers-specific edge logic required |
-| **Supabase** | Remote is the source of truth; no app DB, auth, or cache needed for the assessment |
+The brief lists **Vercel** in a *suggested* stack — it is **not** a hard requirement. Public deploy is the requirement; the platform is ours to choose. We are using **Cloudflare + Wrangler**.
 
-Revisit only if we later need audit logging, multi-user auth, or cached snapshots.
+### Supabase
+
+**Optional, not required.** Remote remains the source of truth for employments. We only add a free Supabase project if we invent a real need (e.g. lightweight deploy metadata, optional response cache). Default plan: no Supabase.
 
 ## Environment
 
@@ -58,7 +57,7 @@ Feature and UX/UI work stay on **separate** branches. One PR per issue where pra
 | [#5](https://github.com/chikoshire/remote-org-chart/issues/5) | `feat/org-chart-react-flow` |
 | [#6](https://github.com/chikoshire/remote-org-chart/issues/6) | `feat/edge-case-handling` |
 | [#7](https://github.com/chikoshire/remote-org-chart/issues/7) | `feat/search-and-focus` |
-| [#8](https://github.com/chikoshire/remote-org-chart/issues/8) | `feat/deploy-vercel` |
+| [#8](https://github.com/chikoshire/remote-org-chart/issues/8) | `feat/deploy-cloudflare` |
 | [#9](https://github.com/chikoshire/remote-org-chart/issues/9) | `docs/readme-and-handoff` |
 
 ### UX / UI (`ui/*`) — separate from feature work
