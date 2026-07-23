@@ -180,19 +180,22 @@ Time pressure forces cutting Tier 1 items — cut Tier 3 first, then lowest-ROI 
 
 ## 2026-07-23 — Tracking surfaces
 
-**Status:** Accepted  
+**Status:** Accepted (updated)  
 
 **Context:**  
-Want Linear + Orbit + GitHub visibility. Linear free-tier issue create is currently blocked; Orbit MCP JWT expired pending Orbit Main refresh.
+Want Linear + Orbit + GitHub visibility. Linear quota was restored; Orbit JWT refreshes via Orbit Main `/mcp/session`. Day-to-day preference is **Linear** as the board of record.
 
 **Decision:**  
-**GitHub Issues** are the executable backlog. Linear holds the project + backlog/decision documents. Orbit Kanban mirrors when auth works. This `DECISIONS.md` is the durable “why” log in-repo.
+- **Canonical work ID = GitHub `#N` (`GH#N`)** — titles on Linear/Orbit include `· GH#N` so search matches across tools.  
+- Linear/Orbit auto-IDs (`TUXX-…`, `TUX-…`) will **never** numerically equal `1…32`; do not expect that.  
+- Sub-work lives as **Linear children** (`[sub · GH#N] Layer — …`); GitHub + Orbit parents get checklist comments.  
+- Living map: [`ISSUES.md`](./ISSUES.md). This `DECISIONS.md` remains the durable “why” log.
 
 **Consequences:**  
-Interviewers can read rationale on GitHub even if Linear/Orbit are messy.
+Cross-tool sync is by `GH#N` string, not by matching integers. Interviewers can still follow GitHub; you can drive status from Linear.
 
 **Revisit when:**  
-Linear quota restored or Orbit session healthy — then mirror issue IDs into this section.
+Only if we adopt a formal Linear↔GitHub sync product that remaps IDs.
 
 ---
 
