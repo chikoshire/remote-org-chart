@@ -648,6 +648,21 @@ Add an **Incomplete only** filter (+ badge on cards) on People, deep-linked from
 
 ---
 
+## 2026-07-24 — Skeleton loaders + empty illustration
+
+**Status:** Accepted  
+
+**Context:**  
+Full-page spinners felt abrupt; empty states used a bare “∅” glyph.
+
+**Decision:**  
+Replace loading with pulsed org-card skeletons; empty uses a light SVG tree illustration. Error stays alert-styled.
+
+**Consequences:**  
+- Loading reads as “structure incoming,” not a stalled spinner.
+
+---
+
 ## Template for future entries
 
 
