@@ -633,6 +633,21 @@ On People, use a **docked** rail (`placement="dock"`) that shares horizontal spa
 
 ---
 
+## 2026-07-24 — Incomplete profile filter on People
+
+**Status:** Accepted  
+
+**Context:**  
+Many sandbox people lack title/department/country; Data Health listed them but the directory didn’t surface incompleteness.
+
+**Decision:**  
+Add an **Incomplete only** filter (+ badge on cards) on People, deep-linked from Dashboard via `?incomplete=1`. Keep Data Health for cycles/missing managers.
+
+**Consequences:**  
+- Interviewers can jump from completeness score → filtered People list.
+
+---
+
 ## Template for future entries
 
 
