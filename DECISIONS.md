@@ -803,7 +803,7 @@ Accessibility review wants even stronger contrast, or interviewers prefer photog
 
 ## 2026-07-24 — Morph partners, profile return, department avatar legend
 
-**Status:** Accepted  
+**Status:** Superseded (legend placement)  
 
 **Context:**  
 Full profile always linked “← People” even when opened from the org chart. Shared-element morph (#70) existed on drawer shells but not avatar→profile. Initials already used `departmentAccent`, but there was no key explaining the colours.
@@ -819,6 +819,27 @@ Full profile always linked “← People” even when opened from the org chart.
 
 **Revisit when:**  
 Safari/Firefox VT support matures or we add a fallback FLIP morph.
+
+---
+
+## 2026-07-24 — Department colours live in the filter (not a side legend)
+
+**Status:** Accepted (supersedes always-visible DepartmentColorLegend)  
+
+**Context:**  
+The People/chart colour key sat on the left, was always visible, and “+N more” did nothing. Users want colours as part of filtering, not a decorative strip.
+
+**Decision:**  
+1. Remove the always-on `DepartmentColorLegend`.  
+2. Replace native Department `<select>` with `DepartmentFilterSelect` — closed by default; opening the menu shows every department with its avatar swatch and applies the filter.  
+3. Widen the pastel palette so neighbouring teams collide less often.
+
+**Consequences:**  
+- Colour meaning is discovered when filtering (and on avatars), not via a permanent key.  
+- Native select accessibility is replaced by a listbox button pattern.
+
+**Revisit when:**  
+We need multi-select department filters.
 
 ---
 

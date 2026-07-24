@@ -2,6 +2,7 @@
 
 import type { OrgFilters } from "@/lib/org/filters";
 import { filtersAreActive } from "@/lib/org/filters";
+import { DepartmentFilterSelect } from "@/components/org/DepartmentFilterSelect";
 
 type OrgFiltersBarProps = {
   filters: OrgFilters;
@@ -43,26 +44,12 @@ export function OrgFiltersBar({
           </button>
         ) : null}
       </div>
-      <label className="flex flex-col gap-0.5 text-[11px] text-norma-ink-muted">
-        Department
-        <select
-          className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1.5 text-sm text-norma-prussian"
-          value={filters.department ?? ""}
-          onChange={(e) =>
-            onChange({
-              ...filters,
-              department: e.target.value || null,
-            })
-          }
-        >
-          <option value="">All departments</option>
-          {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
-            </option>
-          ))}
-        </select>
-      </label>
+      <DepartmentFilterSelect
+        size="sm"
+        departments={departments}
+        value={filters.department}
+        onChange={(department) => onChange({ ...filters, department })}
+      />
       <label className="flex flex-col gap-0.5 text-[11px] text-norma-ink-muted">
         Country
         <select
