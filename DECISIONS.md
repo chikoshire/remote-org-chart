@@ -584,6 +584,22 @@ The Departments layout under People still felt like a thin catalog (sidebar + ca
 
 ---
 
+## 2026-07-24 — Map display landmasses (no overseas surprises)
+
+**Status:** Accepted  
+
+**Context:**  
+Natural Earth / world-atlas country MultiPolygons include overseas territories. Selecting France also highlighted French Guiana in South America — correct ISO membership, confusing for an org location map.
+
+**Decision:**  
+For map fills, keep only landmass polygons within ~5200km of the country’s largest polygon centroid. That drops far overseas fragments while keeping nearby large regions (e.g. Alaska with the US). Pins still use our mainland-ish centroids.
+
+**Consequences:**  
+- Clicking France highlights metropolitan France only.  
+- Tiny distant territories are not click targets.
+
+---
+
 ## Template for future entries
 
 
