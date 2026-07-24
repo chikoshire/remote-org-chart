@@ -56,15 +56,6 @@ export type FetchEmploymentsOptions = {
   fanOut?: EnrichFanOut;
 };
 
-function isCloudflareRuntime(): boolean {
-  try {
-    getCloudflareContext();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 const ACTIVE_STATUSES = new Set(["active", "hired", "employed"]);
 
 function isActiveStatus(status: string | null | undefined): boolean {
@@ -192,7 +183,7 @@ export async function enrichEmploymentsViaFanOut(
       };
 
       const response = self
-        ? await self.fetch(new Request(bindingEndpoint, init))
+        ? await self.fetch(bindingEndpoint, init)
         : await fetch(publicEndpoint, init);
 
       const text = await response.text();
@@ -235,7 +226,13 @@ export async function fetchEmploymentsForOrgChart(
   const concurrency =
     options.detailConcurrency ?? ENRICH_DETAIL_CONCURRENCY;
 
-  if (options.fanOut && isCloudflareRuntime()) {
+  // Fan-out needs a real Worker self binding. Local `next dev` may expose a
+  // stub WORKER_SELF whose fetch cannot parse Request URLs — stay in-process.
+  if (
+    options.fanOut &&
+    process.env.NODE_ENV === "production" &&
+    getWorkerSelfBinding()
+  ) {
     return enrichEmploymentsViaFanOut(list, options.fanOut);
   }
 

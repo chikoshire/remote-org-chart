@@ -294,10 +294,16 @@ test.describe("org chart smoke", () => {
       }),
     ).toHaveCount(0);
 
-    await directory.getByRole("button", { name: "Open profile" }).click();
+    await directory
+      .getByRole("button", { name: /Jordan Report/i })
+      .first()
+      .click();
     await expect(page.getByRole("dialog", { name: "Jordan Report" })).toBeVisible();
     await expect(
       page.locator('[data-morph-person="emp_report"].bloom-enter'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Open full profile" }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Close person details" }).click();

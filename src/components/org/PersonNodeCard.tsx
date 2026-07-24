@@ -1,4 +1,3 @@
-import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { isIncompletePerson } from "@/lib/org/data-health";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
@@ -26,11 +25,11 @@ export type PersonNodeData = {
 
 const variantClass: Record<PersonNodeVariant, string> = {
   default:
-    "border-norma-border/90 bg-white shadow-norma-sm hover:border-[#2a9d8f]/55 hover:shadow-norma-md",
+    "border-norma-border/90 bg-norma-surface shadow-norma-sm hover:border-[#2a9d8f]/55 hover:shadow-norma-md",
   selected:
-    "border-norma-royal bg-white shadow-norma-md ring-2 ring-norma-royal/30",
-  path: "border-[#2a9d8f]/80 bg-[#f0faf8] shadow-norma-sm",
-  root: "border-[#e85d04]/70 bg-white shadow-norma-md ring-1 ring-[#e85d04]/20",
+    "border-norma-royal bg-norma-surface shadow-norma-md ring-2 ring-norma-royal/30",
+  path: "border-[#2a9d8f]/80 bg-norma-highlight-soft/40 shadow-norma-sm",
+  root: "border-[#e85d04]/70 bg-norma-surface shadow-norma-md ring-1 ring-[#e85d04]/20",
 };
 
 export function PersonNodeCard({
@@ -52,9 +51,7 @@ export function PersonNodeCard({
 }: PersonNodeData) {
   const name = fullName?.trim() || "Unknown person";
   const compact = density === "compact";
-  const isRoot = variant === "root";
   const countryLabel = formatCountryLabel(country);
-  const accent = departmentAccent(department);
   const incomplete =
     incompleteFields ??
     isIncompletePerson({
@@ -96,19 +93,7 @@ export function PersonNodeCard({
       data-manager-missing={managerMissing ? "true" : "false"}
       data-incomplete={incomplete ? "true" : "false"}
     >
-      <span
-        aria-hidden
-        className="absolute inset-y-0 left-0 w-1.5"
-        style={{
-          backgroundColor:
-            isRoot || variant === "selected"
-              ? "var(--norma-royal)"
-              : variant === "path"
-                ? "#2a9d8f"
-                : accent,
-        }}
-      />
-      <div className={`flex items-start gap-3 ${compact ? "pl-1" : "pl-1.5"}`}>
+      <div className="flex items-start gap-3">
         <PersonAvatar
           personId={id || fullName || "person"}
           fullName={fullName}
@@ -119,7 +104,7 @@ export function PersonNodeCard({
         />
         <div className="min-w-0 flex-1">
           <h3
-            className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-prussian ${
+            className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-ink ${
               compact ? "text-xs" : "text-[15px] leading-snug"
             }`}
           >
@@ -135,12 +120,7 @@ export function PersonNodeCard({
           {!compact ? (
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               {department?.trim() ? (
-                <span
-                  className="max-w-full truncate rounded-norma-sm px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian"
-                  style={{
-                    backgroundColor: `color-mix(in srgb, ${accent} 16%, white)`,
-                  }}
-                >
+                <span className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink">
                   {department.trim()}
                 </span>
               ) : (
@@ -163,11 +143,11 @@ export function PersonNodeCard({
       </div>
       <div
         className={`mt-3 flex items-center justify-between gap-2 border-t border-norma-border/60 ${
-          compact ? "pt-2 pl-1" : "pt-2.5 pl-1.5"
+          compact ? "pt-2" : "pt-2.5"
         }`}
       >
         <span
-          className={`inline-flex items-center rounded-norma-sm font-semibold text-norma-prussian ${
+          className={`inline-flex items-center rounded-norma-sm font-semibold text-norma-ink ${
             compact
               ? "bg-norma-surface-muted px-1.5 py-0.5 text-[10px]"
               : "bg-norma-surface-muted px-2 py-0.5 text-[11px]"
@@ -188,7 +168,7 @@ export function PersonNodeCard({
             </span>
           ) : null}
           {managerMissing ? (
-            <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
+            <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-100">
               Unlinked
             </span>
           ) : null}
@@ -200,7 +180,7 @@ export function PersonNodeCard({
           {directReports > 0 && onToggleCollapse ? (
             <button
               type="button"
-              className="nodrag nopan rounded-norma-sm border border-norma-border bg-white px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian hover:border-norma-royal"
+              className="nodrag nopan rounded-norma-sm border border-norma-border bg-norma-surface px-1.5 py-0.5 text-[10px] font-medium text-norma-ink hover:border-norma-royal"
               aria-expanded={!collapsed}
               aria-label={
                 collapsed

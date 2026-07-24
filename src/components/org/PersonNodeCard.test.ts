@@ -14,7 +14,7 @@ describe("PersonNodeCard", () => {
     expect(card).toContain('"path"');
     expect(card).toContain('"root"');
     expect(card).toContain("norma-royal");
-    expect(card).toContain("norma-prussian");
+    expect(card).toContain("text-norma-ink");
     expect(card).toContain("#2a9d8f");
   });
 
@@ -27,8 +27,9 @@ describe("PersonNodeCard", () => {
     expect(card).toContain("Profile");
   });
 
-  it("uses department accents and taller comfortable cards", () => {
-    expect(card).toContain("departmentAccent");
+  it("uses taller comfortable cards without left color chips", () => {
+    expect(card).not.toContain("departmentAccent");
+    expect(card).not.toContain("inset-y-0 left-0 w-1");
     expect(card).toContain("w-[260px]");
     expect(card).toContain("reports");
     expect(card).toContain("PersonAvatar");

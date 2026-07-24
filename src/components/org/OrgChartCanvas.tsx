@@ -33,7 +33,6 @@ import {
 import {
   applyCollapseToForest,
   readStoredDensity,
-  writeStoredDensity,
   type ChartDensity,
 } from "@/lib/org/collapse";
 import {
@@ -70,8 +69,10 @@ import {
 } from "@/lib/org/deep-links";
 import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
 import {
+  PREFS_CHANGED_EVENT,
   readLiveDefault,
   readSidePanelOpen,
+  writeDensityPref,
   writeLiveDefault,
   writeSidePanelOpen,
 } from "@/lib/ui/prefs";
@@ -305,7 +306,14 @@ function OrgChartInner() {
   >([]);
 
   useEffect(() => {
-    setDensity(readStoredDensity());
+    const syncPrefs = () => {
+      setDensity(readStoredDensity());
+      setLiveUpdates(readLiveDefault());
+      setSidePanelOpen(readSidePanelOpen());
+    };
+    syncPrefs();
+    window.addEventListener(PREFS_CHANGED_EVENT, syncPrefs);
+    return () => window.removeEventListener(PREFS_CHANGED_EVENT, syncPrefs);
   }, []);
 
   const toggleCollapse = useCallback((id: string) => {
@@ -345,7 +353,7 @@ function OrgChartInner() {
 
   const setDensityPreference = useCallback((next: ChartDensity) => {
     setDensity(next);
-    writeStoredDensity(next);
+    writeDensityPref(next);
   }, []);
 
   const load = useCallback(async (opts?: { refresh?: boolean; silent?: boolean }) => {

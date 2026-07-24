@@ -40,7 +40,8 @@ export default function SettingsPage() {
     setLiveDefault(prefs.liveDefault);
     setTheme(prefs.theme);
     setConnected(readRemoteConnected());
-    applyThemeClass(prefs.theme);  }, []);
+    applyThemeClass(prefs.theme);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,7 +99,7 @@ export default function SettingsPage() {
           <section className="mt-6 rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-sm font-semibold text-norma-prussian">
+                <h2 className="text-sm font-semibold text-norma-ink">
                   Integrations
                 </h2>
                 <p className="mt-0.5 text-xs text-norma-ink-muted">
@@ -107,13 +108,13 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-white to-norma-surface-muted/60 px-4 py-4">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-norma-surface to-norma-surface-muted/60 px-4 py-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-norma-md bg-norma-prussian text-[11px] font-bold tracking-wide text-white">
                   R
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-norma-prussian">
+                  <p className="text-sm font-semibold text-norma-ink">
                     Remote
                   </p>
                   <p className="text-xs text-norma-ink-muted">
@@ -125,7 +126,7 @@ export default function SettingsPage() {
                     liveConnected
                       ? "bg-norma-success-soft text-norma-success"
                       : connected
-                        ? "bg-amber-100 text-amber-900"
+                        ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-100"
                         : "bg-norma-surface-muted text-norma-ink-muted"
                   }`}
                 >
@@ -140,7 +141,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={disconnect}
-                  className="rounded-norma-sm border border-norma-border bg-white px-4 py-2 text-sm font-medium text-norma-prussian hover:border-norma-danger hover:text-norma-danger"
+                  className="rounded-norma-sm border border-norma-border bg-norma-surface px-4 py-2 text-sm font-medium text-norma-ink hover:border-norma-danger hover:text-norma-danger"
                 >
                   Disconnect
                 </button>
@@ -156,7 +157,8 @@ export default function SettingsPage() {
             </div>
             <p className="mt-3 text-xs text-norma-ink-muted">
               Disconnect pauses org data in this browser. Credentials stay on the
-              server.
+              server. This is not a Remote OAuth login — the company token is
+              already configured server-side.
             </p>
             {wizardOpen && !connected ? (
               <RemoteConnectWizard
@@ -169,7 +171,7 @@ export default function SettingsPage() {
 
           <section className="mt-5 space-y-5 rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
             <div>
-              <h2 className="text-sm font-semibold text-norma-prussian">
+              <h2 className="text-sm font-semibold text-norma-ink">
                 Chart preferences
               </h2>
               <p className="mt-0.5 text-xs text-norma-ink-muted">
@@ -192,9 +194,12 @@ export default function SettingsPage() {
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     density === "comfortable"
                       ? "bg-[#e85d04] text-white shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
+                      : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
-                  onClick={() => setDensity("comfortable")}
+                  onClick={() => {
+                    setDensity("comfortable");
+                    writeDensityPref("comfortable");
+                  }}
                 >
                   Comfortable
                 </button>
@@ -204,9 +209,12 @@ export default function SettingsPage() {
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     density === "compact"
                       ? "bg-[#e85d04] text-white shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
+                      : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
-                  onClick={() => setDensity("compact")}
+                  onClick={() => {
+                    setDensity("compact");
+                    writeDensityPref("compact");
+                  }}
                 >
                   Compact
                 </button>
@@ -228,10 +236,11 @@ export default function SettingsPage() {
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     theme === "light"
                       ? "bg-[#e85d04] text-white shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
+                      : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
                     setTheme("light");
+                    writeThemePref("light");
                     applyThemeClass("light");
                   }}
                 >
@@ -243,10 +252,11 @@ export default function SettingsPage() {
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     theme === "dark"
                       ? "bg-[#e85d04] text-white shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
+                      : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
                     setTheme("dark");
+                    writeThemePref("dark");
                     applyThemeClass("dark");
                   }}
                 >
@@ -255,12 +265,15 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <label className="flex items-start gap-2.5 text-sm text-norma-prussian">
+            <label className="flex items-start gap-2.5 text-sm text-norma-ink">
               <input
                 type="checkbox"
                 className="mt-0.5"
                 checked={liveDefault}
-                onChange={(e) => setLiveDefault(e.target.checked)}
+                onChange={(e) => {
+                  setLiveDefault(e.target.checked);
+                  writeLiveDefault(e.target.checked);
+                }}
               />
               <span>
                 Auto-refresh when Remote sends updates
