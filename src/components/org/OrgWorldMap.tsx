@@ -14,6 +14,10 @@ import { countryCentroid } from "@/lib/geo/country-centroids";
 import { alphaToNumericId, normalizeNumericId } from "@/lib/geo/iso-numeric";
 import { worldCountries, worldLand } from "@/lib/geo/world-features";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import {
+  departmentAccent,
+  departmentAccentsForPeople,
+} from "@/lib/ui/department-accent";
 
 export type MapPerson = {
   id: string;
@@ -157,6 +161,25 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
 
   const active = activeCode ? (clustersByCode.get(activeCode) ?? null) : null;
   const activeNumeric = active?.numericId ?? null;
+  const activeDeptColors = useMemo(() => {
+    if (!activeCode) return [];
+    const cluster = clustersByCode.get(activeCode);
+    return cluster ? departmentAccentsForPeople(cluster.people) : [];
+  }, [activeCode, clustersByCode]);
+  const activeGradientId =
+    activeCode && activeDeptColors.length > 0
+      ? `map-dept-grad-${activeCode}`
+      : null;
+  const activeBounds = useMemo(() => {
+    if (!activeNumeric) return null;
+    const feature = worldCountries.find((country) => {
+      const nid = normalizeNumericId(country.id ?? country.properties.id);
+      return nid != null && nid === activeNumeric;
+    });
+    if (!feature) return null;
+    const [[x0, y0], [x1, y1]] = path.bounds(feature);
+    return { x0, y0, x1, y1 };
+  }, [activeNumeric, path]);
   const zoomLevel = MAP_WIDTH / view.w;
   const screenScale = 1 / zoomLevel;
 
@@ -336,6 +359,29 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   floodOpacity="0.12"
                 />
               </filter>
+              {activeGradientId && activeBounds ? (
+                <linearGradient
+                  id={activeGradientId}
+                  gradientUnits="userSpaceOnUse"
+                  x1={activeBounds.x0}
+                  y1={activeBounds.y0}
+                  x2={activeBounds.x1}
+                  y2={activeBounds.y1}
+                >
+                  {activeDeptColors.map((color, index) => {
+                    const last = activeDeptColors.length - 1;
+                    const offset =
+                      last === 0 ? 50 : Math.round((index / last) * 100);
+                    return (
+                      <stop
+                        key={`${color}-${index}`}
+                        offset={`${offset}%`}
+                        stopColor={color}
+                      />
+                    );
+                  })}
+                </linearGradient>
+              ) : null}
             </defs>
 
             <path d={spherePath} fill="url(#oceanFill)" />
@@ -361,11 +407,18 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
               const cluster = code ? clustersByCode.get(code) : undefined;
               const hasPeople = Boolean(cluster);
               const isActive = numericId != null && numericId === activeNumeric;
-              const selectedHere = cluster?.people.some(
-                (p) => p.id === selectedId,
-              );
               const d = path(country) ?? "";
               if (!d) return null;
+
+              const activeFill =
+                isActive && activeGradientId
+                  ? `url(#${activeGradientId})`
+                  : isActive
+                    ? departmentAccent(
+                        cluster?.people.find((p) => p.department?.trim())
+                          ?.department,
+                      )
+                    : null;
 
               return (
                 <path
@@ -374,24 +427,21 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   data-map-interactive={hasPeople ? "true" : undefined}
                   d={d}
                   fill={
-                    isActive || selectedHere
-                      ? "#6aae96"
-                      : hasPeople
-                        ? "#121212"
-                        : "#d7e4d2"
+                    activeFill ??
+                    (hasPeople
+                      ? "#121212"
+                      : "#d7e4d2")
                   }
-                  fillOpacity={
-                    isActive || selectedHere ? 0.92 : hasPeople ? 0.82 : 1
-                  }
+                  fillOpacity={isActive ? 0.95 : hasPeople ? 0.82 : 1}
                   stroke={
-                    isActive || selectedHere
+                    isActive
                       ? "#121212"
                       : hasPeople
                         ? "#75E8F0"
                         : "#7a9578"
                   }
                   strokeWidth={
-                    (isActive || selectedHere ? 1.6 : hasPeople ? 1 : 0.5) /
+                    (isActive ? 1.6 : hasPeople ? 1 : 0.5) /
                     Math.sqrt(zoomLevel)
                   }
                   className={

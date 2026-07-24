@@ -33,5 +33,22 @@ export function departmentAccent(department: string | null | undefined): string 
   return PASTELS[hashString(key.toLocaleLowerCase()) % PASTELS.length]!;
 }
 
+/** Unique department accent colours for a set of people (stable name order). */
+export function departmentAccentsForPeople(
+  people: Array<{ department?: string | null }>,
+): string[] {
+  const byKey = new Map<string, { label: string; color: string }>();
+  for (const person of people) {
+    const label = person.department?.trim();
+    if (!label) continue;
+    const key = label.toLocaleLowerCase();
+    if (byKey.has(key)) continue;
+    byKey.set(key, { label, color: departmentAccent(label) });
+  }
+  return [...byKey.values()]
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .map((entry) => entry.color);
+}
+
 /** Chart bar / progress accent — single quiet black, not a rainbow. */
 export const CHART_BAR_ACCENT = "#121212";

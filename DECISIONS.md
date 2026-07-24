@@ -843,6 +843,25 @@ We need multi-select department filters.
 
 ---
 
+## 2026-07-24 — Map selection fill is a department-colour mix
+
+**Status:** Accepted  
+
+**Context:**  
+Clicked countries used a flat mint fill. The map should reflect which departments sit in that country, but only when the country is selected.
+
+**Decision:**  
+On country click, fill with an SVG gradient of unique `departmentAccent` colours for people in that country. Unselected countries keep the neutral charcoal / land treatment — no department tint until clicked.
+
+**Consequences:**  
+- Single-department countries show a solid-ish pastel; multi-department countries blend.  
+- Closing the country panel clears the gradient fill.
+
+**Revisit when:**  
+We want proportional stop weights by headcount instead of equal spacing.
+
+---
+
 ## Template for future entries
 
 
