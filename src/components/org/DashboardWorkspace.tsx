@@ -220,21 +220,21 @@ export function DashboardWorkspace() {
       items.push({
         label: "Manager missing",
         count: insights.managerMissingCount,
-        href: "/app/data-health",
+        href: "/settings/data-health",
       });
     }
     if (insights.incompleteCount > 0) {
       items.push({
         label: "Incomplete profiles",
         count: insights.incompleteCount,
-        href: "/app/data-health",
+        href: "/settings/data-health",
       });
     }
     if (insights.cycleMemberCount > 0) {
       items.push({
         label: "Reporting cycle",
         count: insights.cycleMemberCount,
-        href: "/app/data-health",
+        href: "/settings/data-health",
       });
     }
     if (insights.rootCount > 1) {
@@ -296,7 +296,7 @@ export function DashboardWorkspace() {
               { href: "/app", label: "Org Chart" },
               { href: "/app/people", label: "People" },
               { href: "/app/departments", label: "Departments" },
-              { href: "/app/data-health", label: "Data Health" },
+              { href: "/settings/data-health", label: "Data Health" },
             ].map((link) => (
               <Link
                 key={link.href}
@@ -347,7 +347,7 @@ export function DashboardWorkspace() {
             label="Data completeness"
             value={`${insights.completenessScore}%`}
             hint="Share of people with title, department, and country"
-            href="/app/data-health"
+            href="/settings/data-health"
             hrefLabel="Fix incomplete profiles"
             onNavigate={navigate}
           />
@@ -370,7 +370,7 @@ export function DashboardWorkspace() {
             label="Manager missing"
             value={String(insights.managerMissingCount)}
             hint="Manager id set but not in the active set"
-            href="/app/data-health"
+            href="/settings/data-health"
             hrefLabel="Review Data Health"
             onNavigate={navigate}
           />
@@ -378,7 +378,7 @@ export function DashboardWorkspace() {
             label="Incomplete profiles"
             value={String(insights.incompleteCount)}
             hint="Missing title, department, or country"
-            href="/app/data-health"
+            href="/settings/data-health"
             hrefLabel="Open incomplete list"
             onNavigate={navigate}
           />
@@ -449,11 +449,11 @@ export function DashboardWorkspace() {
                 Needs attention
               </h2>
               <Link
-                href="/app/data-health"
+                href="/settings/data-health"
                 className="text-xs font-semibold text-norma-royal hover:underline"
                 onClick={(event) => {
                   event.preventDefault();
-                  navigate("/app/data-health");
+                  navigate("/settings/data-health");
                 }}
               >
                 Data Health
