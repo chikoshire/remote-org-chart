@@ -54,6 +54,20 @@ test.describe("org chart smoke", () => {
     await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
   });
 
+  test("command bar opens with keyboard shortcut", async ({ page }) => {
+    await mockOrgChart(page, orgChartReadyFixture);
+    await loginAsDemo(page);
+    await page.goto("/app");
+    await page.keyboard.press("Meta+k");
+    await expect(
+      page.getByRole("dialog", { name: "Command bar" }),
+    ).toBeVisible();
+    await page.getByPlaceholder(/search people or jump/i).fill("Jordan");
+    await expect(page.getByRole("option").filter({ hasText: "Jordan Report" })).toBeVisible();
+    await page.getByRole("option").filter({ hasText: "Jordan Report" }).click();
+    await expect(page).toHaveURL(/person=emp_report/);
+  });
+
   test("dashboard shows organisational insight cards", async ({ page }) => {
     await mockOrgChart(page, orgChartReadyFixture);
     await loginAsDemo(page);

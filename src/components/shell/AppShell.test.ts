@@ -21,6 +21,7 @@ describe("ProductShell", () => {
     expect(shell).toContain('href: "/app/data-health"');
     expect(shell).toContain('href="/settings"');
     expect(shell).toContain("Log out");
+    expect(shell).toContain("CommandBar");
     expect(shell).toContain('aria-label="Settings"');
     expect(shell).toContain("Dashboard");
     expect(shell).toContain("Org Chart");
