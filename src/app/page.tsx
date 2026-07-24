@@ -6,7 +6,7 @@ export default function Home() {
     <AppShell
       status={
         <span className="truncate">
-          Live sandbox org chart · tap a person to highlight their path
+          Live sandbox org chart · select a person for path + profile details
         </span>
       }
     >
