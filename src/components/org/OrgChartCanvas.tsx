@@ -39,6 +39,7 @@ import {
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
+import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 type OrgChartResponse = {
   ok: boolean;
   nodeCount: number;
@@ -113,6 +114,7 @@ function applySelection(
 
 function OrgChartInner() {
   const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
+  const reducedMotion = usePrefersReducedMotion();
   const { fitView } = useReactFlow();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
@@ -237,11 +239,11 @@ function OrgChartInner() {
         void fitView({
           nodes: [...path].map((nodeId) => ({ id: nodeId })),
           padding: 0.35,
-          duration: 400,
+          duration: reducedMotion ? 0 : 420,
         });
       });
     },
-    [fitView, managerIndex],
+    [fitView, managerIndex, reducedMotion],
   );
 
   const statusLabel = useMemo(() => {
@@ -285,7 +287,9 @@ function OrgChartInner() {
   }
 
   return (
-    <div className="relative h-full w-full">
+    <div
+      className={`relative h-full w-full ${reducedMotion ? "" : "org-chart-enter"}`}
+    >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <label className="sr-only" htmlFor="org-search">
           Search people by name or title
