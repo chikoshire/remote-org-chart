@@ -19,6 +19,12 @@
       "service": "remote-org-chart"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "ORG_CHART_CACHE",
+      "id": "58bdbc1d85944a6fa304010c1803597c"
+    }
+  ],
   "observability": {
     "enabled": true
   }

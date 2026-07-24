@@ -8,6 +8,9 @@ export const orgChartReadyFixture = {
   rootCount: 1,
   cycleCount: 0,
   orphanManagerCount: 0,
+  lastSyncedAt: "2026-07-24T12:00:00.000Z",
+  cached: false,
+  source: "remote" as const,
   roots: [
     {
       id: "emp_root",

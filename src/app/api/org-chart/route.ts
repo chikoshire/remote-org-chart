@@ -3,6 +3,10 @@ import { RemoteApiError } from "@/lib/remote/client";
 import { getRemoteEnv } from "@/lib/remote/env";
 import { fetchEmploymentsForOrgChart } from "@/lib/remote/employments";
 import { buildOrgForest, flattenOrgForest } from "@/lib/org";
+import {
+  readOrgChartSnapshot,
+  writeOrgChartSnapshot,
+} from "@/lib/org/snapshot-cache";
 
 export const runtime = "nodejs";
 
@@ -12,9 +16,26 @@ export const runtime = "nodejs";
  *
  * On Cloudflare, detail enrichment fans out across sibling Worker invocations
  * so we stay under the free-plan subrequest limit (GH#8).
+ *
+ * Snapshot cache (GH#24): KV hit returns lastSyncedAt quickly; `?refresh=1`
+ * bypasses cache and rewrites the snapshot (GH#25).
  */
 export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const forceRefresh = url.searchParams.get("refresh") === "1";
+
+    if (!forceRefresh) {
+      const cached = await readOrgChartSnapshot();
+      if (cached) {
+        return NextResponse.json({
+          ...cached,
+          cached: true,
+          source: "cache",
+        });
+      }
+    }
+
     const env = getRemoteEnv();
     const records = await fetchEmploymentsForOrgChart({
       statusPolicy: "active_only",
@@ -30,15 +51,20 @@ export async function GET(request: Request) {
       children: undefined,
     }));
 
-    return NextResponse.json({
+    const snapshot = await writeOrgChartSnapshot({
       ok: true,
       nodeCount: forest.nodeCount,
       rootCount: forest.roots.length,
       cycleCount: forest.cycleIds.length,
       orphanManagerCount: forest.orphanManagerIds.length,
       roots: stripEmails(forest.roots),
-      // flat index aids search (#7) without walking twice client-side
       nodes: flat,
+    });
+
+    return NextResponse.json({
+      ...snapshot,
+      cached: false,
+      source: "remote",
     });
   } catch (err) {
     if (err instanceof RemoteApiError) {
