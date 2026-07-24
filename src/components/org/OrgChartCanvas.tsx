@@ -37,6 +37,7 @@ import {
   type ChartWarning,
 } from "@/lib/org/chart-state";
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
+import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 type OrgChartResponse = {
   ok: boolean;
   nodeCount: number;
@@ -105,6 +106,7 @@ function applySelection(
 }
 
 function OrgChartInner() {
+  const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
   const { fitView } = useReactFlow();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
@@ -330,24 +332,42 @@ function OrgChartInner() {
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.15}
+        fitViewOptions={{ padding: isMobile ? 0.12 : 0.2 }}
+        minZoom={isMobile ? 0.08 : 0.15}
         maxZoom={1.4}
         proOptions={{ hideAttribution: true }}
         nodesConnectable={false}
         deleteKeyCode={null}
+        panOnScroll
+        panOnDrag
+        zoomOnScroll
+        zoomOnPinch
+        zoomOnDoubleClick={!isMobile}
+        selectionOnDrag={false}
+        preventScrolling
       >
-        <Background color="#d5dce8" gap={20} size={1} />
-        <Controls showInteractive={false} />
-        <MiniMap
-          pannable
-          zoomable
-          nodeColor={() => "#624DE3"}
-          maskColor="rgb(0 35 75 / 0.08)"
+        <Background color="#d5dce8" gap={isMobile ? 16 : 20} size={1} />
+        <Controls
+          showInteractive={false}
+          position={isMobile ? "bottom-right" : "bottom-left"}
+          className={isMobile ? "!m-2" : undefined}
         />
+        {!isMobile ? (
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor={() => "#624DE3"}
+            maskColor="rgb(0 35 75 / 0.08)"
+          />
+        ) : null}
       </ReactFlow>
-      <p className="pointer-events-none absolute bottom-3 left-3 rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm">
+      <p
+        className={`pointer-events-none absolute rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm ${
+          isMobile ? "bottom-14 left-2 max-w-[70%]" : "bottom-3 left-3"
+        }`}
+      >
         {statusLabel}
+        {isMobile ? " · pinch to zoom · drag to pan" : ""}
       </p>
     </div>
   );
@@ -356,7 +376,7 @@ function OrgChartInner() {
 export function OrgChartCanvas() {
   return (
     <ReactFlowProvider>
-      <div className="h-[min(78vh,720px)] w-full">
+      <div className="h-[min(100dvh-9rem,720px)] w-full md:h-[min(78vh,720px)]">
         <OrgChartInner />
       </div>
     </ReactFlowProvider>
