@@ -7,7 +7,7 @@ export const ORG_CHART_CACHE_KEY = "org-chart:v1:active";
  * Stale policy: KV entries expire after this TTL. Manual refresh (`?refresh=1`)
  * bypasses the cache and rewrites the snapshot immediately.
  */
-export const ORG_CHART_CACHE_TTL_SECONDS = 15 * 60;
+export const ORG_CHART_CACHE_TTL_SECONDS = 60 * 60;
 
 export type OrgChartCachePayload = {
   ok: true;

@@ -10,7 +10,7 @@ import {
 describe("snapshot-cache", () => {
   it("documents TTL and key", () => {
     expect(ORG_CHART_CACHE_KEY).toBe("org-chart:v1:active");
-    expect(ORG_CHART_CACHE_TTL_SECONDS).toBe(900);
+    expect(ORG_CHART_CACHE_TTL_SECONDS).toBe(3600);
   });
 
   it("round-trips through a fake KV and supports invalidate", async () => {

@@ -6,10 +6,10 @@ import {
 } from "@/lib/org/chart-state";
 
 describe("mapOrgChartHttpError", () => {
-  it("marks auth problems as retryable so a transient sandbox blip can recover", () => {
+  it("marks auth problems as retryable so a transient Remote blip can recover", () => {
     const err = mapOrgChartHttpError(401, { code: "unauthorized" });
     expect(err.retryable).toBe(true);
-    expect(err.message).toMatch(/token/i);
+    expect(err.message).toMatch(/Remote|authorize|admin/i);
   });
 
   it("marks rate limits as retryable", () => {

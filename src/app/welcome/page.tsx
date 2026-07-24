@@ -5,7 +5,7 @@ import { AcmeLogo } from "@/components/brand/AcmeLogo";
 export const metadata: Metadata = {
   title: "Acme Org Chart · Welcome",
   description:
-    "Interactive organization chart for Acme Sandbox Corp — powered by the Remote sandbox HRIS API.",
+    "Interactive organization chart for Acme — powered by Remote.",
 };
 
 /**
@@ -44,14 +44,13 @@ export default function WelcomePage() {
       <main className="relative z-10 flex flex-1 flex-col justify-center px-5 pb-16 pt-8 md:px-10 md:pb-24">
         <div className="max-w-2xl">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#e85d04]">
-            People powered · Remote HRIS
+            People powered · Remote
           </p>
           <h1 className="mt-4 font-[family-name:var(--font-norma-display)] text-[clamp(2.5rem,8vw,4.5rem)] leading-[1.05] tracking-tight text-[#1a1a1a]">
             Organization chart
           </h1>
           <p className="mt-4 max-w-md text-base leading-relaxed text-[#4a646c] md:text-lg">
-            See who reports to whom across Acme Sandbox Corp — live from Remote,
-            built for interview demos and headless HRIS workflows.
+            See who reports to whom across Acme — live from Remote.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link

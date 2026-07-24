@@ -25,7 +25,12 @@ test.describe("org chart smoke", () => {
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-        name: "Org",
+        name: "Org chart",
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+        name: "People",
       }),
     ).toBeVisible();
     await expect(
@@ -47,7 +52,9 @@ test.describe("org chart smoke", () => {
       page.getByRole("heading", { name: "Settings", exact: true }),
     ).toBeVisible();
     await expect(page.getByText("Integrations")).toBeVisible();
-    await expect(page.getByText("About this data")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Disconnect" }).or(
+      page.getByRole("button", { name: "Connect" }),
+    )).toBeVisible();
     await expect(page.getByRole("button", { name: "Save preferences" })).toBeVisible();
   });
 
@@ -57,7 +64,7 @@ test.describe("org chart smoke", () => {
     await mockOrgChart(page, orgChartReadyFixture);
     await page.goto("/app");
 
-    await expect(page.getByText("2 people · 1 roots · 0 cycles")).toBeVisible({
+    await expect(page.getByText(/2 people · 1 teams/)).toBeVisible({
       timeout: 20_000,
     });
     await expect(page.getByRole("heading", { name: "Alex Root" })).toBeVisible();
@@ -90,7 +97,7 @@ test.describe("org chart smoke", () => {
     await mockOrgChart(page, orgChartReadyFixture);
     await page.goto("/app");
 
-    await expect(page.getByText("2 people · 1 roots · 0 cycles")).toBeVisible({
+    await expect(page.getByText(/2 people · 1 teams/)).toBeVisible({
       timeout: 20_000,
     });
 
@@ -126,7 +133,7 @@ test.describe("org chart smoke", () => {
     await page.goto("/app");
 
     await expect(
-      page.getByRole("heading", { name: "No people to chart" }),
+      page.getByRole("heading", { name: "No people to show" }),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   });
@@ -139,7 +146,7 @@ test.describe("org chart smoke", () => {
       page.getByRole("heading", { name: /couldn’t load the org chart/i }),
     ).toBeVisible();
     await expect(
-      page.getByText(/sandbox rejected the token/i),
+      page.getByText(/couldn’t authorize this connection/i),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
   });
