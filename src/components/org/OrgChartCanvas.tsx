@@ -46,6 +46,7 @@ import {
 import { computeOrgInsights } from "@/lib/org/insights";
 import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
+import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -251,6 +252,8 @@ function OrgChartInner() {
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [syncLogOpen, setSyncLogOpen] = useState(false);
+  const [syncLogToken, setSyncLogToken] = useState(0);
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
@@ -384,6 +387,7 @@ function OrgChartInner() {
       setFromCache(body.cached === true || body.source === "cache");
       hasReadyData.current = true;
       setStatus("ready");
+      if (isRefresh) setSyncLogToken((n) => n + 1);
     } catch (err) {
       const mapped = mapOrgChartHttpError(0, {
         code: "network",
@@ -1096,6 +1100,13 @@ function OrgChartInner() {
               insights={insights}
               open={insightsOpen}
               onOpenChange={setInsightsOpen}
+            />
+          ) : null}
+          {!selectedDetail && !compareMode ? (
+            <SyncRunsPanel
+              open={syncLogOpen}
+              onOpenChange={setSyncLogOpen}
+              refreshToken={syncLogToken}
             />
           ) : null}
         </>

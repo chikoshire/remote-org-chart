@@ -25,6 +25,14 @@
       "id": "58bdbc1d85944a6fa304010c1803597c"
     }
   ],
+  "d1_databases": [
+    {
+      "binding": "SYNC_RUNS_DB",
+      "database_name": "remote-org-chart-sync",
+      "database_id": "530501ab-4bc3-4132-9af7-7a94508bd291",
+      "migrations_dir": "migrations"
+    }
+  ],
   "observability": {
     "enabled": true
   }
