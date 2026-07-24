@@ -51,6 +51,8 @@ export const employmentDetailSchema = z
     manager_email: z.string().optional().nullable(),
     manager_id: z.string().optional().nullable(),
     manager_employment_id: z.string().optional().nullable(),
+    profile_picture: z.string().optional().nullable(),
+    user: z.record(z.string(), z.unknown()).optional().nullable(),
   })
   .passthrough();
 
@@ -73,6 +75,8 @@ export const employmentRecordSchema = z.object({
   status: z.string().nullable(),
   country: z.string().nullable(),
   workEmail: z.string().nullable(),
+  /** Remote profile picture URL when present; null otherwise. */
+  avatarUrl: z.string().nullable(),
   managerName: z.string().nullable(),
   managerEmploymentId: z.string().nullable(),
 });
