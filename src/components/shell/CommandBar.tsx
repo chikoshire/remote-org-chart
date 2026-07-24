@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { searchPeople, type SearchablePerson } from "@/lib/org/search-people";
 import { readSessionOrgPayload } from "@/lib/ui/remote-connection";
+import { withViewTransition } from "@/lib/ui/motion";
 
 type NavAction = {
   id: string;
@@ -165,11 +166,13 @@ export function CommandBar() {
 
   const runItem = useCallback(
     (item: ResultItem) => {
-      if (item.kind === "person") {
-        router.push(`/app${withPersonSearchParam("", item.person.id)}`);
-      } else {
-        router.push(item.action.href);
-      }
+      const href =
+        item.kind === "person"
+          ? `/app${withPersonSearchParam("", item.person.id)}`
+          : item.action.href;
+      void withViewTransition(() => {
+        router.push(href);
+      });
       close();
     },
     [close, router],

@@ -22,6 +22,7 @@ import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import { personMorphName, withViewTransition } from "@/lib/ui/motion";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -69,6 +70,12 @@ export function DepartmentsWorkspace() {
   const [people, setPeople] = useState<DepartmentPerson[]>([]);
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const selectPerson = useCallback((id: string | null) => {
+    void withViewTransition(() => {
+      setSelectedId(id);
+    });
+  }, []);
 
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
@@ -270,9 +277,20 @@ export function DepartmentsWorkspace() {
                 const name = person.fullName?.trim() || "Unknown person";
                 const countryLabel = formatCountryLabel(person.country);
                 const isLead = active.lead?.id === person.id;
+                const isSelected = selectedId === person.id;
                 return (
                   <li key={person.id}>
-                    <article className="relative flex h-full flex-col overflow-hidden rounded-norma-lg border border-norma-border bg-norma-surface shadow-norma-sm">
+                    <article
+                      className="relative flex h-full flex-col overflow-hidden rounded-norma-lg border border-norma-border bg-norma-surface shadow-norma-sm"
+                      style={
+                        isSelected
+                          ? undefined
+                          : {
+                              viewTransitionName: personMorphName(person.id),
+                            }
+                      }
+                      data-morph-person={person.id}
+                    >
                       <span
                         aria-hidden
                         className="absolute inset-y-0 left-0 w-1.5"
@@ -281,7 +299,7 @@ export function DepartmentsWorkspace() {
                       <button
                         type="button"
                         className="flex w-full items-start gap-3 px-4 py-4 pl-5 text-left"
-                        onClick={() => setSelectedId(person.id)}
+                        onClick={() => selectPerson(person.id)}
                       >
                         <span
                           aria-hidden
@@ -318,7 +336,7 @@ export function DepartmentsWorkspace() {
                         <button
                           type="button"
                           className="text-xs font-semibold text-norma-royal hover:underline"
-                          onClick={() => setSelectedId(person.id)}
+                          onClick={() => selectPerson(person.id)}
                         >
                           Open profile
                         </button>
@@ -326,9 +344,11 @@ export function DepartmentsWorkspace() {
                           type="button"
                           className="text-xs font-medium text-norma-ink-muted hover:text-norma-prussian hover:underline"
                           onClick={() =>
-                            router.push(
-                              `/app${withPersonSearchParam("", person.id)}`,
-                            )
+                            void withViewTransition(() => {
+                              router.push(
+                                `/app${withPersonSearchParam("", person.id)}`,
+                              );
+                            })
                           }
                         >
                           Show in chart
@@ -346,8 +366,8 @@ export function DepartmentsWorkspace() {
             person={selected.person}
             pathToRoot={selected.pathToRoot}
             reports={selected.reports}
-            onClose={() => setSelectedId(null)}
-            onSelectPerson={setSelectedId}
+            onClose={() => selectPerson(null)}
+            onSelectPerson={selectPerson}
           />
         ) : null}
       </div>
