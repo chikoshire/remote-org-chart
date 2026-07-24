@@ -22,7 +22,6 @@ export function HelpChatWidget() {
   const titleId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
-  const feedEndRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -171,7 +170,6 @@ export function HelpChatWidget() {
                 ))}
               </div>
             ) : null}
-            <div ref={feedEndRef} aria-hidden className="h-px w-full shrink-0" />
           </div>
           <form
             onSubmit={onSubmit}

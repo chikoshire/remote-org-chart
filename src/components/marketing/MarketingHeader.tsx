@@ -28,23 +28,23 @@ export function MarketingHeader() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 md:px-8 md:py-5">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 md:px-8 md:py-6">
         <a href="#top" className="shrink-0 transition hover:opacity-80" id="top">
           <AcmeLogo withWordmark />
         </a>
-        <nav aria-label="Marketing" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Marketing" className="hidden items-center gap-10 md:flex">
           {NAV.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-norma-ink-muted transition hover:text-norma-ink"
+              className="text-base font-medium text-norma-ink-muted transition hover:text-norma-ink"
             >
               {item.label}
             </a>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="norma-cta min-h-10 px-5 text-sm">
+          <Link href="/login" className="norma-cta min-h-11 px-6 text-base">
             Log in
           </Link>
         </div>

@@ -47,23 +47,23 @@
   --norma-success: #2f7a5c;
   --norma-success-soft: var(--norma-mint);
 
-  /* Type scale */
-  --norma-text-xs: 0.75rem;
-  --norma-text-sm: 0.875rem;
-  --norma-text-base: 1rem;
-  --norma-text-lg: 1.125rem;
-  --norma-text-xl: 1.35rem;
-  --norma-text-2xl: 1.75rem;
-  --norma-text-3xl: 2.25rem;
+  /* Type scale - bumped for readability vs remote.com density */
+  --norma-text-xs: 0.8125rem;
+  --norma-text-sm: 0.9375rem;
+  --norma-text-base: 1.0625rem;
+  --norma-text-lg: 1.1875rem;
+  --norma-text-xl: 1.45rem;
+  --norma-text-2xl: 1.875rem;
+  --norma-text-3xl: 2.4rem;
   --norma-leading-tight: 1.2;
   --norma-leading-snug: 1.35;
-  --norma-leading-normal: 1.5;
+  --norma-leading-normal: 1.55;
   --norma-tracking-label: 0.14em;
 
   /* Radius & elevation - squircles */
-  --norma-radius-sm: 0.625rem;
-  --norma-radius-md: 1rem;
-  --norma-radius-lg: 1.5rem;
+  --norma-radius-sm: 0.75rem;
+  --norma-radius-md: 1.125rem;
+  --norma-radius-lg: 1.625rem;
   --norma-shadow-sm: 0 2px 8px rgb(18 18 18 / 0.04);
   --norma-shadow-md: 0 16px 40px rgb(18 18 18 / 0.08);
 

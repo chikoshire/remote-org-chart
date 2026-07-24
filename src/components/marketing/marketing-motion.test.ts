@@ -42,6 +42,11 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(hero).toContain("/marketing/hero-org-chart.png");
     expect(how).toContain("aria-expanded");
     expect(how).toContain("/marketing/app-dashboard.png");
+    expect(how).toContain("rounded-[1.35rem]");
+    expect(how).toContain("bg-norma-peach");
+    expect(how).toContain("bg-norma-lavender");
+    expect(how).not.toContain("divide-y");
+    expect(how).not.toContain("bg-norma-ink text-norma-ink-inverse");
 
     for (const file of [
       "public/marketing/hero-org-chart.png",

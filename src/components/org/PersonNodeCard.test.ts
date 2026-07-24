@@ -31,7 +31,7 @@ describe("PersonNodeCard", () => {
   it("uses taller comfortable cards without left color chips", () => {
     expect(card).not.toContain("departmentAccent");
     expect(card).not.toContain("inset-y-0 left-0 w-1");
-    expect(card).toContain("w-[260px]");
+    expect(card).toContain("w-[280px]");
     expect(card).toContain("reports");
     expect(card).toContain("PersonAvatar");
   });
