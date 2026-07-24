@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   expandCollapsedAncestors,
   mapCountryHref,
+  orgChartOpenDepartmentsHref,
   peopleDepartmentHref,
   personDeepLinkHref,
   readCompareFlagFromSearch,
   readCountryFromSearch,
   readDepartmentFromSearch,
+  readOpenDepartmentsFromSearch,
   readPersonIdFromSearch,
   readViewModeFromSearch,
   resolvePersonDeepLink,
@@ -73,5 +75,13 @@ describe("deep-links", () => {
     expect(readDepartmentFromSearch("?department=Marketing")).toBe(
       "Marketing",
     );
+  });
+
+  it("builds org chart open-departments deep link", () => {
+    expect(orgChartOpenDepartmentsHref()).toBe("/app?open=departments");
+    expect(readOpenDepartmentsFromSearch("?open=departments")).toBe(true);
+    expect(readOpenDepartmentsFromSearch("?open=Departments")).toBe(true);
+    expect(readOpenDepartmentsFromSearch("?open=map")).toBe(false);
+    expect(readOpenDepartmentsFromSearch("?q=hi")).toBe(false);
   });
 });

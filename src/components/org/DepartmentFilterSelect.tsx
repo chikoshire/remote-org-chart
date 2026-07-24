@@ -13,6 +13,8 @@ type DepartmentFilterSelectProps = {
   /** Compact styling for the chart workspace panel. */
   size?: "sm" | "md";
   label?: string;
+  /** Open the menu when true (e.g. Dashboard → Org Chart deep link). */
+  defaultOpen?: boolean;
 };
 
 /**
@@ -27,12 +29,17 @@ export function DepartmentFilterSelect({
   className = "",
   size = "md",
   label = "Department",
+  defaultOpen = false,
 }: DepartmentFilterSelectProps) {
   const autoId = useId();
   const id = idProp ?? autoId;
   const listId = `${id}-listbox`;
   const rootRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    if (defaultOpen) setOpen(true);
+  }, [defaultOpen]);
 
   const sorted = [...departments].sort((a, b) => a.localeCompare(b));
   const selectedLabel = value?.trim() || "All departments";

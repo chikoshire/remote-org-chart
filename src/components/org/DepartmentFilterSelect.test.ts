@@ -23,10 +23,12 @@ describe("DepartmentFilterSelect", () => {
 
     expect(select).toContain("departmentAccent");
     expect(select).toContain('role="listbox"');
-    expect(select).toContain("All departments");
-    expect(filters).toContain("DepartmentFilterSelect");
+    expect(select).toContain("defaultOpen");
+    expect(filters).toContain("openDepartmentMenu");
     expect(people).toContain("DepartmentFilterSelect");
     expect(people).not.toContain("DepartmentColorLegend");
     expect(canvas).not.toContain("DepartmentColorLegend");
+    expect(canvas).toContain("openDepartmentMenu");
+    expect(canvas).toContain("readOpenDepartmentsFromSearch");
   });
 });

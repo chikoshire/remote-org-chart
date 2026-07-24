@@ -13,6 +13,13 @@ export const COUNTRY_QUERY_PARAM = "country";
 /** People directory department filter (`/app/people?department=Marketing`). */
 export const DEPARTMENT_QUERY_PARAM = "department";
 
+/**
+ * Open a workspace affordance from a deep link (`/app?open=departments`
+ * expands the Department filter menu on Org Chart).
+ */
+export const OPEN_QUERY_PARAM = "open";
+export const OPEN_DEPARTMENTS_VALUE = "departments";
+
 /** Read `person` from a `location.search` string (with or without leading `?`). */
 export function readPersonIdFromSearch(search: string): string | null {
   const raw = search.startsWith("?") ? search.slice(1) : search;
@@ -55,6 +62,23 @@ export function readDepartmentFromSearch(search: string): string | null {
   if (!value) return null;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** True when search asks Org Chart to open the Department filter menu. */
+export function readOpenDepartmentsFromSearch(search: string): boolean {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const value = new URLSearchParams(raw)
+    .get(OPEN_QUERY_PARAM)
+    ?.trim()
+    .toLowerCase();
+  return value === OPEN_DEPARTMENTS_VALUE;
+}
+
+/** Org Chart with the Department filter menu open. */
+export function orgChartOpenDepartmentsHref(): string {
+  const params = new URLSearchParams();
+  params.set(OPEN_QUERY_PARAM, OPEN_DEPARTMENTS_VALUE);
+  return `/app?${params.toString()}`;
 }
 
 /**

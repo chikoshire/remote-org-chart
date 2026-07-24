@@ -11,6 +11,8 @@ type OrgFiltersBarProps = {
   jobTitles: string[];
   onChange: (next: OrgFilters) => void;
   onReset: () => void;
+  /** Expand the Department menu (Dashboard deep link). */
+  openDepartmentMenu?: boolean;
 };
 
 export function OrgFiltersBar({
@@ -20,6 +22,7 @@ export function OrgFiltersBar({
   jobTitles,
   onChange,
   onReset,
+  openDepartmentMenu = false,
 }: OrgFiltersBarProps) {
   const active = filtersAreActive(filters);
 
@@ -49,6 +52,7 @@ export function OrgFiltersBar({
         departments={departments}
         value={filters.department}
         onChange={(department) => onChange({ ...filters, department })}
+        defaultOpen={openDepartmentMenu}
       />
       <label className="flex flex-col gap-0.5 text-[11px] text-norma-ink-muted">
         Country
