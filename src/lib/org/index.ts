@@ -31,3 +31,9 @@ export {
 export { navigateReportingRelative } from "@/lib/org/keyboard-nav";
 export { reportingRelation } from "@/lib/org/reporting-distance";
 export type { ReportingRelation } from "@/lib/org/reporting-distance";
+export {
+  ORG_CHART_CACHE_KEY,
+  ORG_CHART_CACHE_TTL_SECONDS,
+  readOrgChartSnapshot,
+  writeOrgChartSnapshot,
+} from "@/lib/org/snapshot-cache";

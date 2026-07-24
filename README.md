@@ -10,9 +10,10 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 |-------|----------|
 | Home | Interactive React Flow chart (~149 people, ~10 roots) |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
-| `/api/org-chart` | Hierarchy JSON (emails stripped); cold build ~15–25s |
+| `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15–25s |
+| `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
 
-> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker.
+> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** to force a rebuild.
 
 ### Links for the interview team
 
@@ -33,6 +34,7 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 6. Shareable deep links (`/?person=<employmentId>`) select, center, and highlight path-to-root — **Copy link** in the person drawer
 7. Export the visible chart as **PNG** or **SVG**; keyboard: `/` search, arrows move manager/reports/siblings, `Esc` clears selection
 8. **Compare** two people for reporting distance and lowest common manager (highlights both paths)
+9. **KV snapshot cache** (15m TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
 
 ### Keyboard shortcuts
 
