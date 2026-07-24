@@ -22,7 +22,7 @@ describe("motion polish (#16)", () => {
   });
 
   it("animates person selection and edge path highlight", () => {
-    expect(card).toContain("transition-[");
+    expect(card).toContain("selection-fade");
     expect(edge).toContain("transition:");
   });
 
