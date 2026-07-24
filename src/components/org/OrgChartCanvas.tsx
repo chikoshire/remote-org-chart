@@ -36,8 +36,16 @@ import {
   writeStoredDensity,
   type ChartDensity,
 } from "@/lib/org/collapse";
+import {
+  collectFilterOptions,
+  EMPTY_ORG_FILTERS,
+  filterOrgForest,
+  filtersAreActive,
+  type OrgFilters,
+} from "@/lib/org/filters";
 import { computeOrgInsights } from "@/lib/org/insights";
 import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
+import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -203,6 +211,7 @@ function OrgChartInner() {
     () => new Set(),
   );
   const [insightsOpen, setInsightsOpen] = useState(false);
+  const [filters, setFilters] = useState<OrgFilters>(EMPTY_ORG_FILTERS);
   const [baseNodes, setBaseNodes] = useState<Node<PersonNodeData>[]>([]);
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
@@ -230,8 +239,10 @@ function OrgChartInner() {
       roots: OrgChartPayloadNode[],
       nextDensity: ChartDensity,
       collapsed: Set<string>,
+      nextFilters: OrgFilters,
     ) => {
-      const pruned = applyCollapseToForest(roots, collapsed);
+      const filtered = filterOrgForest(roots, nextFilters);
+      const pruned = applyCollapseToForest(filtered, collapsed);
       const laid = layoutOrgChart(pruned, { density: nextDensity });
       const withHandlers = laid.nodes.map((n) => ({
         ...n,
@@ -261,6 +272,7 @@ function OrgChartInner() {
     setWarnings([]);
     setSelectedId(null);
     setCollapsedIds(new Set());
+    setFilters(EMPTY_ORG_FILTERS);
     try {
       const res = await fetch("/api/org-chart");
       const body = (await res.json()) as OrgChartResponse;
@@ -318,8 +330,23 @@ function OrgChartInner() {
 
   useEffect(() => {
     if (status !== "ready" || forestRoots.length === 0) return;
-    rebuildLayout(forestRoots, density, collapsedIds);
-  }, [collapsedIds, density, forestRoots, rebuildLayout, status]);
+    rebuildLayout(forestRoots, density, collapsedIds, filters);
+  }, [collapsedIds, density, filters, forestRoots, rebuildLayout, status]);
+
+  const filterOptions = useMemo(
+    () => collectFilterOptions(forestRoots),
+    [forestRoots],
+  );
+
+  const filteredForest = useMemo(
+    () => filterOrgForest(forestRoots, filters),
+    [filters, forestRoots],
+  );
+
+  const filterEmpty =
+    status === "ready" &&
+    filtersAreActive(filters) &&
+    filteredForest.length === 0;
 
   useEffect(() => {
     if (status !== "ready") return;
@@ -389,8 +416,10 @@ function OrgChartInner() {
 
   const insights = useMemo(
     () =>
-      computeOrgInsights(applyCollapseToForest(forestRoots, collapsedIds)),
-    [collapsedIds, forestRoots],
+      computeOrgInsights(
+        applyCollapseToForest(filteredForest, collapsedIds),
+      ),
+    [collapsedIds, filteredForest],
   );
 
   const statusLabel = useMemo(() => {
@@ -468,6 +497,13 @@ function OrgChartInner() {
             Compact
           </button>
         </div>
+        <OrgFiltersBar
+          filters={filters}
+          departments={filterOptions.departments}
+          countries={filterOptions.countries}
+          onChange={setFilters}
+          onReset={() => setFilters(EMPTY_ORG_FILTERS)}
+        />
         <label className="sr-only" htmlFor="org-search">
           Search people by name or title
         </label>
@@ -530,76 +566,92 @@ function OrgChartInner() {
           </p>
         ))}
       </div>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodeClick={onNodeClick}
-        onPaneClick={onPaneClick}
-        fitView
-        fitViewOptions={{ padding: isMobile ? 0.12 : 0.2 }}
-        minZoom={isMobile ? 0.08 : 0.15}
-        maxZoom={1.4}
-        proOptions={{ hideAttribution: true }}
-        nodesConnectable={false}
-        nodesFocusable
-        edgesFocusable={false}
-        deleteKeyCode={null}
-        panOnScroll
-        panOnDrag
-        zoomOnScroll
-        zoomOnPinch
-        zoomOnDoubleClick={!isMobile}
-        selectionOnDrag={false}
-        preventScrolling
-        aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
-      >
-        <Background color="#d5dce8" gap={isMobile ? 16 : 20} size={1} />
-        <Controls
-          showInteractive={false}
-          position={isMobile ? "bottom-right" : "bottom-left"}
-          className={isMobile ? "!m-2" : undefined}
-          aria-label="Chart zoom controls"
+      {filterEmpty ? (
+        <ChartEmptyState
+          title="No people match these filters"
+          description="Ancestors stay when they connect a match to the root. Reset filters to see the full Acme org again."
+          action={
+            <RetryButton
+              label="Reset filters"
+              onClick={() => setFilters(EMPTY_ORG_FILTERS)}
+            />
+          }
         />
-        {!isMobile ? (
-          <MiniMap
-            pannable
-            zoomable
-            nodeColor={() => "#624DE3"}
-            maskColor="rgb(0 35 75 / 0.08)"
-            aria-label="Organization chart overview map"
-          />
-        ) : null}
-      </ReactFlow>
-      <p
-        role="status"
-        aria-live="polite"
-        className={`pointer-events-none absolute rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm ${
-          isMobile ? "bottom-14 left-2 max-w-[70%]" : "bottom-3 left-3"
-        }`}
-      >
-        {statusLabel}
-        {isMobile ? " · pinch to zoom · drag to pan" : ""}
-      </p>
-      {selectedDetail ? (
-        <PersonDetailDrawer
-          person={selectedDetail.person}
-          pathToRoot={selectedDetail.pathToRoot}
-          reports={selectedDetail.reports}
-          onClose={() => setSelectedId(null)}
-          onSelectPerson={focusPerson}
-        />
-      ) : null}
-      {!selectedDetail ? (
-        <OrgInsightsPanel
-          insights={insights}
-          open={insightsOpen}
-          onOpenChange={setInsightsOpen}
-        />
-      ) : null}
+      ) : (
+        <>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            fitView
+            fitViewOptions={{ padding: isMobile ? 0.12 : 0.2 }}
+            minZoom={isMobile ? 0.08 : 0.15}
+            maxZoom={1.4}
+            proOptions={{ hideAttribution: true }}
+            nodesConnectable={false}
+            nodesFocusable
+            edgesFocusable={false}
+            deleteKeyCode={null}
+            panOnScroll
+            panOnDrag
+            zoomOnScroll
+            zoomOnPinch
+            zoomOnDoubleClick={!isMobile}
+            selectionOnDrag={false}
+            preventScrolling
+            aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
+          >
+            <Background color="#d5dce8" gap={isMobile ? 16 : 20} size={1} />
+            <Controls
+              showInteractive={false}
+              position={isMobile ? "bottom-right" : "bottom-left"}
+              className={isMobile ? "!m-2" : undefined}
+              aria-label="Chart zoom controls"
+            />
+            {!isMobile ? (
+              <MiniMap
+                pannable
+                zoomable
+                nodeColor={() => "#624DE3"}
+                maskColor="rgb(0 35 75 / 0.08)"
+                aria-label="Organization chart overview map"
+              />
+            ) : null}
+          </ReactFlow>
+          <p
+            role="status"
+            aria-live="polite"
+            className={`pointer-events-none absolute rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm ${
+              isMobile ? "bottom-14 left-2 max-w-[70%]" : "bottom-3 left-3"
+            }`}
+          >
+            {statusLabel}
+            {filtersAreActive(filters) ? " · filters on" : ""}
+            {isMobile ? " · pinch to zoom · drag to pan" : ""}
+          </p>
+          {selectedDetail ? (
+            <PersonDetailDrawer
+              person={selectedDetail.person}
+              pathToRoot={selectedDetail.pathToRoot}
+              reports={selectedDetail.reports}
+              onClose={() => setSelectedId(null)}
+              onSelectPerson={focusPerson}
+            />
+          ) : null}
+          {!selectedDetail ? (
+            <OrgInsightsPanel
+              insights={insights}
+              open={insightsOpen}
+              onOpenChange={setInsightsOpen}
+            />
+          ) : null}
+        </>
+      )}
     </div>
   );
 }
