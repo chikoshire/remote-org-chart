@@ -240,6 +240,32 @@ Starting the visual polish block, or if Remote exposes avatar/history fields we 
 
 ---
 
+## 2026-07-24 — Org chart snapshot cache in Cloudflare KV
+
+**Status:** Accepted  
+
+**Context:**  
+Cold `/api/org-chart` builds take 15–25s (employment detail fan-out under Workers Free). Interviewers and demos need a fast second load without adding Supabase.
+
+**Decision:**  
+Store the **derived hierarchy JSON** (emails already stripped) in Cloudflare KV binding `ORG_CHART_CACHE`, key `org-chart:v1:active`.
+
+| Policy | Value |
+|--------|-------|
+| TTL | **15 minutes** (`expirationTtl`) |
+| Cache miss | Fetch Remote → write snapshot → return `source: "remote"` |
+| Cache hit | Return snapshot with `lastSyncedAt`, `cached: true` |
+| Manual refresh | `GET /api/org-chart?refresh=1` bypasses KV read, rewrites on success; failed refresh leaves prior KV entry intact |
+| Local `next dev` | No KV binding → always live Remote (same as miss) |
+
+**Consequences:**  
+UI shows last-synced + **Refresh from Remote**. Tier 3 webhooks (#27+) can invalidate/rewrite this key later.
+
+**Revisit when:**  
+TTL feels wrong in demos, or we add D1 sync-run history (#26).
+
+---
+
 ## Template for future entries
 
 

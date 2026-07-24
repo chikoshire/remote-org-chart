@@ -98,6 +98,9 @@ type OrgChartResponse = {
   nodes: FlatPerson[];
   message?: string;
   code?: string;
+  lastSyncedAt?: string;
+  cached?: boolean;
+  source?: "cache" | "remote";
 };
 
 function toDetail(
@@ -244,6 +247,11 @@ function OrgChartInner() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareA, setCompareA] = useState<string | null>(null);
   const [compareB, setCompareB] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
   const chartRootRef = useRef<HTMLDivElement>(null);
@@ -299,32 +307,51 @@ function OrgChartInner() {
     writeStoredDensity(next);
   }, []);
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setErrorMessage(null);
-    setErrorRetryable(true);
-    setWarnings([]);
-    setSelectedId(null);
-    setDeepLinkError(null);
-    setUrlSyncReady(false);
-    deepLinkResolved.current = false;
-    pendingDeepLinkId.current = null;
-    setCompareMode(false);
-    setCompareA(null);
-    setCompareB(null);
-    setCollapsedIds(new Set());
-    setFilters(EMPTY_ORG_FILTERS);
+  const load = useCallback(async (opts?: { refresh?: boolean }) => {
+    const isRefresh = opts?.refresh === true;
+    setRefreshError(null);
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setStatus("loading");
+      setErrorMessage(null);
+      setErrorRetryable(true);
+      setWarnings([]);
+      setSelectedId(null);
+      setDeepLinkError(null);
+      setUrlSyncReady(false);
+      deepLinkResolved.current = false;
+      pendingDeepLinkId.current = null;
+      setCompareMode(false);
+      setCompareA(null);
+      setCompareB(null);
+      setCollapsedIds(new Set());
+      setFilters(EMPTY_ORG_FILTERS);
+      hasReadyData.current = false;
+      setLastSyncedAt(null);
+      setFromCache(false);
+    }
     try {
-      const res = await fetch("/api/org-chart");
+      const res = await fetch(
+        isRefresh ? "/api/org-chart?refresh=1" : "/api/org-chart",
+      );
       const body = (await res.json()) as OrgChartResponse;
       if (!res.ok || !body.ok) {
         const mapped = mapOrgChartHttpError(res.status, body);
+        if (isRefresh && hasReadyData.current) {
+          setRefreshError(mapped.message);
+          return;
+        }
         setStatus("error");
         setErrorMessage(mapped.message);
         setErrorRetryable(mapped.retryable);
         return;
       }
       if (!body.roots?.length || body.nodeCount === 0) {
+        if (isRefresh && hasReadyData.current) {
+          setRefreshError("Remote returned an empty org chart; kept the previous snapshot.");
+          return;
+        }
         setStatus("empty");
         setMeta({
           nodeCount: body.nodeCount ?? 0,
@@ -353,15 +380,24 @@ function OrgChartInner() {
       setForestRoots(body.roots);
       setMeta(nextMeta);
       setWarnings(warningsFromMeta(nextMeta));
+      setLastSyncedAt(body.lastSyncedAt ?? new Date().toISOString());
+      setFromCache(body.cached === true || body.source === "cache");
+      hasReadyData.current = true;
       setStatus("ready");
     } catch (err) {
       const mapped = mapOrgChartHttpError(0, {
         code: "network",
         message: err instanceof Error ? err.message : "Network error",
       });
+      if (isRefresh && hasReadyData.current) {
+        setRefreshError(mapped.message);
+        return;
+      }
       setStatus("error");
       setErrorMessage(mapped.message);
       setErrorRetryable(mapped.retryable);
+    } finally {
+      if (isRefresh) setRefreshing(false);
     }
   }, []);
 
@@ -729,10 +765,21 @@ function OrgChartInner() {
     if (status === "loading") return "Loading org chart…";
     if (status === "error") return "Org chart error";
     if (status === "empty") return "Empty org chart";
+    const synced = lastSyncedAt
+      ? ` · synced ${new Date(lastSyncedAt).toLocaleString()}`
+      : "";
+    const cacheNote = fromCache ? " · from cache" : "";
     return `${meta.nodeCount} people · ${meta.rootCount} roots · ${meta.cycleCount} cycles${
       selectedId ? " · path highlighted" : ""
-    }`;
-  }, [meta, selectedId, status]);
+    }${cacheNote}${synced}${refreshing ? " · refreshing…" : ""}`;
+  }, [
+    fromCache,
+    lastSyncedAt,
+    meta,
+    refreshing,
+    selectedId,
+    status,
+  ]);
 
   if (status === "loading") {
     return (
@@ -772,6 +819,14 @@ function OrgChartInner() {
     >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <div className="flex flex-wrap items-center justify-end gap-1 self-end">
+          <button
+            type="button"
+            disabled={refreshing}
+            className="rounded-norma-md border border-norma-border bg-norma-surface px-2 py-1 text-[11px] font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
+            onClick={() => void load({ refresh: true })}
+          >
+            {refreshing ? "Refreshing…" : "Refresh from Remote"}
+          </button>
           <button
             type="button"
             aria-pressed={compareMode}
@@ -906,6 +961,21 @@ function OrgChartInner() {
             {warningCopy(warning)}
           </p>
         ))}
+        {refreshError ? (
+          <p
+            role="status"
+            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
+          >
+            Refresh failed — kept the previous chart. {refreshError}{" "}
+            <button
+              type="button"
+              className="font-medium text-norma-royal underline"
+              onClick={() => setRefreshError(null)}
+            >
+              Dismiss
+            </button>
+          </p>
+        ) : null}
         {deepLinkError ? (
           <p
             role="status"
