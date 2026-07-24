@@ -27,8 +27,8 @@
 
   /* Text */
   --norma-ink: #121212;
-  --norma-ink-muted: #6b6b6b;
-  --norma-ink-subtle: #9a9590;
+  --norma-ink-muted: #4a4640;
+  --norma-ink-subtle: #6b6660;
   --norma-ink-inverse: #faf8f5;
 
   /* Borders & focus */
@@ -115,40 +115,7 @@
   --shadow-norma-md: var(--norma-shadow-md);
 }
 
-/* Dark tokens must sit outside @layer so they win over :root / @theme. */
-html.dark {
-  color-scheme: dark;
 
-  --norma-canvas: #12151a;
-  --norma-surface: #1c2128;
-  --norma-surface-muted: #262c35;
-  --norma-overlay: rgb(0 0 0 / 0.55);
-
-  --norma-ink: #f2efe9;
-  --norma-ink-muted: #a8a49c;
-  --norma-ink-subtle: #7a7670;
-  --norma-ink-inverse: #121212;
-
-  --norma-border: #323842;
-  --norma-border-strong: #454d5a;
-
-  --norma-lavender: #3a3450;
-  --norma-mint: #2a4038;
-  --norma-peach: #4a3c28;
-  --norma-sky: #2a3848;
-  --norma-rose: #402830;
-
-  --norma-accent-soft: var(--norma-lavender);
-  --norma-highlight-soft: var(--norma-mint);
-  --norma-danger-soft: var(--norma-rose);
-  --norma-success-soft: var(--norma-mint);
-
-  --norma-shadow-sm: 0 2px 8px rgb(0 0 0 / 0.35);
-  --norma-shadow-md: 0 16px 40px rgb(0 0 0 / 0.45);
-
-  --background: var(--norma-canvas);
-  --foreground: var(--norma-ink);
-}
 
 @layer base {
   html {
@@ -176,14 +143,6 @@ html.dark {
       radial-gradient(ellipse 50% 40% at 80% 100%, rgb(217 235 248 / 0.5) 0%, transparent 50%),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E");
     background-size: auto, auto, auto, 180px 180px;
-  }
-
-  html.dark body::before {
-    opacity: 0.45;
-    background-image:
-      radial-gradient(ellipse 70% 50% at -8% -5%, rgb(58 52 80 / 0.55) 0%, transparent 55%),
-      radial-gradient(ellipse 55% 45% at 105% 0%, rgb(74 60 40 / 0.4) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 80% 100%, rgb(42 56 72 / 0.45) 0%, transparent 50%);
   }
 
   body > * {
@@ -273,18 +232,47 @@ html.dark {
 
 /* Morph + bloom (#70) */
 .bloom-enter {
-  animation: bloom-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: bloom-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bloom-enter-delay-1 {
+  animation-delay: 60ms;
+}
+.bloom-enter-delay-2 {
+  animation-delay: 120ms;
+}
+.bloom-enter-delay-3 {
+  animation-delay: 180ms;
+}
+.bloom-enter-delay-4 {
+  animation-delay: 240ms;
+}
+.bloom-enter-delay-5 {
+  animation-delay: 300ms;
+}
+.bloom-enter-delay-6 {
+  animation-delay: 360ms;
 }
 
 @keyframes bloom-enter {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.97);
+    transform: translateY(14px) scale(0.97);
   }
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+@keyframes meter-fill {
+  from {
+    stroke-dashoffset: var(--meter-circumference);
+  }
+}
+
+.meter-ring-progress {
+  animation: meter-fill 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 ::view-transition-old(root),
@@ -293,7 +281,8 @@ html.dark {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bloom-enter {
+  .bloom-enter,
+  .meter-ring-progress {
     animation: none !important;
   }
 
@@ -314,6 +303,12 @@ html.dark {
 
 .marketing-mock-node {
   animation: marketing-float 5.5s ease-in-out infinite;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.marketing-mock-node:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--norma-shadow-md);
 }
 
 .marketing-mock-node-delay {
@@ -322,6 +317,44 @@ html.dark {
 
 .marketing-mock-node-delay-2 {
   animation-delay: 1.2s;
+}
+
+.marketing-surface-card {
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.marketing-surface-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--norma-shadow-md);
+  border-color: color-mix(in srgb, var(--norma-ink) 18%, transparent);
+}
+
+.marketing-editorial {
+  position: relative;
+  overflow: hidden;
+  min-height: 12rem;
+}
+
+.marketing-editorial::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.45), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgb(18 18 18 / 0.06), transparent 40%);
+  pointer-events: none;
+}
+
+.marketing-beat-row {
+  transition: background-color 200ms ease, padding-left 200ms ease;
+}
+
+.marketing-beat-row:hover {
+  background-color: color-mix(in srgb, var(--norma-lavender) 35%, transparent);
+  padding-left: 0.5rem;
 }
 
 @keyframes marketing-rise {
@@ -348,8 +381,18 @@ html.dark {
 @media (prefers-reduced-motion: reduce) {
   .marketing-hero-copy,
   .marketing-hero-visual,
-  .marketing-mock-node {
+  .marketing-mock-node,
+  .marketing-surface-card,
+  .marketing-beat-row {
     animation: none !important;
+    transition: none !important;
+  }
+
+  .marketing-surface-card:hover,
+  .marketing-mock-node:hover,
+  .marketing-beat-row:hover {
+    transform: none;
+    padding-left: 0;
   }
 }
 
@@ -358,10 +401,6 @@ html.dark {
   background: color-mix(in srgb, var(--norma-surface) 72%, transparent);
   backdrop-filter: blur(20px) saturate(1.35);
   -webkit-backdrop-filter: blur(20px) saturate(1.35);
-}
-
-html.dark .norma-glass {
-  background: color-mix(in srgb, var(--norma-surface) 68%, transparent);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -384,9 +423,5 @@ html.dark .norma-glass {
 
 .norma-cta:hover {
   background: var(--norma-accent-hover);
-}
-
-html.dark .norma-cta {
-  background: var(--norma-ink);
-  color: var(--norma-canvas);
+  transform: translateY(-1px);
 }

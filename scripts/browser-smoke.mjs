@@ -121,24 +121,19 @@ async function main() {
     });
     ok("Show in chart from profile", page.url());
 
-    // --- Settings: theme + density ---
+    // --- Settings: density only (light mode locked) ---
     await page.goto(`${BASE}/settings`);
     await page.waitForLoadState("domcontentloaded");
 
-    await page.getByRole("button", { name: "Dark" }).click();
-    await page.waitForTimeout(400);
-    const darkInfo = await page.evaluate(() => ({
+    const themeControls = await page.getByRole("button", { name: "Dark" }).count();
+    await expect("dark mode control removed", themeControls === 0, String(themeControls));
+
+    const lightOnly = await page.evaluate(() => ({
       dark: document.documentElement.classList.contains("dark"),
-      canvas: getComputedStyle(document.documentElement)
-        .getPropertyValue("--norma-canvas")
-        .trim(),
+      scheme: document.documentElement.style.colorScheme || "unset",
     }));
-    await expect("dark mode toggles html.dark", darkInfo.dark);
-    await expect(
-      "dark canvas token applied",
-      /#12151a/i.test(darkInfo.canvas),
-      darkInfo.canvas,
-    );
+    await expect("html is not dark", !lightOnly.dark);
+    ok("light-only theme", lightOnly.scheme);
 
     await page.getByRole("button", { name: "Compact" }).click();
     await page.waitForTimeout(150);
@@ -157,13 +152,6 @@ async function main() {
       density2 === "comfortable",
       density2 ?? "null",
     );
-
-    await page.getByRole("button", { name: "Light" }).click();
-    await page.waitForTimeout(200);
-    const darkOff = await page.evaluate(
-      () => !document.documentElement.classList.contains("dark"),
-    );
-    await expect("light mode clears html.dark", darkOff);
 
     await page.getByRole("link", { name: "Data Health" }).click();
     await page.waitForURL(/\/settings\/data-health/);

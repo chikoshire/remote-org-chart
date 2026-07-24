@@ -48,7 +48,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="norma-glass flex h-12 shrink-0 items-center gap-3 border-b border-norma-border/80 px-3 text-norma-ink md:h-14 md:gap-6 md:px-6"
+        className="norma-glass flex h-14 shrink-0 items-center gap-4 border-b border-norma-border/80 px-4 text-norma-ink md:h-16 md:gap-6 md:px-6"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo withWordmark />
