@@ -116,7 +116,7 @@ export function PeopleDirectory({
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-transparent">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-16 top-8 h-56 w-56 rounded-full bg-[#e85d04]/10 blur-3xl" />
+        <div className="absolute -left-16 top-8 h-56 w-56 rounded-full bg-norma-ink/10 blur-3xl" />
         <div className="absolute right-0 top-32 h-64 w-64 rounded-full bg-[#2a9d8f]/12 blur-3xl" />
       </div>
 
@@ -143,7 +143,7 @@ export function PeopleDirectory({
                 aria-pressed={view === "grid"}
                 className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                   view === "grid"
-                    ? "bg-[#e85d04] text-white shadow-norma-sm"
+                    ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                     : "text-norma-ink-muted hover:text-norma-ink"
                 }`}
                 onClick={() => setView("grid")}
@@ -155,7 +155,7 @@ export function PeopleDirectory({
                 aria-pressed={view === "list"}
                 className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                   view === "list"
-                    ? "bg-[#e85d04] text-white shadow-norma-sm"
+                    ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                     : "text-norma-ink-muted hover:text-norma-ink"
                 }`}
                 onClick={() => setView("list")}
@@ -342,7 +342,7 @@ function PersonCard({
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href={`/app/people/${person.id}`}
-            className="text-xs font-semibold text-norma-royal hover:underline"
+            className="norma-cta px-4 py-1.5 text-xs"
           >
             Full profile
           </Link>
@@ -363,7 +363,7 @@ function PersonCard({
       className={`norma-glass relative flex h-full flex-col overflow-hidden rounded-norma-lg border shadow-norma-sm transition ${
         selected
           ? "border-norma-royal ring-2 ring-norma-royal/25"
-          : "border-norma-border/80 hover:border-[#2a9d8f]/45 hover:shadow-norma-md"
+          : "border-norma-border/80 hover:border-norma-spray/45 hover:shadow-norma-md"
       }`}
       style={
         selected
@@ -380,7 +380,7 @@ function PersonCard({
       >
         <div
           aria-hidden
-          className="mb-0 h-16 w-full bg-gradient-to-br from-norma-surface-muted via-[#dfe8ea] to-[#c5ddd8] dark:from-norma-surface-muted dark:via-[#1a3239] dark:to-[#143a44]"
+          className="mb-0 h-16 w-full bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint dark:from-norma-lavender dark:via-norma-sky dark:to-norma-mint"
         />
         <div className="-mt-10 rounded-full bg-norma-surface p-1 shadow-norma-sm ring-1 ring-norma-border/60">
           <PersonAvatar
@@ -432,7 +432,7 @@ function PersonCard({
       <div className="mt-auto flex shrink-0 justify-center gap-4 border-t border-norma-border/60 px-4 py-3">
         <Link
           href={`/app/people/${person.id}`}
-          className="text-xs font-semibold text-norma-royal hover:underline"
+          className="norma-cta px-4 py-1.5 text-xs"
         >
           Full profile
         </Link>

@@ -136,7 +136,7 @@ async function main() {
     await expect("dark mode toggles html.dark", darkInfo.dark);
     await expect(
       "dark canvas token applied",
-      darkInfo.canvas === "#0d1b1f",
+      /#12151a/i.test(darkInfo.canvas),
       darkInfo.canvas,
     );
 

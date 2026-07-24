@@ -68,7 +68,7 @@ const initialEdges: Edge[] = [
     target: "b",
     type: "reporting",
     data: { highlighted: true },
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#e85d04" },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "#121212" },
   },
   {
     id: "a-c",

@@ -25,11 +25,11 @@ export type PersonNodeData = {
 
 const variantClass: Record<PersonNodeVariant, string> = {
   default:
-    "border-norma-border/90 bg-norma-surface shadow-norma-sm hover:border-[#2a9d8f]/55 hover:shadow-norma-md",
+    "border-norma-border/80 bg-norma-surface/95 shadow-norma-sm hover:border-norma-ink/20 hover:shadow-norma-md",
   selected:
-    "border-norma-royal bg-norma-surface shadow-norma-md ring-2 ring-norma-royal/30",
-  path: "border-[#2a9d8f]/80 bg-norma-highlight-soft/40 shadow-norma-sm",
-  root: "border-[#e85d04]/70 bg-norma-surface shadow-norma-md ring-1 ring-[#e85d04]/20",
+    "border-norma-ink bg-norma-peach/50 shadow-norma-md ring-2 ring-norma-ink/15",
+  path: "border-norma-lavender bg-norma-lavender/70 shadow-norma-sm",
+  root: "border-norma-ink/30 bg-norma-mint/60 shadow-norma-md ring-1 ring-norma-ink/10",
 };
 
 export function PersonNodeCard({

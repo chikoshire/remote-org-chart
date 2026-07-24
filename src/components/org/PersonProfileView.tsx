@@ -225,9 +225,9 @@ export function PersonProfileView({ personId }: { personId: string }) {
   return (
     <div className="relative min-h-0 flex-1 overflow-auto">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-24 -top-20 h-72 w-72 rounded-full bg-[#e85d04]/12 blur-3xl" />
-        <div className="absolute -right-16 top-40 h-80 w-80 rounded-full bg-[#2a9d8f]/14 blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-[#0b2a32]/08 blur-3xl" />
+        <div className="absolute -left-24 -top-20 h-72 w-72 rounded-full bg-norma-ink/12 blur-3xl" />
+        <div className="absolute -right-16 top-40 h-80 w-80 rounded-full bg-norma-sky/40 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-norma-ink/08 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-3xl space-y-5 px-4 py-6 md:px-8 md:py-8">
@@ -255,7 +255,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
         <section className="norma-glass overflow-hidden rounded-norma-lg border border-norma-border/80 shadow-norma-md">
           <div
             aria-hidden
-            className="h-28 bg-gradient-to-br from-[#0b2a32] via-[#1a4a52] to-[#2a9d8f] md:h-36"
+            className="h-28 bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint md:h-36"
           />
           <div className="relative px-5 pb-6 pt-0 md:px-8">
             <div className="-mt-12 flex justify-center md:-mt-14">

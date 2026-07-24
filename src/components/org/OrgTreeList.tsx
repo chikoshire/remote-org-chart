@@ -357,7 +357,7 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
               aria-pressed={density === "comfortable"}
               className={`rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold ${
                 density === "comfortable"
-                  ? "bg-[#e85d04] text-norma-prussian"
+                  ? "bg-norma-ink text-norma-prussian"
                   : "text-norma-ink-muted hover:text-norma-prussian"
               }`}
               onClick={() => setDensity("comfortable")}
@@ -369,7 +369,7 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
               aria-pressed={density === "compact"}
               className={`rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold ${
                 density === "compact"
-                  ? "bg-[#e85d04] text-norma-prussian"
+                  ? "bg-norma-ink text-norma-prussian"
                   : "text-norma-ink-muted hover:text-norma-prussian"
               }`}
               onClick={() => setDensity("compact")}

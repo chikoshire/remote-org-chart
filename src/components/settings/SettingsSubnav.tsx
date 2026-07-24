@@ -26,7 +26,7 @@ export function SettingsSubnav() {
   return (
     <nav
       aria-label="Settings sections"
-      className="flex flex-wrap gap-1 rounded-norma-lg border border-norma-border bg-white/85 p-1 shadow-norma-sm"
+      className="norma-glass flex flex-wrap gap-1 rounded-full border border-norma-border/80 p-1 shadow-norma-sm"
     >
       {TABS.map((tab) => {
         const active = tab.match(pathname);
@@ -35,10 +35,10 @@ export function SettingsSubnav() {
             key={tab.href}
             href={tab.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-norma-md px-3.5 py-2 text-sm font-semibold transition ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
               active
-                ? "bg-[#e85d04] text-white shadow-norma-sm"
-                : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+                ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
+                : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
             }`}
           >
             {tab.label}
