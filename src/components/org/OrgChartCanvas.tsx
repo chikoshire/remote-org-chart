@@ -81,7 +81,6 @@ import {
   readSessionOrgPayload,
   writeSessionOrgPayload,
 } from "@/lib/ui/remote-connection";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   reportingRelation,
@@ -1037,13 +1036,13 @@ function OrgChartInner() {
               onClick={() => setPanelOpen(false)}
               aria-label="Hide side panel"
             >
-              Hide panel
+              Hide
             </button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="flex flex-col gap-3">
               <div
-                className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
+                className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted/60 p-1"
                 role="group"
                 aria-label="Org chart presentation"
               >
@@ -1052,7 +1051,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "chart"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "chart"
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("chart")}
@@ -1064,7 +1063,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "tree"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "tree"
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("tree")}
@@ -1076,7 +1075,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "map"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "map"
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("map")}
@@ -1084,19 +1083,13 @@ function OrgChartInner() {
                   Map
                 </button>
               </div>
-              <Link
-                href="/app/people"
-                className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-center text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian"
-              >
-                Open People directory
-              </Link>
               <button
                 type="button"
                 disabled={refreshing || !remoteConnected}
                 className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
                 onClick={() => void load({ refresh: true })}
               >
-                {refreshing ? "Refreshing…" : "Refresh people"}
+                {refreshing ? "Refreshing…" : "Refresh"}
               </button>
               <OrgFiltersBar
                 filters={filters}
@@ -1135,9 +1128,7 @@ function OrgChartInner() {
                   className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
                   autoComplete="off"
                 />
-                <p className="text-[11px] text-norma-ink-subtle">
-                  Select a person to open their profile. ⌘K jumps anywhere.
-                </p>
+
                 {suggestions.length > 0 ? (
                   <ul
                     id="org-search-results"
