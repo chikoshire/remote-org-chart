@@ -862,6 +862,26 @@ We want proportional stop weights by headcount instead of equal spacing.
 
 ---
 
+## 2026-07-24 — Settings density live preview + official Remote mark
+
+**Status:** Accepted  
+
+**Context:**  
+Chart preferences left empty space beside Comfortable/Compact with no visual of the outcome. The Integrations row used a generic “R” tile instead of Remote’s mark.
+
+**Decision:**  
+1. Add `DensityPreview` on Settings using real `PersonNodeCard` samples that switch with the density toggle (prefs already write on click so the org chart matches).  
+2. Ship `public/brand/remote-mark.svg` from Remote’s public Contentstack asset (`Union.svg` on remote.com) and render via `RemoteMark`.
+
+**Consequences:**  
+- Preview is illustrative sample people, not live Remote data.  
+- Remote trademark used only as attribution for the integration.
+
+**Revisit when:**  
+Remote publishes a formal press-kit URL we should prefer.
+
+---
+
 ## Template for future entries
 
 
