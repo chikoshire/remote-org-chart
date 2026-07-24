@@ -48,6 +48,13 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(how).not.toContain("divide-y");
     expect(how).not.toContain("bg-norma-ink text-norma-ink-inverse");
 
+    const shot = readFileSync(
+      join(process.cwd(), "src/components/marketing/MarketingAppShot.tsx"),
+      "utf8",
+    );
+    expect(shot).toContain("object-contain");
+    expect(shot).not.toContain("object-cover");
+
     for (const file of [
       "public/marketing/hero-org-chart.png",
       "public/marketing/app-dashboard.png",
