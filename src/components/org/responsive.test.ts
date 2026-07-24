@@ -6,7 +6,7 @@ const canvas = readFileSync(
   join(process.cwd(), "src/components/org/OrgChartCanvas.tsx"),
   "utf8",
 );
-const page = readFileSync(join(process.cwd(), "src/app/page.tsx"), "utf8");
+const page = readFileSync(join(process.cwd(), "src/app/app/page.tsx"), "utf8");
 
 describe("responsive org chart chrome", () => {
   it("enables pinch zoom and touch-friendly pan modes", () => {
@@ -16,8 +16,8 @@ describe("responsive org chart chrome", () => {
     expect(canvas).toContain("useMediaQuery");
   });
 
-  it("uses a denser mobile page layout for the canvas", () => {
-    expect(page).toContain("min-h-[100dvh]");
-    expect(page).toMatch(/p-2|md:p-6/);
+  it("uses a flex workspace layout for the org page", () => {
+    expect(page).toContain("min-h-0 flex-1");
+    expect(canvas).toContain("flex-col md:flex-row");
   });
 });

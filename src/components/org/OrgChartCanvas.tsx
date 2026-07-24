@@ -67,12 +67,8 @@ import {
   resolvePersonDeepLink,
   withPersonSearchParam,
 } from "@/lib/org/deep-links";
-import {
-  chartExportFilename,
-  downloadDataUrl,
-  exportChartDataUrl,
-} from "@/lib/org/export-chart";
 import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
+import { readLiveDefault, writeLiveDefault } from "@/lib/ui/prefs";
 import {
   reportingRelation,
   type ReportingRelation,
@@ -246,7 +242,6 @@ function OrgChartInner() {
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
   const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
   const [urlSyncReady, setUrlSyncReady] = useState(false);
-  const [exportBusy, setExportBusy] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [compareA, setCompareA] = useState<string | null>(null);
   const [compareB, setCompareB] = useState<string | null>(null);
@@ -258,12 +253,11 @@ function OrgChartInner() {
   const [syncLogToken, setSyncLogToken] = useState(0);
   const [eventsOpen, setEventsOpen] = useState(false);
   const [eventsToken, setEventsToken] = useState(0);
-  const [liveUpdates, setLiveUpdates] = useState(false);
+  const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
   const [viewMode, setViewMode] = useState<"chart" | "directory">("chart");
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
-  const chartRootRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
     [],
@@ -623,6 +617,7 @@ function OrgChartInner() {
         void fitView({
           nodes: [...path].map((nodeId) => ({ id: nodeId })),
           padding: 0.35,
+          maxZoom: 0.9,
           duration: reducedMotion ? 0 : 420,
         });
       });
@@ -635,7 +630,8 @@ function OrgChartInner() {
     requestAnimationFrame(() => {
       void fitView({
         nodes: [...relation.highlightIds].map((nodeId) => ({ id: nodeId })),
-        padding: 0.3,
+        padding: 0.35,
+        maxZoom: 0.9,
         duration: reducedMotion ? 0 : 420,
       });
     });
@@ -668,26 +664,6 @@ function OrgChartInner() {
     setSelectedId(null);
     setDeepLinkError(null);
   }, []);
-
-  const exportChart = useCallback(
-    async (format: "png" | "svg") => {
-      const root = chartRootRef.current;
-      if (!root || exportBusy) return;
-      setExportBusy(true);
-      try {
-        const dataUrl = await exportChartDataUrl(root, format, {
-          reducedMotion,
-          backgroundColor: "#f4f6fb",
-        });
-        downloadDataUrl(dataUrl, chartExportFilename(format));
-      } catch {
-        // Keep UI quiet — status line already shows chart state.
-      } finally {
-        setExportBusy(false);
-      }
-    },
-    [exportBusy, reducedMotion],
-  );
 
   useEffect(() => {
     if (status !== "ready") return;
@@ -796,19 +772,33 @@ function OrgChartInner() {
 
   const directoryPeople = useMemo(() => {
     const list = [...peopleIndex.values()];
-    return list.filter((p) => {
-      if (
-        filters.department &&
-        (p.department?.trim() ?? "") !== filters.department
-      ) {
-        return false;
-      }
-      if (filters.country && (p.country?.trim() ?? "") !== filters.country) {
-        return false;
-      }
-      return true;
-    });
-  }, [filters.country, filters.department, peopleIndex]);
+    return list
+      .filter((p) => {
+        if (
+          filters.department &&
+          (p.department?.trim() ?? "") !== filters.department
+        ) {
+          return false;
+        }
+        if (filters.country && (p.country?.trim() ?? "") !== filters.country) {
+          return false;
+        }
+        if (
+          filters.jobTitle &&
+          (p.jobTitle?.trim() ?? "") !== filters.jobTitle
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .map((p) => {
+        const mgrId = p.managerEmploymentId;
+        const managerName = mgrId
+          ? (peopleIndex.get(mgrId)?.fullName?.trim() ?? null)
+          : null;
+        return { ...p, managerName };
+      });
+  }, [filters.country, filters.department, filters.jobTitle, peopleIndex]);
 
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
@@ -829,6 +819,50 @@ function OrgChartInner() {
     selectedId,
     status,
   ]);
+
+  const personDrawer =
+    selectedDetail && !compareMode ? (
+      <PersonDetailDrawer
+        person={selectedDetail.person}
+        pathToRoot={selectedDetail.pathToRoot}
+        reports={selectedDetail.reports}
+        onClose={clearSelection}
+        onSelectPerson={focusPerson}
+      />
+    ) : null;
+
+  const auxiliaryPanels =
+    !selectedDetail && !compareMode ? (
+      <>
+        <OrgInsightsPanel
+          insights={insights}
+          open={insightsOpen}
+          onOpenChange={setInsightsOpen}
+        />
+        <SyncRunsPanel
+          open={syncLogOpen}
+          onOpenChange={setSyncLogOpen}
+          refreshToken={syncLogToken}
+        />
+        <WebhookEventsPanel
+          open={eventsOpen}
+          onOpenChange={setEventsOpen}
+          refreshToken={eventsToken}
+        />
+      </>
+    ) : null;
+
+  const statusLine = (
+    <p
+      role="status"
+      aria-live="polite"
+      className="shrink-0 border-t border-norma-border bg-norma-surface/95 px-3 py-2 text-[11px] text-norma-ink-muted"
+    >
+      {statusLabel}
+      {filtersAreActive(filters) ? " · filters on" : ""}
+      {viewMode === "chart" && isMobile ? " · pinch to zoom · drag to pan" : ""}
+    </p>
+  );
 
   if (status === "loading") {
     return (
@@ -863,11 +897,10 @@ function OrgChartInner() {
 
   return (
     <div
-      ref={chartRootRef}
-      className={`relative h-full w-full ${reducedMotion ? "" : "org-chart-enter"}`}
+      className={`flex h-full min-h-0 w-full flex-col md:flex-row ${reducedMotion ? "" : "org-chart-enter"}`}
     >
-      <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
-        <div className="flex flex-wrap items-center justify-end gap-1 self-end">
+      <aside className="w-full shrink-0 overflow-y-auto border-b border-norma-border bg-norma-surface p-3 md:w-80 md:border-b-0 md:border-r">
+        <div className="flex flex-col gap-3">
           <div
             className="flex items-center gap-0.5 rounded-norma-md border border-[#0b2a32]/15 bg-[#0b2a32] p-1 shadow-norma-md"
             role="group"
@@ -876,7 +909,7 @@ function OrgChartInner() {
             <button
               type="button"
               aria-pressed={viewMode === "chart"}
-              className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+              className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                 viewMode === "chart"
                   ? "bg-[#e85d04] text-[#0b2a32]"
                   : "text-[#9fd5de] hover:text-[#f4f7f5]"
@@ -888,7 +921,7 @@ function OrgChartInner() {
             <button
               type="button"
               aria-pressed={viewMode === "directory"}
-              className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+              className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                 viewMode === "directory"
                   ? "bg-[#e85d04] text-[#0b2a32]"
                   : "text-[#9fd5de] hover:text-[#f4f7f5]"
@@ -901,334 +934,322 @@ function OrgChartInner() {
           <button
             type="button"
             disabled={refreshing}
-            className="rounded-norma-md border border-norma-border bg-norma-surface px-2 py-1 text-[11px] font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
+            className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
             onClick={() => void load({ refresh: true })}
           >
             {refreshing ? "Refreshing…" : "Refresh from Remote"}
           </button>
-          <button
-            type="button"
-            aria-pressed={liveUpdates}
-            className={`rounded-norma-md border px-2 py-1 text-[11px] font-medium shadow-norma-sm ${
-              liveUpdates
-                ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
-                : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
-            }`}
-            onClick={() => {
-              setLiveUpdates((v) => !v);
-            }}
-          >
-            {liveUpdates ? "Live on" : "Live"}
-          </button>
-          <button
-            type="button"
-            aria-pressed={compareMode}
-            className={`rounded-norma-md border px-2 py-1 text-[11px] font-medium shadow-norma-sm ${
-              compareMode
-                ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
-                : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
-            }`}
-            onClick={() => (compareMode ? exitCompare() : enterCompare())}
-          >
-            {compareMode ? "Exit compare" : "Compare"}
-          </button>
-          <div
-            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
-            role="group"
-            aria-label="Export chart"
-          >
-            <button
-              type="button"
-              disabled={exportBusy || filterEmpty}
-              className="rounded-norma-sm px-2 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
-              onClick={() => void exportChart("png")}
-            >
-              {exportBusy ? "Exporting…" : "PNG"}
-            </button>
-            <button
-              type="button"
-              disabled={exportBusy || filterEmpty}
-              className="rounded-norma-sm px-2 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
-              onClick={() => void exportChart("svg")}
-            >
-              SVG
-            </button>
+          <OrgFiltersBar
+            filters={filters}
+            departments={filterOptions.departments}
+            countries={filterOptions.countries}
+            jobTitles={filterOptions.jobTitles}
+            onChange={setFilters}
+            onReset={() => setFilters(EMPTY_ORG_FILTERS)}
+          />
+          <div className="flex flex-col gap-1">
+            <label className="sr-only" htmlFor="org-search">
+              Search people by name or title
+            </label>
+            <input
+              ref={searchInputRef}
+              id="org-search"
+              type="search"
+              role="combobox"
+              aria-expanded={suggestions.length > 0}
+              aria-controls="org-search-results"
+              aria-autocomplete="list"
+              aria-haspopup="listbox"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setQuery("");
+                  return;
+                }
+                if (e.key === "Enter" && suggestions[0]) {
+                  e.preventDefault();
+                  focusPerson(suggestions[0].id);
+                }
+              }}
+              placeholder="Search by name or title… (/)"
+              className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
+              autoComplete="off"
+            />
+            <p className="text-[11px] text-norma-ink-subtle">
+              Select a person to open their profile.
+            </p>
+            {suggestions.length > 0 ? (
+              <ul
+                id="org-search-results"
+                role="listbox"
+                aria-label="Matching people"
+                className="max-h-56 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-md"
+              >
+                {suggestions.map((person) => (
+                  <li key={person.id} role="option" aria-selected={false}>
+                    <button
+                      type="button"
+                      className="flex min-h-11 w-full flex-col items-start px-3 py-1.5 text-left hover:bg-norma-accent-soft focus-visible:bg-norma-accent-soft"
+                      onClick={() => focusPerson(person.id)}
+                    >
+                      <span className="text-sm font-medium text-norma-prussian">
+                        {person.fullName ?? "Unknown"}
+                      </span>
+                      <span className="text-xs text-norma-ink-muted">
+                        {person.jobTitle ?? "No title"}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
-          <div
-            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
-            role="group"
-            aria-label="Node density"
-          >
-            <button
-              type="button"
-              aria-pressed={density === "comfortable"}
-              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-                density === "comfortable"
-                  ? "bg-norma-accent-soft text-norma-royal"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
-              }`}
-              onClick={() => setDensityPreference("comfortable")}
+          {warnings.map((warning) => (
+            <p
+              key={warning.type}
+              role="status"
+              className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
             >
-              Comfortable
-            </button>
-            <button
-              type="button"
-              aria-pressed={density === "compact"}
-              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-                density === "compact"
-                  ? "bg-norma-accent-soft text-norma-royal"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
-              }`}
-              onClick={() => setDensityPreference("compact")}
+              {warningCopy(warning)}
+            </p>
+          ))}
+          {refreshError ? (
+            <p
+              role="status"
+              className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
             >
-              Compact
-            </button>
-          </div>
-        </div>
-        <OrgFiltersBar
-          filters={filters}
-          departments={filterOptions.departments}
-          countries={filterOptions.countries}
-          onChange={setFilters}
-          onReset={() => setFilters(EMPTY_ORG_FILTERS)}
-        />
-        <label className="sr-only" htmlFor="org-search">
-          Search people by name or title
-        </label>
-        <input
-          ref={searchInputRef}
-          id="org-search"
-          type="search"
-          role="combobox"
-          aria-expanded={suggestions.length > 0}
-          aria-controls="org-search-results"
-          aria-autocomplete="list"
-          aria-haspopup="listbox"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setQuery("");
-              return;
-            }
-            if (e.key === "Enter" && suggestions[0]) {
-              e.preventDefault();
-              focusPerson(suggestions[0].id);
-            }
-          }}
-          placeholder="Search by name or title… (/)"
-          className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
-          autoComplete="off"
-        />
-        {suggestions.length > 0 ? (
-          <ul
-            id="org-search-results"
-            role="listbox"
-            aria-label="Matching people"
-            className="max-h-56 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-md"
-          >
-            {suggestions.map((person) => (
-              <li key={person.id} role="option" aria-selected={false}>
+              Refresh failed — kept the previous chart. {refreshError}{" "}
+              <button
+                type="button"
+                className="font-medium text-norma-royal underline"
+                onClick={() => setRefreshError(null)}
+              >
+                Dismiss
+              </button>
+            </p>
+          ) : null}
+          {deepLinkError ? (
+            <p
+              role="status"
+              className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
+            >
+              {deepLinkError}{" "}
+              <button
+                type="button"
+                className="font-medium text-norma-royal underline"
+                onClick={() => {
+                  setDeepLinkError(null);
+                  const next = withPersonSearchParam(
+                    window.location.search,
+                    null,
+                  );
+                  window.history.replaceState(
+                    null,
+                    "",
+                    `${window.location.pathname}${next}${window.location.hash}`,
+                  );
+                }}
+              >
+                Dismiss
+              </button>
+            </p>
+          ) : null}
+          {compareMode ? (
+            <div
+              role="status"
+              className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-2 text-xs text-norma-prussian shadow-norma-sm"
+            >
+              <p className="font-medium">Reporting distance</p>
+              <p className="mt-1 text-norma-ink-muted">
+                {personLabel(compareA)}
+                {" → "}
+                {personLabel(compareB)}
+              </p>
+              <p className="mt-1">{compareHint}</p>
+            </div>
+          ) : null}
+          <details className="rounded-norma-md border border-norma-border bg-norma-surface-muted/50 px-3 py-2">
+            <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+              Tools
+            </summary>
+            <div className="mt-2 flex flex-col gap-2">
+              <button
+                type="button"
+                aria-pressed={liveUpdates}
+                className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
+                  liveUpdates
+                    ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                    : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => {
+                  setLiveUpdates((v) => {
+                    const next = !v;
+                    writeLiveDefault(next);
+                    return next;
+                  });
+                }}
+              >
+                {liveUpdates ? "Live updates on" : "Live updates off"}
+              </button>
+              <button
+                type="button"
+                aria-pressed={compareMode}
+                className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
+                  compareMode
+                    ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                    : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => (compareMode ? exitCompare() : enterCompare())}
+              >
+                {compareMode ? "Exit compare mode" : "Compare reporting distance"}
+              </button>
+              <div
+                className="flex flex-wrap gap-1"
+                role="group"
+                aria-label="Node density"
+              >
                 <button
                   type="button"
-                  className="flex min-h-11 w-full flex-col items-start px-3 py-1.5 text-left hover:bg-norma-accent-soft focus-visible:bg-norma-accent-soft"
-                  onClick={() => focusPerson(person.id)}
+                  aria-pressed={density === "comfortable"}
+                  className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                    density === "comfortable"
+                      ? "bg-norma-accent-soft text-norma-royal"
+                      : "border border-norma-border text-norma-ink-muted hover:text-norma-prussian"
+                  }`}
+                  onClick={() => setDensityPreference("comfortable")}
                 >
-                  <span className="text-sm font-medium text-norma-prussian">
-                    {person.fullName ?? "Unknown"}
-                  </span>
-                  <span className="text-xs text-norma-ink-muted">
-                    {person.jobTitle ?? "No title"}
-                  </span>
+                  Comfortable
                 </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {warnings.map((warning) => (
-          <p
-            key={warning.type}
-            role="status"
-            className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
-          >
-            {warningCopy(warning)}
-          </p>
-        ))}
-        {refreshError ? (
-          <p
-            role="status"
-            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
-          >
-            Refresh failed — kept the previous chart. {refreshError}{" "}
-            <button
-              type="button"
-              className="font-medium text-norma-royal underline"
-              onClick={() => setRefreshError(null)}
-            >
-              Dismiss
-            </button>
-          </p>
-        ) : null}
-        {deepLinkError ? (
-          <p
-            role="status"
-            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
-          >
-            {deepLinkError}{" "}
-            <button
-              type="button"
-              className="font-medium text-norma-royal underline"
-              onClick={() => {
-                setDeepLinkError(null);
-                const next = withPersonSearchParam(window.location.search, null);
-                window.history.replaceState(
-                  null,
-                  "",
-                  `${window.location.pathname}${next}${window.location.hash}`,
-                );
+                <button
+                  type="button"
+                  aria-pressed={density === "compact"}
+                  className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                    density === "compact"
+                      ? "bg-norma-accent-soft text-norma-royal"
+                      : "border border-norma-border text-norma-ink-muted hover:text-norma-prussian"
+                  }`}
+                  onClick={() => setDensityPreference("compact")}
+                >
+                  Compact
+                </button>
+              </div>
+              <button
+                type="button"
+                aria-pressed={syncLogOpen}
+                className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
+                  syncLogOpen
+                    ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                    : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setSyncLogOpen((v) => !v)}
+              >
+                {syncLogOpen ? "Hide sync log" : "Show sync log"}
+              </button>
+              <button
+                type="button"
+                aria-pressed={eventsOpen}
+                className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
+                  eventsOpen
+                    ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                    : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setEventsOpen((v) => !v)}
+              >
+                {eventsOpen ? "Hide webhook events" : "Show webhook events"}
+              </button>
+              <button
+                type="button"
+                aria-pressed={insightsOpen}
+                className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
+                  insightsOpen
+                    ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                    : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setInsightsOpen((v) => !v)}
+              >
+                {insightsOpen ? "Hide org insights" : "Show org insights"}
+              </button>
+            </div>
+          </details>
+        </div>
+      </aside>
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="relative min-h-0 flex-1">
+          {filterEmpty && viewMode === "chart" ? (
+            <ChartEmptyState
+              title="No people match these filters"
+              description="Ancestors stay when they connect a match to the root. Reset filters to see the full Acme org again."
+              action={
+                <RetryButton
+                  label="Reset filters"
+                  onClick={() => setFilters(EMPTY_ORG_FILTERS)}
+                />
+              }
+            />
+          ) : viewMode === "directory" ? (
+            <PeopleDirectory
+              people={directoryPeople}
+              selectedId={selectedId}
+              query={query}
+              onSelect={focusPerson}
+              onOpenInChart={(id) => {
+                setViewMode("chart");
+                focusPerson(id);
               }}
+            />
+          ) : (
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
+              onNodeClick={onNodeClick}
+              onPaneClick={onPaneClick}
+              fitView
+              fitViewOptions={{ padding: 0.35, maxZoom: 0.85 }}
+              minZoom={0.2}
+              maxZoom={1.4}
+              proOptions={{ hideAttribution: true }}
+              nodesConnectable={false}
+              nodesFocusable
+              edgesFocusable={false}
+              deleteKeyCode={null}
+              panOnScroll
+              panOnDrag
+              zoomOnScroll
+              zoomOnPinch
+              zoomOnDoubleClick={!isMobile}
+              selectionOnDrag={false}
+              preventScrolling
+              className="h-full w-full"
+              aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
             >
-              Dismiss
-            </button>
-          </p>
-        ) : null}
-        {compareMode ? (
-          <div
-            role="status"
-            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-2 text-xs text-norma-prussian shadow-norma-sm"
-          >
-            <p className="font-medium">Reporting distance</p>
-            <p className="mt-1 text-norma-ink-muted">
-              {personLabel(compareA)}
-              {" → "}
-              {personLabel(compareB)}
-            </p>
-            <p className="mt-1">{compareHint}</p>
-          </div>
-        ) : null}
-      </div>
-      {filterEmpty && viewMode === "chart" ? (
-        <ChartEmptyState
-          title="No people match these filters"
-          description="Ancestors stay when they connect a match to the root. Reset filters to see the full Acme org again."
-          action={
-            <RetryButton
-              label="Reset filters"
-              onClick={() => setFilters(EMPTY_ORG_FILTERS)}
-            />
-          }
-        />
-      ) : viewMode === "directory" ? (
-        <>
-          <PeopleDirectory
-            people={directoryPeople}
-            selectedId={selectedId}
-            query={query}
-            onSelect={focusPerson}
-            onOpenInChart={(id) => {
-              setViewMode("chart");
-              focusPerson(id);
-            }}
-          />
-          {selectedDetail && !compareMode ? (
-            <PersonDetailDrawer
-              person={selectedDetail.person}
-              pathToRoot={selectedDetail.pathToRoot}
-              reports={selectedDetail.reports}
-              onClose={clearSelection}
-              onSelectPerson={focusPerson}
-            />
-          ) : null}
-        </>
-      ) : (
-        <>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
-            fitView
-            fitViewOptions={{ padding: isMobile ? 0.12 : 0.2 }}
-            minZoom={isMobile ? 0.08 : 0.15}
-            maxZoom={1.4}
-            proOptions={{ hideAttribution: true }}
-            nodesConnectable={false}
-            nodesFocusable
-            edgesFocusable={false}
-            deleteKeyCode={null}
-            panOnScroll
-            panOnDrag
-            zoomOnScroll
-            zoomOnPinch
-            zoomOnDoubleClick={!isMobile}
-            selectionOnDrag={false}
-            preventScrolling
-            aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
-          >
-            <Background color="#c5d5d1" gap={isMobile ? 16 : 22} size={1} />
-            <Controls
-              showInteractive={false}
-              position={isMobile ? "bottom-right" : "bottom-left"}
-              className={isMobile ? "!m-2" : undefined}
-              aria-label="Chart zoom controls"
-            />
-            {!isMobile ? (
-              <MiniMap
-                pannable
-                zoomable
-                nodeColor={() => "#e85d04"}
-                maskColor="rgb(11 42 50 / 0.08)"
-                aria-label="Organization chart overview map"
+              <Background color="#c5d5d1" gap={isMobile ? 16 : 22} size={1} />
+              <Controls
+                showInteractive={false}
+                position={isMobile ? "bottom-right" : "bottom-left"}
+                className={isMobile ? "!m-2" : undefined}
+                aria-label="Chart zoom controls"
               />
-            ) : null}
-          </ReactFlow>
-          <p
-            role="status"
-            aria-live="polite"
-            className={`pointer-events-none absolute rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm ${
-              isMobile ? "bottom-14 left-2 max-w-[70%]" : "bottom-3 left-3"
-            }`}
-          >
-            {statusLabel}
-            {filtersAreActive(filters) ? " · filters on" : ""}
-            {isMobile ? " · pinch to zoom · drag to pan" : ""}
-          </p>
-          {selectedDetail && !compareMode ? (
-            <PersonDetailDrawer
-              person={selectedDetail.person}
-              pathToRoot={selectedDetail.pathToRoot}
-              reports={selectedDetail.reports}
-              onClose={clearSelection}
-              onSelectPerson={focusPerson}
-            />
-          ) : null}
-          {!selectedDetail && !compareMode ? (
-            <OrgInsightsPanel
-              insights={insights}
-              open={insightsOpen}
-              onOpenChange={setInsightsOpen}
-            />
-          ) : null}
-          {!selectedDetail && !compareMode ? (
-            <SyncRunsPanel
-              open={syncLogOpen}
-              onOpenChange={setSyncLogOpen}
-              refreshToken={syncLogToken}
-            />
-          ) : null}
-          {!selectedDetail && !compareMode ? (
-            <WebhookEventsPanel
-              open={eventsOpen}
-              onOpenChange={setEventsOpen}
-              refreshToken={eventsToken}
-            />
-          ) : null}
-        </>
-      )}
+              {!isMobile ? (
+                <MiniMap
+                  pannable
+                  zoomable
+                  nodeColor={() => "#e85d04"}
+                  maskColor="rgb(11 42 50 / 0.08)"
+                  aria-label="Organization chart overview map"
+                />
+              ) : null}
+            </ReactFlow>
+          )}
+          {personDrawer}
+          {auxiliaryPanels}
+        </div>
+        {statusLine}
+      </div>
     </div>
   );
 }
@@ -1236,7 +1257,7 @@ function OrgChartInner() {
 export function OrgChartCanvas() {
   return (
     <ReactFlowProvider>
-      <div className="h-[min(100dvh-9rem,720px)] w-full md:h-[min(78vh,720px)]">
+      <div className="h-full min-h-0 w-full">
         <OrgChartInner />
       </div>
     </ReactFlowProvider>
