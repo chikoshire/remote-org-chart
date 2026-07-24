@@ -131,7 +131,8 @@ function markCycles(byId: Map<string, OrgNode>): string[] {
       onPath.add(current);
       visited.add(current);
 
-      const next = byId.get(current)?.managerEmploymentId ?? null;
+      const next: string | null =
+        byId.get(current)?.managerEmploymentId ?? null;
       if (!next || next === current) {
         if (next === current) {
           cycle.add(current);
