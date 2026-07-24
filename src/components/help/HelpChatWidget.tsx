@@ -21,6 +21,8 @@ const SUGGESTIONS = [
 export function HelpChatWidget() {
   const titleId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
+  const feedEndRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -36,6 +38,16 @@ export function HelpChatWidget() {
     setOpen(true);
   }, []);
 
+  const scrollFeedToEnd = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const feed = feedRef.current;
+    if (!feed) return;
+    if (typeof feed.scrollTo === "function") {
+      feed.scrollTo({ top: feed.scrollHeight, behavior });
+    } else {
+      feed.scrollTop = feed.scrollHeight;
+    }
+  }, []);
+
   useEffect(() => {
     const onOpen = () => openPanel();
     window.addEventListener("acme:open-help-chat", onOpen);
@@ -45,6 +57,11 @@ export function HelpChatWidget() {
   useEffect(() => {
     if (open) inputRef.current?.focus();
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    scrollFeedToEnd(messages.length <= 2 ? "auto" : "smooth");
+  }, [busy, messages, open, scrollFeedToEnd]);
 
   async function send(text: string) {
     const content = text.trim();
@@ -119,7 +136,10 @@ export function HelpChatWidget() {
               Close
             </button>
           </header>
-          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3">
+          <div
+            ref={feedRef}
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3"
+          >
             {messages.map((m, i) => (
               <div
                 key={`${m.role}-${i}`}
@@ -132,13 +152,18 @@ export function HelpChatWidget() {
                 {m.content}
               </div>
             ))}
+            {busy ? (
+              <div className="mr-4 rounded-norma-md bg-norma-lavender/40 px-3 py-2 text-sm text-norma-ink-muted">
+                Thinking…
+              </div>
+            ) : null}
             {messages.length <= 1 ? (
               <div className="flex flex-wrap gap-1.5">
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}
                     type="button"
-                    className="rounded-full border border-norma-border bg-norma-surface px-2.5 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian"
+                    className="cursor-pointer rounded-full border border-norma-border bg-norma-surface px-2.5 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian"
                     onClick={() => void send(s)}
                   >
                     {s}
@@ -146,6 +171,7 @@ export function HelpChatWidget() {
                 ))}
               </div>
             ) : null}
+            <div ref={feedEndRef} aria-hidden className="h-px w-full shrink-0" />
           </div>
           <form
             onSubmit={onSubmit}
