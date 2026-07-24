@@ -9,18 +9,19 @@ describe("Org Intelligence IA routes", () => {
     expect(readFileSync(path, "utf8")).toContain("DashboardWorkspace");
   });
 
-  it("has /app/people page with directory views", () => {
+  it("has /app/people page with directory", () => {
     const path = join(process.cwd(), "src/app/app/people/page.tsx");
     expect(existsSync(path)).toBe(true);
     expect(readFileSync(path, "utf8")).toContain("PeopleWorkspace");
   });
 
-  it("redirects legacy /app/departments into People Departments view", () => {
+  it("redirects legacy /app/departments to Dashboard", () => {
     const path = join(process.cwd(), "src/app/app/departments/page.tsx");
     expect(existsSync(path)).toBe(true);
     const src = readFileSync(path, "utf8");
-    expect(src).toContain('redirect("/app/people?view=departments")');
+    expect(src).toContain('redirect("/app/dashboard")');
     expect(src).not.toContain("DepartmentsWorkspace");
+    expect(src).not.toContain("view=departments");
   });
 
   it("keeps Data Health under Settings with redirect from old path", () => {
