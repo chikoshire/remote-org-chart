@@ -65,24 +65,28 @@ export function PeopleDirectory({
   }, [deptOnly, people, query]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-norma-surface-muted/40">
-      <div className="flex flex-wrap items-center gap-2 border-b border-norma-border bg-norma-surface px-4 py-3">
-        <p className="text-sm font-medium text-norma-prussian">
-          {filtered.length}{" "}
-          {filtered.length === 1 ? "person" : "people"}
-        </p>
-        <label className="ml-auto flex items-center gap-2 text-xs text-norma-ink-muted">
+    <div className="flex h-full min-h-0 flex-col bg-[linear-gradient(180deg,#eef3f2_0%,#f7faf9_40%,#ffffff_100%)]">
+      <div className="flex flex-wrap items-center gap-3 border-b border-norma-border bg-[#0b2a32] px-4 py-3 text-[#f4f7f5]">
+        <div>
+          <p className="font-[family-name:var(--font-norma-display)] text-sm font-semibold tracking-tight">
+            People directory
+          </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#9fd5de]">
+            {filtered.length} {filtered.length === 1 ? "person" : "people"}
+          </p>
+        </div>
+        <label className="ml-auto flex items-center gap-2 text-xs text-[#9fd5de]">
           <span className="sr-only">Filter directory by department</span>
           <select
             value={deptOnly}
             onChange={(e) =>
               setDeptOnly(e.target.value === "all" ? "all" : e.target.value)
             }
-            className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1.5 text-xs text-norma-ink"
+            className="rounded-norma-sm border border-white/20 bg-white/10 px-2 py-1.5 text-xs text-[#f4f7f5]"
           >
             <option value="all">All departments</option>
             {departments.map((d) => (
-              <option key={d} value={d}>
+              <option key={d} value={d} className="text-norma-prussian">
                 {d}
               </option>
             ))}
@@ -105,25 +109,29 @@ export function PeopleDirectory({
             return (
               <li key={person.id}>
                 <article
-                  className={`flex h-full flex-col rounded-norma-lg border bg-norma-surface p-4 shadow-norma-sm transition ${
+                  className={`relative flex h-full flex-col overflow-hidden rounded-norma-lg border bg-norma-surface shadow-norma-sm transition ${
                     selected
-                      ? "border-norma-royal ring-2 ring-norma-royal/25"
-                      : "border-norma-border hover:border-norma-border-strong"
+                      ? "border-norma-royal ring-2 ring-norma-royal/30"
+                      : "border-norma-border hover:border-[#2a9d8f]/70 hover:shadow-norma-md"
                   }`}
                 >
+                  <div
+                    aria-hidden
+                    className="h-14 bg-[linear-gradient(135deg,#0b2a32_0%,#1a6b7a_55%,#e85d04_140%)]"
+                  />
                   <button
                     type="button"
-                    className="flex w-full items-start gap-3 text-left"
+                    className="flex w-full -mt-7 items-start gap-3 px-4 text-left"
                     onClick={() => onSelect(person.id)}
                     aria-pressed={selected}
                   >
                     <span
                       aria-hidden
-                      className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-norma-accent-soft text-sm font-semibold text-norma-royal"
+                      className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-norma-surface bg-norma-accent-soft text-base font-semibold text-norma-royal shadow-norma-sm"
                     >
                       {initials(person.fullName)}
                     </span>
-                    <span className="min-w-0 flex-1">
+                    <span className="min-w-0 flex-1 pt-8">
                       <span className="block truncate font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-prussian">
                         {name}
                       </span>
@@ -143,13 +151,13 @@ export function PeopleDirectory({
                       </span>
                     </span>
                   </button>
-                  <div className="mt-3 flex gap-2 border-t border-norma-border pt-3">
+                  <div className="mt-auto flex gap-3 border-t border-norma-border px-4 py-3">
                     <button
                       type="button"
-                      className="text-xs font-medium text-norma-royal hover:underline"
+                      className="text-xs font-semibold text-norma-royal hover:underline"
                       onClick={() => onSelect(person.id)}
                     >
-                      Profile
+                      Open profile
                     </button>
                     <button
                       type="button"
