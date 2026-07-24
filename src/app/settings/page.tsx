@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ProductShell } from "@/components/shell/ProductShell";
 import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
-import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
 import { SettingsChrome } from "@/components/settings/SettingsChrome";
 import type { ChartDensity } from "@/lib/org/collapse";
@@ -87,41 +86,47 @@ export default function SettingsPage() {
     <ProductShell status={<span>Preferences</span>}>
       <SettingsChrome>
         <ProductPageFrame>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
-                Acme
-              </p>
-              <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian">
-                Preferences
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-norma-ink-muted">
-                Manage how Acme connects to Remote and how the org chart looks
-                for you.
-              </p>
-            </div>
-            <AcmeLogo withWordmark={false} />
+          <div>
+            <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+              Preferences
+            </h1>
+            <p className="mt-1 text-sm text-norma-ink-muted">
+              Remote connection and chart appearance on this device
+            </p>
           </div>
 
-          <section className="mt-8 rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
-            <h2 className="text-sm font-semibold text-norma-prussian">
-              Integrations
-            </h2>
-            <p className="mt-1 text-xs text-norma-ink-muted">
-              People data for the org chart.
-            </p>
-
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-norma-md border border-norma-border bg-norma-surface-muted/50 px-4 py-4">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-norma-prussian">
-                  Remote
-                </p>
+          <section className="mt-6 rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-norma-prussian">
+                  Integrations
+                </h2>
                 <p className="mt-0.5 text-xs text-norma-ink-muted">
-                  HR platform · employments &amp; reporting lines
+                  People data source
                 </p>
-                <p
-                  className={`mt-2 text-xs font-semibold ${
-                    liveConnected ? "text-norma-success" : "text-norma-ink-muted"
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-white to-norma-surface-muted/60 px-4 py-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-norma-md bg-norma-prussian text-[11px] font-bold tracking-wide text-white">
+                  R
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-norma-prussian">
+                    Remote
+                  </p>
+                  <p className="text-xs text-norma-ink-muted">
+                    Employments &amp; reporting lines
+                  </p>
+                </div>
+                <span
+                  className={`ml-1 rounded-norma-sm px-2 py-0.5 text-[11px] font-semibold ${
+                    liveConnected
+                      ? "bg-norma-success-soft text-norma-success"
+                      : connected
+                        ? "bg-amber-100 text-amber-900"
+                        : "bg-norma-surface-muted text-norma-ink-muted"
                   }`}
                 >
                   {liveConnected
@@ -129,7 +134,7 @@ export default function SettingsPage() {
                     : connected
                       ? "Connecting…"
                       : "Disconnected"}
-                </p>
+                </span>
               </div>
               {connected ? (
                 <button
@@ -143,17 +148,15 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setWizardOpen(true)}
-                  className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-norma-prussian hover:bg-[#ff7a2f]"
+                  className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ff7a2f]"
                 >
                   Connect
                 </button>
               )}
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-norma-ink-muted">
-              Disconnect pauses org data in this browser. Connect walks through
-              a short wizard and turns data back on instantly. Company
-              credentials stay on the server. This is not a Remote OAuth login
-              redirect.
+            <p className="mt-3 text-xs text-norma-ink-muted">
+              Disconnect pauses org data in this browser. Credentials stay on the
+              server.
             </p>
             {wizardOpen && !connected ? (
               <RemoteConnectWizard
@@ -164,13 +167,13 @@ export default function SettingsPage() {
             ) : null}
           </section>
 
-          <section className="mt-6 space-y-5 rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
+          <section className="mt-5 space-y-5 rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
             <div>
               <h2 className="text-sm font-semibold text-norma-prussian">
                 Chart preferences
               </h2>
-              <p className="mt-1 text-xs text-norma-ink-muted">
-                Saved on this device only.
+              <p className="mt-0.5 text-xs text-norma-ink-muted">
+                Saved on this device
               </p>
             </div>
 
@@ -179,7 +182,7 @@ export default function SettingsPage() {
                 Card size
               </h3>
               <div
-                className="mt-3 flex gap-2"
+                className="mt-3 inline-flex gap-1 rounded-norma-md border border-norma-border bg-norma-surface-muted/50 p-1"
                 role="group"
                 aria-label="Default density"
               >
@@ -188,8 +191,8 @@ export default function SettingsPage() {
                   aria-pressed={density === "comfortable"}
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     density === "comfortable"
-                      ? "bg-[#e85d04] text-norma-prussian"
-                      : "border border-norma-border text-norma-ink-muted"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setDensity("comfortable")}
                 >
@@ -200,8 +203,8 @@ export default function SettingsPage() {
                   aria-pressed={density === "compact"}
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     density === "compact"
-                      ? "bg-[#e85d04] text-norma-prussian"
-                      : "border border-norma-border text-norma-ink-muted"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setDensity("compact")}
                 >
@@ -215,7 +218,7 @@ export default function SettingsPage() {
                 Appearance
               </h3>
               <div
-                className="mt-3 flex gap-2"
+                className="mt-3 inline-flex gap-1 rounded-norma-md border border-norma-border bg-norma-surface-muted/50 p-1"
                 role="group"
                 aria-label="Color theme"
               >
@@ -224,8 +227,8 @@ export default function SettingsPage() {
                   aria-pressed={theme === "light"}
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     theme === "light"
-                      ? "bg-[#e85d04] text-norma-prussian"
-                      : "border border-norma-border text-norma-ink-muted"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => {
                     setTheme("light");
@@ -239,8 +242,8 @@ export default function SettingsPage() {
                   aria-pressed={theme === "dark"}
                   className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
                     theme === "dark"
-                      ? "bg-[#e85d04] text-norma-prussian"
-                      : "border border-norma-border text-norma-ink-muted"
+                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => {
                     setTheme("dark");
@@ -250,12 +253,9 @@ export default function SettingsPage() {
                   Dark
                 </button>
               </div>
-              <p className="mt-2 text-xs text-norma-ink-muted">
-                Theme is controlled here only. It is saved on this device.
-              </p>
             </div>
 
-            <label className="flex items-start gap-2 text-sm text-norma-prussian">
+            <label className="flex items-start gap-2.5 text-sm text-norma-prussian">
               <input
                 type="checkbox"
                 className="mt-0.5"
@@ -263,10 +263,9 @@ export default function SettingsPage() {
                 onChange={(e) => setLiveDefault(e.target.checked)}
               />
               <span>
-                Automatically refresh when Remote sends updates
+                Auto-refresh when Remote sends updates
                 <span className="mt-0.5 block text-xs font-normal text-norma-ink-muted">
-                  Turn this on if you want the chart to stay current during a
-                  live demo.
+                  Useful for live demos
                 </span>
               </span>
             </label>
