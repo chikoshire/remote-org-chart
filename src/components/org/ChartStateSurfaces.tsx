@@ -34,7 +34,10 @@ export function ChartEmptyState({
   action,
 }: Partial<SurfaceProps>) {
   return (
-    <div className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 px-6 text-center">
+    <div
+      role="status"
+      className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 px-6 text-center"
+    >
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-norma-accent-soft text-norma-royal">
         <span aria-hidden className="text-lg font-semibold">
           ∅
@@ -84,7 +87,7 @@ export function RetryButton({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-norma-sm bg-norma-royal px-3 py-1.5 text-sm font-medium text-norma-ink-inverse hover:bg-norma-accent-hover"
+      className="min-h-11 min-w-11 rounded-norma-sm bg-norma-royal px-3 py-1.5 text-sm font-medium text-norma-ink-inverse hover:bg-norma-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-norma-ring"
     >
       {label}
     </button>
