@@ -37,6 +37,7 @@ import {
   type ChartWarning,
 } from "@/lib/org/chart-state";
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
+import { personAccessibleName } from "@/lib/org/person-a11y";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 type OrgChartResponse = {
   ok: boolean;
@@ -64,14 +65,17 @@ function applySelection(
 ): { nodes: Node<PersonNodeData>[]; edges: Edge<ReportingEdgeData>[] } {
   if (!selectedId) {
     return {
-      nodes: nodes.map((n) => ({
-        ...n,
-        selected: false,
-        data: {
-          ...n.data,
-          variant: n.data.variant === "root" ? "root" : "default",
-        },
-      })),
+      nodes: nodes.map((n) => {
+        const variant: PersonNodeData["variant"] =
+          n.data.variant === "root" ? "root" : "default";
+        const data = { ...n.data, variant };
+        return {
+          ...n,
+          selected: false,
+          ariaLabel: personAccessibleName(data),
+          data,
+        };
+      }),
       edges: edges.map((e) => ({
         ...e,
         data: { ...e.data, highlighted: false },
@@ -89,10 +93,12 @@ function applySelection(
       if (onPath) variant = isSelected ? "selected" : "path";
       if (n.data.variant === "root" && onPath && !isSelected) variant = "path";
       if (n.data.variant === "root" && isSelected) variant = "selected";
+      const data = { ...n.data, variant };
       return {
         ...n,
         selected: isSelected,
-        data: { ...n.data, variant },
+        ariaLabel: personAccessibleName(data),
+        data,
       };
     }),
     edges: edges.map((e) => ({
@@ -282,24 +288,44 @@ function OrgChartInner() {
     <div className="relative h-full w-full">
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <label className="sr-only" htmlFor="org-search">
-          Search people
+          Search people by name or title
         </label>
         <input
           id="org-search"
           type="search"
+          role="combobox"
+          aria-expanded={suggestions.length > 0}
+          aria-controls="org-search-results"
+          aria-autocomplete="list"
+          aria-haspopup="listbox"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setQuery("");
+              return;
+            }
+            if (e.key === "Enter" && suggestions[0]) {
+              e.preventDefault();
+              focusPerson(suggestions[0].id);
+            }
+          }}
           placeholder="Search by name or title…"
-          className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
+          className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
           autoComplete="off"
         />
         {suggestions.length > 0 ? (
-          <ul className="max-h-56 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-md">
+          <ul
+            id="org-search-results"
+            role="listbox"
+            aria-label="Matching people"
+            className="max-h-56 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-md"
+          >
             {suggestions.map((person) => (
-              <li key={person.id}>
+              <li key={person.id} role="option" aria-selected={false}>
                 <button
                   type="button"
-                  className="flex w-full flex-col items-start px-3 py-1.5 text-left hover:bg-norma-accent-soft"
+                  className="flex min-h-11 w-full flex-col items-start px-3 py-1.5 text-left hover:bg-norma-accent-soft focus-visible:bg-norma-accent-soft"
                   onClick={() => focusPerson(person.id)}
                 >
                   <span className="text-sm font-medium text-norma-prussian">
@@ -316,6 +342,7 @@ function OrgChartInner() {
         {warnings.map((warning) => (
           <p
             key={warning.type}
+            role="status"
             className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
           >
             {warningCopy(warning)}
@@ -337,6 +364,8 @@ function OrgChartInner() {
         maxZoom={1.4}
         proOptions={{ hideAttribution: true }}
         nodesConnectable={false}
+        nodesFocusable
+        edgesFocusable={false}
         deleteKeyCode={null}
         panOnScroll
         panOnDrag
@@ -345,12 +374,14 @@ function OrgChartInner() {
         zoomOnDoubleClick={!isMobile}
         selectionOnDrag={false}
         preventScrolling
+        aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
       >
         <Background color="#d5dce8" gap={isMobile ? 16 : 20} size={1} />
         <Controls
           showInteractive={false}
           position={isMobile ? "bottom-right" : "bottom-left"}
           className={isMobile ? "!m-2" : undefined}
+          aria-label="Chart zoom controls"
         />
         {!isMobile ? (
           <MiniMap
@@ -358,10 +389,13 @@ function OrgChartInner() {
             zoomable
             nodeColor={() => "#624DE3"}
             maskColor="rgb(0 35 75 / 0.08)"
+            aria-label="Organization chart overview map"
           />
         ) : null}
       </ReactFlow>
       <p
+        role="status"
+        aria-live="polite"
         className={`pointer-events-none absolute rounded-norma-sm bg-norma-surface/90 px-2 py-1 text-[11px] text-norma-ink-muted shadow-norma-sm ${
           isMobile ? "bottom-14 left-2 max-w-[70%]" : "bottom-3 left-3"
         }`}

@@ -3,6 +3,7 @@ import type { Edge, Node } from "@xyflow/react";
 import type { OrgNode } from "@/lib/org/types";
 import type { PersonNodeData } from "@/components/org/PersonNodeCard";
 import type { ReportingEdgeData } from "@/components/org/ReportingEdge";
+import { personAccessibleName } from "@/lib/org/person-a11y";
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 96;
@@ -46,6 +47,15 @@ export function layoutOrgChart(
       id: node.id,
       type: "person",
       position: { x: 0, y: 0 },
+      ariaLabel: personAccessibleName({
+        fullName: node.fullName,
+        jobTitle: node.jobTitle,
+        department: node.department,
+        country: node.country,
+        directReports: node.directReports,
+        inCycle: node.inCycle,
+        variant: parentId === null ? "root" : "default",
+      }),
       data: {
         fullName: node.fullName,
         jobTitle: node.jobTitle,
