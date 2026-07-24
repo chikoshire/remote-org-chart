@@ -45,18 +45,38 @@ function looksLikePersonQuery(text: string): boolean {
   );
 }
 
-async function peopleFromSnapshot(): Promise<SearchablePerson[]> {
+function looksLikeOrgStatsQuery(text: string): boolean {
+  const t = text.toLowerCase();
+  return (
+    /\b(how many|headcount|team size|number of people|people in (the )?team|total people)\b/.test(
+      t,
+    ) || /\b(count|size of)\b/.test(t)
+  );
+}
+
+async function peopleFromSnapshot(): Promise<
+  Array<SearchablePerson & { department?: string | null; country?: string | null }>
+> {
   const snap = await readOrgChartSnapshot();
-  const nodes = (snap as { nodes?: Array<{
-    id: string;
-    fullName?: string | null;
-    jobTitle?: string | null;
-  }> } | null)?.nodes;
+  const nodes = (
+    snap as {
+      nodes?: Array<{
+        id: string;
+        fullName?: string | null;
+        jobTitle?: string | null;
+        department?: string | null;
+        country?: string | null;
+      }>;
+      nodeCount?: number;
+    } | null
+  )?.nodes;
   if (!nodes?.length) return [];
   return nodes.map((n) => ({
     id: n.id,
     fullName: n.fullName ?? null,
     jobTitle: n.jobTitle ?? null,
+    department: n.department ?? null,
+    country: n.country ?? null,
   }));
 }
 
@@ -114,28 +134,48 @@ export async function POST(request: Request) {
     .join("\n\n");
 
   let peopleBlock = "";
-  if (looksLikePersonQuery(lastUser.content)) {
+  let statsBlock = "";
+  const needPeople =
+    looksLikePersonQuery(lastUser.content) ||
+    looksLikeOrgStatsQuery(lastUser.content);
+  if (needPeople) {
     const people = await peopleFromSnapshot();
-    const hits = searchPeople(people, lastUser.content, 5);
-    if (hits.length) {
-      peopleBlock = hits
-        .map(
-          (p) =>
-            `- ${p.fullName ?? "Unknown"} (${p.jobTitle ?? "Title not set"}; profile /app/people/${p.id})`,
-        )
-        .join("\n");
+    if (looksLikeOrgStatsQuery(lastUser.content) && people.length > 0) {
+      const depts = new Map<string, number>();
+      for (const p of people) {
+        const d = p.department?.trim() || "Unknown";
+        depts.set(d, (depts.get(d) ?? 0) + 1);
+      }
+      const topDepts = [...depts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => `${name}: ${count}`)
+        .join("; ");
+      statsBlock = `Active people in the current org snapshot: ${people.length}. Top departments: ${topDepts}.`;
+    }
+    if (looksLikePersonQuery(lastUser.content)) {
+      const hits = searchPeople(people, lastUser.content, 5);
+      if (hits.length) {
+        peopleBlock = hits
+          .map(
+            (p) =>
+              `- ${p.fullName ?? "Unknown"} (${p.jobTitle ?? "Title not set"}; profile /app/people/${p.id})`,
+          )
+          .join("\n");
+      }
     }
   }
 
   const system = [
     "You are the Acme Org Chart Help assistant.",
-    "Answer briefly using the Help knowledge base and optional people matches.",
+    "Answer briefly using the Help knowledge base and optional org facts.",
     "Never invent demo passwords or API tokens. Credentials are shared privately.",
     "If unsure, point the user to /help or the relevant product surface.",
     "Prefer linking to /help/<slug> or /app/people/<id> when useful.",
     "",
     "## Help knowledge base",
     kbBlock || "(no matching help pages)",
+    statsBlock ? `\n## Org snapshot stats\n${statsBlock}` : "",
     peopleBlock ? `\n## People matches\n${peopleBlock}` : "",
   ].join("\n");
 
@@ -165,7 +205,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = (await ai.run("@cf/meta/llama-3.1-8b-instruct", {
+    const result = (await ai.run("@cf/meta/llama-3.1-8b-instruct-fast", {
       messages: [{ role: "system", content: system }, ...messages],
       max_tokens: 512,
     })) as { response?: string; result?: string };
@@ -181,15 +221,13 @@ export async function POST(request: Request) {
       citations: chunks.map((c) => ({ slug: c.slug, title: c.title })),
     });
   } catch (err) {
-    return NextResponse.json(
-      {
-        ok: false,
-        message:
-          err instanceof Error
-            ? err.message
-            : "Assistant failed. Try again or open /help.",
-      },
-      { status: 502 },
-    );
+    const raw =
+      err instanceof Error
+        ? err.message
+        : "Assistant failed. Try again or open /help.";
+    const message = /deprecated|5028/i.test(raw)
+      ? "The help model needs a quick update on the server. Open /help for how-tos in the meantime."
+      : raw;
+    return NextResponse.json({ ok: false, message }, { status: 502 });
   }
 }
