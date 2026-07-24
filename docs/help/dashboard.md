@@ -17,4 +17,4 @@ Next to the synced timestamp, use **Refresh from Remote** to bypass the cache an
 
 ## Jumping elsewhere
 
-KPI cards and attention rows navigate into Org Chart, People, or Data Health.
+KPI cards and attention rows navigate into Org Chart, People, or Data Health. The Departments card opens Org Chart with the Department filter menu already expanded so you can pick a team right away.
