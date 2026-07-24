@@ -90,7 +90,6 @@ import {
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 import { withViewTransition } from "@/lib/ui/motion";
-import { DepartmentColorLegend } from "@/components/org/DepartmentColorLegend";
 
 type FlatPerson = {
   id: string;
@@ -1123,10 +1122,6 @@ function OrgChartInner() {
                 jobTitles={filterOptions.jobTitles}
                 onChange={setFilters}
                 onReset={() => setFilters(EMPTY_ORG_FILTERS)}
-              />
-              <DepartmentColorLegend
-                departments={filterOptions.departments}
-                className="rounded-norma-md border border-norma-border/60 bg-white/50 px-2.5 py-2"
               />
               <div className="flex flex-col gap-1">
                 <label className="sr-only" htmlFor="org-search">

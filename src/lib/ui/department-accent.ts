@@ -1,5 +1,5 @@
 /**
- * Pastel department accents — lavender / mint / peach / sky / rose.
+ * Pastel department accents — wider set so sibling teams stay distinguishable.
  */
 const PASTELS = [
   "#9b8ec4", // lavender
@@ -8,6 +8,12 @@ const PASTELS = [
   "#6a9ec4", // sky
   "#c48aa0", // rose
   "#8a9eb0", // cool gray-blue
+  "#c4a88e", // warm sand
+  "#7eb8a8", // seafoam
+  "#b09ec9", // soft violet
+  "#d4b06a", // soft gold
+  "#8eb4c9", // powder blue
+  "#c49aa8", // dusty rose
 ] as const;
 
 const FALLBACK = "#8a8580";

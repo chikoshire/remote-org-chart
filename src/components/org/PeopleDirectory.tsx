@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
-import { DepartmentColorLegend } from "@/components/org/DepartmentColorLegend";
+import { DepartmentFilterSelect } from "@/components/org/DepartmentFilterSelect";
 import { isIncompletePerson } from "@/lib/org/data-health";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import {
@@ -144,7 +144,7 @@ export function PeopleDirectory({
               {deptOnly !== "all" ? ` in ${deptOnly}` : ""}
             </p>
           </div>
-          <div className="flex flex-wrap items-end gap-3">
+          <div className="flex flex-wrap items-end justify-end gap-3">
             <div
               className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted/60 p-1"
               role="group"
@@ -175,25 +175,6 @@ export function PeopleDirectory({
                 List
               </button>
             </div>
-            <label className="flex flex-col gap-1 text-xs font-medium text-norma-ink-subtle">
-              Department
-              <select
-                value={deptOnly}
-                onChange={(e) =>
-                  setDeptOnly(
-                    e.target.value === "all" ? "all" : e.target.value,
-                  )
-                }
-                className="min-w-[10rem] rounded-norma-md border border-norma-border bg-norma-surface px-2.5 py-2 text-sm font-normal text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
-              >
-                <option value="all">All departments</option>
-                {departments.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-            </label>
             <label className="flex items-center gap-2 self-end pb-2 text-xs font-medium text-norma-ink-muted">
               <input
                 type="checkbox"
@@ -208,6 +189,12 @@ export function PeopleDirectory({
                 </span>
               ) : null}
             </label>
+            <DepartmentFilterSelect
+              departments={departments}
+              value={deptOnly === "all" ? null : deptOnly}
+              onChange={(dept) => setDeptOnly(dept ?? "all")}
+              className="min-w-[12rem]"
+            />
           </div>
         </div>
         <label className="mt-3 block">
@@ -224,10 +211,6 @@ export function PeopleDirectory({
             autoComplete="off"
           />
         </label>
-        <DepartmentColorLegend
-          departments={departments}
-          className="mt-3"
-        />
       </div>
 
       {filtered.length === 0 ? (
