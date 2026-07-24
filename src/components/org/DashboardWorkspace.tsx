@@ -519,12 +519,9 @@ export function DashboardWorkspace() {
     );
   }
 
+  // Keep Completeness off `sky` so it doesn’t twin the Managers card.
   const completenessTone: KpiTone =
-    insights.completenessScore >= 90
-      ? "mint"
-      : insights.completenessScore >= 70
-        ? "sky"
-        : "rose";
+    insights.completenessScore >= 70 ? "mint" : "rose";
 
   return (
     <ProductPageFrame>
