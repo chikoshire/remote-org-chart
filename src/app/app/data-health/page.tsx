@@ -1,12 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { ProductShell } from "@/components/shell/ProductShell";
-import { DataHealthWorkspace } from "@/components/org/DataHealthWorkspace";
-
-export default function DataHealthPage() {
-  return (
-    <ProductShell status={<span>Data Health</span>}>
-      <DataHealthWorkspace />
-    </ProductShell>
-  );
+/** Data Health lives under Settings. */
+export default function DataHealthRedirectPage() {
+  redirect("/settings/data-health");
 }
