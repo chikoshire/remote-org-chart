@@ -456,12 +456,13 @@ Remote’s product surfaces people with profile photos via `employment.user.prof
 **Decision:**  
 1. Pass through Remote photo URLs when the API provides them (`profile_picture` / `profilePicture` / nested `user`, allowlisted HTTPS hosts including `cdn.employ-assets.remote.com`).  
 2. **Do not** invent third-party portraits (no DiceBear). When no photo URL exists, show department-colored initials — the same honest fallback Remote uses without a photo.  
-3. Keep Org Chart **Map** mode for country pins.
+3. Keep Org Chart **Map** mode for country pins — rendered as a real Natural Earth world map (`world-atlas` + `d3-geo`), not decorative blob silhouettes. Highlight countries with people; pins use the same projection.
 
 **Consequences:**  
 - Avatars match Remote only when the REST payload includes a picture URL.  
 - Sandbox demo people currently render as initials until Remote exposes photos on the customer API (or we gain an authenticated employ-API path).  
-- Map depends on country being set on employments.
+- Map depends on country being set on employments.  
+- Tiny territories missing from countries-110m (e.g. Singapore) still get pins via centroids even without a filled polygon.
 
 **Revisit when:**  
 Remote documents a customer-API way to read `employment.user.profilePicture`, or interviewers accept a session-based employ API integration.
