@@ -950,7 +950,9 @@ function OrgChartInner() {
     >
       {statusLabel}
       {filtersAreActive(filters) ? " · filters on" : ""}
-      {isMobile ? " · pinch to zoom · drag to pan" : ""}
+      {isMobile
+        ? " · pinch to zoom · drag to pan"
+        : " · scroll to zoom · drag to pan"}
     </p>
   );
 
@@ -1397,7 +1399,8 @@ function OrgChartInner() {
               nodesFocusable
               edgesFocusable={false}
               deleteKeyCode={null}
-              panOnScroll
+              // Scroll = zoom (Map parity). Drag pans; trackpad pinch still zooms.
+              panOnScroll={false}
               panOnDrag
               zoomOnScroll
               zoomOnPinch
@@ -1405,7 +1408,7 @@ function OrgChartInner() {
               selectionOnDrag={false}
               preventScrolling
               className="h-full w-full bg-transparent"
-              aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
+              aria-label="Interactive organization chart. Scroll to zoom, drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
             >
               <Background color="#d5e0dd" gap={isMobile ? 18 : 24} size={1.1} />
               <Controls

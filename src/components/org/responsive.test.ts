@@ -11,7 +11,8 @@ const page = readFileSync(join(process.cwd(), "src/app/app/page.tsx"), "utf8");
 describe("responsive org chart chrome", () => {
   it("enables pinch zoom and touch-friendly pan modes", () => {
     expect(canvas).toContain("zoomOnPinch");
-    expect(canvas).toContain("panOnScroll");
+    expect(canvas).toContain("zoomOnScroll");
+    expect(canvas).toContain("panOnScroll={false}");
     expect(canvas).toContain("panOnDrag");
     expect(canvas).toContain("useMediaQuery");
   });

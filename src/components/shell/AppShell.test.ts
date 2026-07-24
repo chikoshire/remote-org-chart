@@ -17,7 +17,7 @@ describe("ProductShell", () => {
     expect(shell).toContain('href: "/app/dashboard"');
     expect(shell).toContain('href: "/app"');
     expect(shell).toContain('href: "/app/people"');
-    expect(shell).toContain('href: "/app/departments"');
+    expect(shell).not.toContain('href: "/app/departments"');
     expect(shell).not.toContain('href: "/app/data-health"');
     expect(shell).toContain('href="/settings"');
     expect(shell).toContain("Log out");
@@ -26,7 +26,7 @@ describe("ProductShell", () => {
     expect(shell).toContain("Dashboard");
     expect(shell).toContain("Org Chart");
     expect(shell).toContain("People");
-    expect(shell).toContain("Departments");
+    expect(shell).not.toContain('label: "Departments"');
     expect(shell).not.toContain('label: "Data Health"');
     expect(shell).toContain("bg-norma-surface");
     expect(shell).not.toContain('href="/welcome"');
