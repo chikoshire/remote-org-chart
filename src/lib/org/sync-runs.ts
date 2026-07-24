@@ -57,21 +57,25 @@ export async function writeSyncRun(
   db: D1Like | null = getSyncRunsDb(),
 ): Promise<void> {
   if (!db) return;
-  await db
-    .prepare(
-      `INSERT INTO sync_runs
-        (started_at, finished_at, ok, employment_count, error_summary, trigger)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      input.startedAt,
-      input.finishedAt,
-      input.ok ? 1 : 0,
-      input.employmentCount ?? null,
-      sanitizeSyncError(input.errorSummary),
-      input.trigger,
-    )
-    .run();
+  try {
+    await db
+      .prepare(
+        `INSERT INTO sync_runs
+          (started_at, finished_at, ok, employment_count, error_summary, trigger)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        input.startedAt,
+        input.finishedAt,
+        input.ok ? 1 : 0,
+        input.employmentCount ?? null,
+        sanitizeSyncError(input.errorSummary),
+        input.trigger,
+      )
+      .run();
+  } catch {
+    // Local/dev D1 may lack migrations — never fail the org-chart response for telemetry.
+  }
 }
 
 export async function listSyncRuns(
