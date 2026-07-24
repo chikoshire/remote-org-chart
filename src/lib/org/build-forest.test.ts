@@ -13,6 +13,7 @@ function emp(
     status: partial.status ?? "active",
     country: partial.country ?? null,
     workEmail: partial.workEmail ?? null,
+    avatarUrl: partial.avatarUrl ?? null,
     managerName: partial.managerName ?? null,
     managerEmploymentId: partial.managerEmploymentId ?? null,
     ...partial,

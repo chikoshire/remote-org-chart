@@ -13,6 +13,7 @@ function person(
     status: "active",
     country: partial.country ?? null,
     workEmail: null,
+    avatarUrl: null,
     managerEmploymentId: partial.managerEmploymentId ?? null,
     inCycle: partial.inCycle ?? false,
     directReports: partial.directReports ?? (partial.children?.length ?? 0),

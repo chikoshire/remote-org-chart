@@ -18,6 +18,7 @@ function person(
     status: "active",
     country: null,
     workEmail: null,
+    avatarUrl: null,
     managerEmploymentId: null,
     inCycle: false,
     directReports: partial.children?.length ?? 0,

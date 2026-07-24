@@ -16,7 +16,9 @@ describe("OrgTreeList optional wow", () => {
     expect(tree).toContain("Organization tree list");
     expect(tree).toContain("aria-expanded");
     expect(canvas).toContain('viewMode === "tree"');
+    expect(canvas).toContain('viewMode === "map"');
     expect(canvas).toContain("OrgTreeList");
+    expect(canvas).toContain("OrgWorldMap");
     expect(canvas).toContain("Chart");
     expect(canvas).toContain("Tree");
   });

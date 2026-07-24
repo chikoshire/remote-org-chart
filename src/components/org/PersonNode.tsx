@@ -18,6 +18,7 @@ export function PersonNode({ data, selected, id }: NodeProps) {
     <div className="relative">
       <Handle type="target" position={Position.Top} />
       <PersonNodeCard
+        id={id}
         fullName={person.fullName ?? null}
         jobTitle={person.jobTitle ?? null}
         department={person.department ?? null}
@@ -26,6 +27,7 @@ export function PersonNode({ data, selected, id }: NodeProps) {
         inCycle={Boolean(person.inCycle)}
         managerMissing={Boolean(person.managerMissing)}
         incompleteFields={Boolean(person.incompleteFields)}
+        avatarUrl={person.avatarUrl ?? null}
         variant={variant}
         density={person.density}
         collapsed={person.collapsed}

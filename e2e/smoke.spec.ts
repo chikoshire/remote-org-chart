@@ -221,6 +221,13 @@ test.describe("org chart smoke", () => {
     await expect(
       page.getByRole("list", { name: "Organization tree list" }),
     ).toBeVisible();
+    await page.getByRole("button", { name: "Map" }).click();
+    await expect(
+      page.getByRole("img", { name: /world map of people/i }),
+    ).toBeVisible();
+    await expect(page.getByText(/countr(?:y|ies) with people/i)).toBeVisible();
+    await page.getByRole("button", { name: /United States|USA/i }).click();
+    await expect(page.getByText("Alex Root")).toBeVisible();
     await page.getByRole("button", { name: "Chart" }).click();
 
     const search = page.getByRole("combobox", {

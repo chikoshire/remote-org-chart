@@ -52,6 +52,7 @@ describe("employment schemas", () => {
       status: "active",
       country: "PT",
       workEmail: "ada@example.com",
+      avatarUrl: null,
       managerName: "Boss",
       managerEmploymentId: "emp_0",
     });

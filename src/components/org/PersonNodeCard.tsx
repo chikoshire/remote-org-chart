@@ -1,10 +1,12 @@
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { isIncompletePerson } from "@/lib/org/data-health";
+import { PersonAvatar } from "@/components/org/PersonAvatar";
 
 export type PersonNodeVariant = "default" | "selected" | "path" | "root";
 
 export type PersonNodeData = {
+  id?: string;
   fullName: string | null;
   jobTitle: string | null;
   department: string | null;
@@ -13,6 +15,7 @@ export type PersonNodeData = {
   inCycle?: boolean;
   managerMissing?: boolean;
   incompleteFields?: boolean;
+  avatarUrl?: string | null;
   variant?: PersonNodeVariant;
   density?: "comfortable" | "compact";
   collapsed?: boolean;
@@ -20,12 +23,6 @@ export type PersonNodeData = {
   /** Set by canvas — toggles subtree collapse for managers. */
   onToggleCollapse?: () => void;
 };
-
-function initials(name: string | null): string {
-  if (!name?.trim()) return "?";
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
 
 const variantClass: Record<PersonNodeVariant, string> = {
   default:
@@ -37,6 +34,7 @@ const variantClass: Record<PersonNodeVariant, string> = {
 };
 
 export function PersonNodeCard({
+  id,
   fullName,
   jobTitle,
   department,
@@ -45,6 +43,7 @@ export function PersonNodeCard({
   inCycle = false,
   managerMissing = false,
   incompleteFields,
+  avatarUrl = null,
   variant = "default",
   density = "comfortable",
   collapsed = false,
@@ -110,15 +109,14 @@ export function PersonNodeCard({
         }}
       />
       <div className={`flex items-start gap-3 ${compact ? "pl-1" : "pl-1.5"}`}>
-        <span
-          aria-hidden
-          className={`mt-0.5 inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white shadow-norma-sm ${
-            compact ? "h-9 w-9 text-[11px]" : "h-11 w-11 text-sm"
-          }`}
-          style={{ backgroundColor: accent }}
-        >
-          {initials(fullName)}
-        </span>
+        <PersonAvatar
+          personId={id || fullName || "person"}
+          fullName={fullName}
+          department={department}
+          avatarUrl={avatarUrl}
+          size={compact ? "sm" : "md"}
+          className="mt-0.5"
+        />
         <div className="min-w-0 flex-1">
           <h3
             className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-prussian ${
