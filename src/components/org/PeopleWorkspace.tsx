@@ -20,6 +20,7 @@ import { withPersonSearchParam } from "@/lib/org/deep-links";
 import {
   mapOrgChartHttpError,
 } from "@/lib/org/chart-state";
+import { withViewTransition } from "@/lib/ui/motion";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -72,6 +73,12 @@ export function PeopleWorkspace() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [people, setPeople] = useState<FlatPerson[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const selectPerson = useCallback((id: string | null) => {
+    void withViewTransition(() => {
+      setSelectedId(id);
+    });
+  }, []);
 
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
@@ -183,10 +190,12 @@ export function PeopleWorkspace() {
       <PeopleDirectory
         people={directoryPeople}
         selectedId={selectedId}
-        onSelect={setSelectedId}
+        onSelect={selectPerson}
         onOpenInChart={(id) => {
           const search = withPersonSearchParam("", id);
-          router.push(`/app${search}`);
+          void withViewTransition(() => {
+            router.push(`/app${search}`);
+          });
         }}
       />
       {selected ? (
@@ -194,8 +203,8 @@ export function PeopleWorkspace() {
           person={selected.person}
           pathToRoot={selected.pathToRoot}
           reports={selected.reports}
-          onClose={() => setSelectedId(null)}
-          onSelectPerson={setSelectedId}
+          onClose={() => selectPerson(null)}
+          onSelectPerson={selectPerson}
         />
       ) : null}
     </div>
