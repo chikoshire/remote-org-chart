@@ -359,6 +359,47 @@ Design system expands beyond Acme assessment chrome.
 
 ---
 
+## 2026-07-24 — Org intelligence IA (brief + wow)
+
+**Status:** Accepted  
+
+**Context:**  
+Core Remote brief is already met. Next goal is to impress: treat Acme as an organisational intelligence product (Dashboard, Org Chart, People, Departments, Data Health), with marketing login, honest Remote connect UX, and stronger edge-case visuals. Reference UIs (Org Mapper, pastel trees, light SaaS shells) beat our current chrome consistency.
+
+**Decision:**  
+Ship the serial wow track GH#58–#68 (Linear TUXX-1593–1603). Top nav after auth: Dashboard · Org Chart · People · Departments · Data Health · Settings gear. Marketing + demo app login/logout. Visual system pass on chart + People. Edge-case badges + Data Health. Theme preference in Settings only. No em dashes in product copy. Command bar and tree-list view tracked as stretch wow (#66–#67).
+
+**Consequences:**  
+- One parent at a time; dedicated `feat/` / `ui/` / `cross/` branches named on each issue.  
+- Brief React Flow chart remains the Org Chart primary; tree list is optional add-on.  
+
+**Revisit when:**  
+Interview handoff date forces cutting optional #66–#67.
+
+---
+
+## 2026-07-24 — Remote Connect Option B; OAuth scaffolded but off
+
+**Status:** Accepted  
+
+**Context:**  
+Ideal product UX would be Connect → Remote OAuth → redirect back. The assessment architecture uses a **server-side read-only Bearer token** (`REMOTE_API_TOKEN`). Faking a Remote login redirect that cannot complete would break the brief path and confuse interviewers.
+
+**Decision:**  
+1. **Ship Option B:** Settings Connect wizard / Disconnect pauses org fetch in the browser (or session); Connect resumes using the existing server token. One-click reconnect, no secrets in the client.  
+2. **Scaffold OAuth** behind `REMOTE_OAUTH_ENABLED` (default off): stub authorize/callback types and routes so flipping the flag + registering a Remote OAuth client can turn it on later without a redesign.  
+3. Document this explicitly so we never claim live OAuth while the flag is off.
+
+**Consequences:**  
+- Demo path stays reliable for Clara’s team.  
+- Codebase stays ready if the ask becomes real OAuth.  
+- Tracking: GH#62 / TUXX-1598 (+ subs TUXX-1606–1608).
+
+**Revisit when:**  
+Remote provides a sandbox OAuth client for this assessment app, or the brief explicitly requires end-user OAuth.
+
+---
+
 ## Template for future entries
 
 
