@@ -30,6 +30,7 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 3. Builds a manager→reports forest (cycles / orphan managers surfaced as warnings)
 4. Renders an interactive chart (name, title, department, country, reporting edges)
 5. Search focuses a person and their path to root; pan/zoom works on desktop and mobile
+6. Shareable deep links (`/?person=<employmentId>`) select, center, and highlight path-to-root — **Copy link** in the person drawer
 
 ---
 

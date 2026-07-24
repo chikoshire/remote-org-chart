@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -58,6 +58,12 @@ import {
 } from "@/components/org/PersonDetailDrawer";
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
+import {
+  expandCollapsedAncestors,
+  readPersonIdFromSearch,
+  resolvePersonDeepLink,
+  withPersonSearchParam,
+} from "@/lib/org/deep-links";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 
@@ -214,6 +220,10 @@ function OrgChartInner() {
   const [filters, setFilters] = useState<OrgFilters>(EMPTY_ORG_FILTERS);
   const [baseNodes, setBaseNodes] = useState<Node<PersonNodeData>[]>([]);
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
+  const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
+  const [urlSyncReady, setUrlSyncReady] = useState(false);
+  const pendingDeepLinkId = useRef<string | null>(null);
+  const deepLinkResolved = useRef(false);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
     [],
   );
@@ -271,6 +281,10 @@ function OrgChartInner() {
     setErrorRetryable(true);
     setWarnings([]);
     setSelectedId(null);
+    setDeepLinkError(null);
+    setUrlSyncReady(false);
+    deepLinkResolved.current = false;
+    pendingDeepLinkId.current = null;
     setCollapsedIds(new Set());
     setFilters(EMPTY_ORG_FILTERS);
     try {
@@ -333,6 +347,30 @@ function OrgChartInner() {
     rebuildLayout(forestRoots, density, collapsedIds, filters);
   }, [collapsedIds, density, filters, forestRoots, rebuildLayout, status]);
 
+  useEffect(() => {
+    if (status !== "ready" || deepLinkResolved.current) return;
+    deepLinkResolved.current = true;
+    const fromUrl = readPersonIdFromSearch(window.location.search);
+    const resolved = resolvePersonDeepLink(fromUrl, peopleIndex);
+    if (resolved.status === "none") {
+      setUrlSyncReady(true);
+      return;
+    }
+    if (resolved.status === "missing") {
+      setDeepLinkError(
+        "That person link is invalid or no longer in this org chart.",
+      );
+      setUrlSyncReady(true);
+      return;
+    }
+    setDeepLinkError(null);
+    setFilters(EMPTY_ORG_FILTERS);
+    setCollapsedIds((prev) =>
+      expandCollapsedAncestors(resolved.personId, managerIndex, prev),
+    );
+    pendingDeepLinkId.current = resolved.personId;
+  }, [managerIndex, peopleIndex, status]);
+
   const filterOptions = useMemo(
     () => collectFilterOptions(forestRoots),
     [forestRoots],
@@ -368,10 +406,14 @@ function OrgChartInner() {
   ]);
 
   const onNodeClick: NodeMouseHandler = useCallback((_event, node) => {
+    setDeepLinkError(null);
     setSelectedId((prev) => (prev === node.id ? null : node.id));
   }, []);
 
-  const onPaneClick = useCallback(() => setSelectedId(null), []);
+  const onPaneClick = useCallback(() => {
+    setSelectedId(null);
+    setDeepLinkError(null);
+  }, []);
 
   const suggestions = useMemo(
     () => searchPeople(peopleFromNodes(baseNodes), query),
@@ -380,6 +422,10 @@ function OrgChartInner() {
 
   const focusPerson = useCallback(
     (id: string) => {
+      setDeepLinkError(null);
+      setCollapsedIds((prev) =>
+        expandCollapsedAncestors(id, managerIndex, prev),
+      );
       setSelectedId(id);
       setQuery("");
       requestAnimationFrame(() => {
@@ -393,6 +439,33 @@ function OrgChartInner() {
     },
     [fitView, managerIndex, reducedMotion],
   );
+
+  useEffect(() => {
+    const pending = pendingDeepLinkId.current;
+    if (!pending || status !== "ready" || baseNodes.length === 0) return;
+    if (!baseNodes.some((n) => n.id === pending)) return;
+    pendingDeepLinkId.current = null;
+    focusPerson(pending);
+    setUrlSyncReady(true);
+  }, [baseNodes, focusPerson, status]);
+
+  useEffect(() => {
+    if (!urlSyncReady || typeof window === "undefined") return;
+    const nextSearch = withPersonSearchParam(
+      window.location.search,
+      selectedId,
+    );
+    const currentSearch = window.location.search || "";
+    if (nextSearch === currentSearch) return;
+    const next =
+      `${window.location.pathname}${nextSearch}${window.location.hash}`;
+    window.history.replaceState(null, "", next);
+  }, [selectedId, urlSyncReady]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedId(null);
+    setDeepLinkError(null);
+  }, []);
 
   const selectedDetail = useMemo(() => {
     if (!selectedId) return null;
@@ -565,6 +638,29 @@ function OrgChartInner() {
             {warningCopy(warning)}
           </p>
         ))}
+        {deepLinkError ? (
+          <p
+            role="status"
+            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
+          >
+            {deepLinkError}{" "}
+            <button
+              type="button"
+              className="font-medium text-norma-royal underline"
+              onClick={() => {
+                setDeepLinkError(null);
+                const next = withPersonSearchParam(window.location.search, null);
+                window.history.replaceState(
+                  null,
+                  "",
+                  `${window.location.pathname}${next}${window.location.hash}`,
+                );
+              }}
+            >
+              Dismiss
+            </button>
+          </p>
+        ) : null}
       </div>
       {filterEmpty ? (
         <ChartEmptyState
@@ -639,7 +735,7 @@ function OrgChartInner() {
               person={selectedDetail.person}
               pathToRoot={selectedDetail.pathToRoot}
               reports={selectedDetail.reports}
-              onClose={() => setSelectedId(null)}
+              onClose={clearSelection}
               onSelectPerson={focusPerson}
             />
           ) : null}

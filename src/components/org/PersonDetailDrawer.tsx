@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { personDeepLinkHref } from "@/lib/org/deep-links";
 
 export type PersonDetail = {
   id: string;
@@ -37,6 +38,9 @@ export function PersonDetailDrawer({
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const name = person.fullName?.trim() || "Unknown person";
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -46,6 +50,24 @@ export function PersonDetailDrawer({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, person.id]);
+
+  useEffect(() => {
+    setCopyState("idle");
+  }, [person.id]);
+
+  const copyLink = useCallback(async () => {
+    const href = personDeepLinkHref(
+      window.location.origin,
+      window.location.pathname,
+      person.id,
+    );
+    try {
+      await navigator.clipboard.writeText(href);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+  }, [person.id]);
 
   return (
     <aside
@@ -71,6 +93,17 @@ export function PersonDetailDrawer({
           <p className="truncate text-sm text-norma-ink-muted">
             {person.jobTitle?.trim() || "No title"}
           </p>
+          <button
+            type="button"
+            onClick={() => void copyLink()}
+            className="mt-1 text-xs font-medium text-norma-royal hover:underline"
+          >
+            {copyState === "copied"
+              ? "Link copied"
+              : copyState === "failed"
+                ? "Copy failed — select from address bar"
+                : "Copy link"}
+          </button>
         </div>
         <button
           ref={closeRef}

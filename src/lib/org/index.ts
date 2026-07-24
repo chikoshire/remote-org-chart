@@ -14,3 +14,12 @@ export {
   EMPTY_ORG_FILTERS,
 } from "@/lib/org/filters";
 export type { OrgFilters } from "@/lib/org/filters";
+export {
+  expandCollapsedAncestors,
+  personDeepLinkHref,
+  readPersonIdFromSearch,
+  resolvePersonDeepLink,
+  withPersonSearchParam,
+  PERSON_QUERY_PARAM,
+} from "@/lib/org/deep-links";
+export type { DeepLinkResolution } from "@/lib/org/deep-links";
