@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { applyThemeClass, readThemePref } from "@/lib/ui/prefs";
+import { forceLightTheme } from "@/lib/ui/prefs";
 
-/** Applies persisted light/dark preference on first paint of client trees. */
+/** Locks the product to light mode and clears legacy dark preference. */
 export function ThemeBootstrap() {
   useEffect(() => {
-    applyThemeClass(readThemePref());
+    forceLightTheme();
   }, []);
   return null;
 }

@@ -169,23 +169,13 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
   });
 
-  test("settings theme preference and connect wizard", async ({ page }) => {
+  test("settings is light-only and connect wizard works", async ({ page }) => {
     await loginAsDemo(page);
     await page.goto("/settings");
 
-    const theme = page.getByRole("group", { name: "Color theme" });
-    await expect(theme).toBeVisible();
-    await theme.getByRole("button", { name: "Dark" }).click();
-    await expect(theme.getByRole("button", { name: "Dark" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await expect(page.locator("html")).toHaveClass(/dark/);
-    await theme.getByRole("button", { name: "Light" }).click();
-    await expect(theme.getByRole("button", { name: "Light" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    await expect(page.getByRole("group", { name: "Color theme" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Dark" })).toHaveCount(0);
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
 
     await page.getByRole("button", { name: "Disconnect" }).click();
     await expect(page.getByText("Disconnected")).toBeVisible();

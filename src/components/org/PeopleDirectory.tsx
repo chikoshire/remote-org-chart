@@ -380,7 +380,7 @@ function PersonCard({
       >
         <div
           aria-hidden
-          className="mb-0 h-16 w-full bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint dark:from-norma-lavender dark:via-norma-sky dark:to-norma-mint"
+          className="mb-0 h-16 w-full bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint"
         />
         <div className="-mt-10 rounded-full bg-norma-surface p-1 shadow-norma-sm ring-1 ring-norma-border/60">
           <PersonAvatar

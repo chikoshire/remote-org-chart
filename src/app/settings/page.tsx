@@ -7,12 +7,10 @@ import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
 import { SettingsChrome } from "@/components/settings/SettingsChrome";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
+  forceLightTheme,
   readAppPrefs,
   writeDensityPref,
   writeLiveDefault,
-  writeThemePref,
-  applyThemeClass,
-  type AppTheme,
 } from "@/lib/ui/prefs";
 import {
   clearSessionOrgPayload,
@@ -28,7 +26,6 @@ type Health = {
 export default function SettingsPage() {
   const [density, setDensity] = useState<ChartDensity>("comfortable");
   const [liveDefault, setLiveDefault] = useState(false);
-  const [theme, setTheme] = useState<AppTheme>("light");
   const [saved, setSaved] = useState(false);
   const [connected, setConnected] = useState(true);
   const [healthOk, setHealthOk] = useState<boolean | null>(null);
@@ -38,9 +35,8 @@ export default function SettingsPage() {
     const prefs = readAppPrefs();
     setDensity(prefs.density);
     setLiveDefault(prefs.liveDefault);
-    setTheme(prefs.theme);
     setConnected(readRemoteConnected());
-    applyThemeClass(prefs.theme);
+    forceLightTheme();
   }, []);
 
   useEffect(() => {
@@ -63,11 +59,10 @@ export default function SettingsPage() {
   const save = useCallback(() => {
     writeDensityPref(density);
     writeLiveDefault(liveDefault);
-    writeThemePref(theme);
-    applyThemeClass(theme);
+    forceLightTheme();
     setSaved(true);
     window.setTimeout(() => setSaved(false), 1600);
-  }, [density, liveDefault, theme]);
+  }, [density, liveDefault]);
 
   const disconnect = () => {
     writeRemoteConnected(false);
@@ -126,7 +121,7 @@ export default function SettingsPage() {
                     liveConnected
                       ? "bg-norma-success-soft text-norma-success"
                       : connected
-                        ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-100"
+                        ? "bg-amber-100 text-amber-900"
                         : "bg-norma-surface-muted text-norma-ink-muted"
                   }`}
                 >
@@ -194,7 +189,7 @@ export default function SettingsPage() {
                   className={`rounded-full px-3 py-2 text-sm font-medium ${
                     density === "comfortable"
                       ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-ink"
+                      : "text-norma-ink hover:bg-white/80"
                   }`}
                   onClick={() => {
                     setDensity("comfortable");
@@ -209,7 +204,7 @@ export default function SettingsPage() {
                   className={`rounded-full px-3 py-2 text-sm font-medium ${
                     density === "compact"
                       ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-ink"
+                      : "text-norma-ink hover:bg-white/80"
                   }`}
                   onClick={() => {
                     setDensity("compact");
@@ -217,50 +212,6 @@ export default function SettingsPage() {
                   }}
                 >
                   Compact
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-                Appearance
-              </h3>
-              <div
-                className="mt-3 inline-flex gap-1 rounded-full border border-norma-border bg-norma-surface-muted/50 p-1"
-                role="group"
-                aria-label="Color theme"
-              >
-                <button
-                  type="button"
-                  aria-pressed={theme === "light"}
-                  className={`rounded-full px-3 py-2 text-sm font-medium ${
-                    theme === "light"
-                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-ink"
-                  }`}
-                  onClick={() => {
-                    setTheme("light");
-                    writeThemePref("light");
-                    applyThemeClass("light");
-                  }}
-                >
-                  Light
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={theme === "dark"}
-                  className={`rounded-full px-3 py-2 text-sm font-medium ${
-                    theme === "dark"
-                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-ink"
-                  }`}
-                  onClick={() => {
-                    setTheme("dark");
-                    writeThemePref("dark");
-                    applyThemeClass("dark");
-                  }}
-                >
-                  Dark
                 </button>
               </div>
             </div>

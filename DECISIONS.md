@@ -779,6 +779,28 @@ Interview feedback asks for stronger Remote/Acme orange recognition in the UI.
 
 ---
 
+## 2026-07-24 — Light-only + pastel polish (spacing, charts, motion)
+
+**Status:** Accepted  
+
+**Context:**  
+After the pastel swap, muted text on cream was too faint (tree toolbar “Collapse all”, active density labels black-on-black via `text-norma-prussian`). Controls felt squashed vs references. Dark mode fought the cream/pastel system. Dashboard KPI cards read as one colour; two identical bar charts were redundant. Marketing needed more hover life and editorial colour panels.
+
+**Decision:**  
+1. **Light only** — remove Appearance Light/Dark; `forceLightTheme()` clears `html.dark` and legacy storage.  
+2. Darker muted ink (`#4a4640` / `#6b6660`); active pills use `text-norma-ink-inverse`; more shell/page/toolbar padding.  
+3. Dashboard: distinct pastel gradient KPI cards, completeness ring meter, department **donut** + country **dot ranks** (not twin bars), staggered bloom-in.  
+4. Marketing: hover lifts, editorial gradient panels, richer surface cards.
+
+**Consequences:**  
+- No OS/Settings dark path.  
+- Chart viz variety is intentional for demo readability.
+
+**Revisit when:**  
+Accessibility review wants even stronger contrast, or interviewers prefer photographic editorial imagery.
+
+---
+
 ## Template for future entries
 
 

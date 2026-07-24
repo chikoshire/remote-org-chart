@@ -333,12 +333,12 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
         }
       `}</style>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-norma-border/70 bg-white/75 px-4 py-3 backdrop-blur-sm md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-norma-border/70 bg-white/80 px-4 py-4 backdrop-blur-sm md:px-6">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
             Reporting tree
           </p>
-          <p className="text-sm text-norma-ink-muted">
+          <p className="mt-1 text-sm text-norma-ink-muted">
             {roots.length === 1
               ? "1 top-level manager"
               : `${roots.length} top-level managers`}
@@ -346,19 +346,19 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
             left to right hierarchy
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <div
-            className="flex rounded-norma-md border border-norma-border bg-white p-0.5 shadow-norma-sm"
+            className="flex rounded-full border border-norma-border bg-white p-1 shadow-norma-sm"
             role="group"
             aria-label="Tree density"
           >
             <button
               type="button"
               aria-pressed={density === "comfortable"}
-              className={`rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold ${
+              className={`rounded-full px-3.5 py-2 text-xs font-semibold ${
                 density === "comfortable"
-                  ? "bg-norma-ink text-norma-prussian"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
+                  ? "bg-norma-ink text-norma-ink-inverse"
+                  : "text-norma-ink hover:bg-norma-surface-muted"
               }`}
               onClick={() => setDensity("comfortable")}
             >
@@ -367,10 +367,10 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
             <button
               type="button"
               aria-pressed={density === "compact"}
-              className={`rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold ${
+              className={`rounded-full px-3.5 py-2 text-xs font-semibold ${
                 density === "compact"
-                  ? "bg-norma-ink text-norma-prussian"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
+                  ? "bg-norma-ink text-norma-ink-inverse"
+                  : "text-norma-ink hover:bg-norma-surface-muted"
               }`}
               onClick={() => setDensity("compact")}
             >
@@ -379,21 +379,21 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
           </div>
           <button
             type="button"
-            className="rounded-norma-md border border-norma-border bg-white px-2.5 py-1.5 text-xs font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-spray/50"
+            className="rounded-full border border-norma-border bg-white px-3.5 py-2 text-xs font-semibold text-norma-ink shadow-norma-sm hover:border-norma-ink/30"
             onClick={expandTwoLevels}
           >
             2 levels
           </button>
           <button
             type="button"
-            className="rounded-norma-md border border-norma-border bg-white px-2.5 py-1.5 text-xs font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-spray/50"
+            className="rounded-full border border-norma-border bg-white px-3.5 py-2 text-xs font-semibold text-norma-ink shadow-norma-sm hover:border-norma-ink/30"
             onClick={expandAll}
           >
             Expand all
           </button>
           <button
             type="button"
-            className="rounded-norma-md border border-norma-border bg-white px-2.5 py-1.5 text-xs font-semibold text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian"
+            className="rounded-full border border-norma-border bg-white px-3.5 py-2 text-xs font-semibold text-norma-ink shadow-norma-sm hover:border-norma-ink/30"
             onClick={collapseAll}
           >
             Collapse all

@@ -168,7 +168,7 @@ export function PersonNodeCard({
             </span>
           ) : null}
           {managerMissing ? (
-            <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+            <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
               Unlinked
             </span>
           ) : null}

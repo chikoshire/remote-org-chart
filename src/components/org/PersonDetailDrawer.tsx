@@ -111,7 +111,7 @@ export function PersonDetailDrawer({
               </span>
             ) : null}
             {person.managerMissing ? (
-              <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+              <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
                 Manager missing
               </span>
             ) : null}
@@ -169,7 +169,7 @@ export function PersonDetailDrawer({
           {person.managerMissing ? (
             <>
               <dt className="text-norma-ink-subtle">Manager</dt>
-              <dd className="text-amber-900 dark:text-amber-200">
+              <dd className="text-amber-900">
                 No manager on file (linked id missing from Remote)
               </dd>
             </>
