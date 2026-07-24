@@ -47,6 +47,7 @@ import { computeOrgInsights } from "@/lib/org/insights";
 import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
+import { WebhookEventsPanel } from "@/components/org/WebhookEventsPanel";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -254,6 +255,9 @@ function OrgChartInner() {
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [syncLogOpen, setSyncLogOpen] = useState(false);
   const [syncLogToken, setSyncLogToken] = useState(0);
+  const [eventsOpen, setEventsOpen] = useState(false);
+  const [eventsToken, setEventsToken] = useState(0);
+  const [liveUpdates, setLiveUpdates] = useState(false);
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
@@ -408,6 +412,29 @@ function OrgChartInner() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!liveUpdates || status !== "ready") return;
+    if (typeof window === "undefined" || typeof EventSource === "undefined") {
+      return;
+    }
+
+    const source = new EventSource("/api/org-chart/stream");
+    const onUpdated = () => {
+      setEventsToken((n) => n + 1);
+      setSyncLogToken((n) => n + 1);
+      void load({ refresh: true });
+    };
+    source.addEventListener("org-updated", onUpdated);
+    source.onerror = () => {
+      // Browser will retry; keep Live toggle on.
+    };
+
+    return () => {
+      source.removeEventListener("org-updated", onUpdated);
+      source.close();
+    };
+  }, [liveUpdates, load, status]);
 
   useEffect(() => {
     if (status !== "ready" || forestRoots.length === 0) return;
@@ -833,6 +860,20 @@ function OrgChartInner() {
           </button>
           <button
             type="button"
+            aria-pressed={liveUpdates}
+            className={`rounded-norma-md border px-2 py-1 text-[11px] font-medium shadow-norma-sm ${
+              liveUpdates
+                ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+            }`}
+            onClick={() => {
+              setLiveUpdates((v) => !v);
+            }}
+          >
+            {liveUpdates ? "Live on" : "Live"}
+          </button>
+          <button
+            type="button"
             aria-pressed={compareMode}
             className={`rounded-norma-md border px-2 py-1 text-[11px] font-medium shadow-norma-sm ${
               compareMode
@@ -1107,6 +1148,13 @@ function OrgChartInner() {
               open={syncLogOpen}
               onOpenChange={setSyncLogOpen}
               refreshToken={syncLogToken}
+            />
+          ) : null}
+          {!selectedDetail && !compareMode ? (
+            <WebhookEventsPanel
+              open={eventsOpen}
+              onOpenChange={setEventsOpen}
+              refreshToken={eventsToken}
             />
           ) : null}
         </>
