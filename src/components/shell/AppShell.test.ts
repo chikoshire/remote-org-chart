@@ -9,13 +9,15 @@ const shell = readFileSync(
 
 describe("AppShell", () => {
   it("exposes header, main canvas, and status strip", () => {
-    expect(shell).toContain("Acme Org Chart");
-    expect(shell).toContain("Sandbox Corp");
+    expect(shell).toContain("Acme");
+    expect(shell).toContain("Org chart · Sandbox Corp");
     expect(shell).toContain("<main");
     expect(shell).toContain("AppStatus");
     expect(shell).toContain("Skip to organization chart");
     expect(shell).toContain('role="banner"');
     expect(shell).toContain('role="contentinfo"');
     expect(shell).toContain('href="/welcome"');
+    expect(shell).toContain("#0b2a32");
+    expect(shell).toContain("#e85d04");
   });
 });
