@@ -37,6 +37,31 @@ Rule: move parent **Backlog → In Progress → Review** (all children done) bef
 
 **Coverage check (2026-07-23):** 34 parents. Tier 0 / UX / stretch / cross + bonus #33–#34. Marketing landing is **not** in Clara’s core brief — tracked as stretch wow.
 
+**Core brief status (2026-07-24):** Tier 0 + UX + stretch #17–#34 closed on `main`. Live chart meets Clara’s must-haves. Active serial work is the **Org Intelligence wow track** below (brief + wow).
+
+## Org Intelligence wow track (active serial)
+
+Plan doc (Linear): [Org intelligence product plan](https://linear.app/orbit-linear/document/org-intelligence-product-plan-brief-wow-7f66395d0b8d)
+
+Locked IA (authenticated): **Dashboard · Org Chart · People · Departments · Data Health · Settings**.  
+Marketing + demo login/logout. Remote Connect = Option B (+ OAuth scaffold off). Theme in Settings. No em dashes in product copy.
+
+| Seq | GH | Linear | Branch | Priority |
+|-----|----|--------|--------|----------|
+| 1 | #58 | TUXX-1593 | `feat/org-intelligence-ia` | High |
+| 2 | #59 | TUXX-1594 | `ui/org-intelligence-visuals` | High |
+| 3 | #60 | TUXX-1595 | `feat/data-health-edge-ui` | High |
+| 4 | #61 | TUXX-1596 | `feat/marketing-auth` | High |
+| 5 | #62 | TUXX-1598 | `feat/remote-connect-wizard` | High |
+| 6 | #63 | TUXX-1597 | `ui/settings-theme-copy` | Medium |
+| 7 | #64 | TUXX-1599 | `feat/dashboard-insights` | High |
+| 8 | #65 | TUXX-1600 | `feat/departments-tab` | High |
+| 9 | #66 | TUXX-1601 | `feat/command-bar` | Medium (wow) |
+| 10 | #67 | TUXX-1603 | `feat/tree-list-view` | Low (optional) |
+| 11 | #68 | TUXX-1602 | `cross/org-intelligence-qa` | High |
+
+Linear subs (examples): TUXX-1604–1605 under #58; TUXX-1606–1608 under #62. GH parents carry full sub-issue checklists in comments.
+
 | GH | Linear | Orbit | Branch | Lane | Subs |
 |----|--------|-------|--------|------|------|
 | #1 | TUXX-1468 | TUX-16894271 | `chore/scaffold-next-app` | Tier 0 | 3 |
