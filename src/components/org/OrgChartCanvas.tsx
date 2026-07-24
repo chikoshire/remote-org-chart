@@ -64,7 +64,9 @@ import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
 import {
   COMPARE_QUERY_PARAM,
+  COUNTRY_QUERY_PARAM,
   OPEN_QUERY_PARAM,
+  VIEW_QUERY_PARAM,
   expandCollapsedAncestors,
   readCountryFromSearch,
   readOpenDepartmentsFromSearch,
@@ -74,6 +76,7 @@ import {
   withCompareSearchParam,
   withPersonSearchParam,
 } from "@/lib/org/deep-links";
+import { resolveCountryCode } from "@/lib/ui/format-country";
 import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
 import {
   PREFS_CHANGED_EVENT,
@@ -660,6 +663,31 @@ function OrgChartInner() {
     () => collectFilterOptions(forestRoots),
     [forestRoots],
   );
+
+  useEffect(() => {
+    const country = readCountryFromSearch(`?${searchParams.toString()}`);
+    if (!country || status !== "ready") return;
+    if (filterOptions.countries.length === 0) return;
+
+    const code = resolveCountryCode(country, filterOptions.countries);
+    if (code) {
+      setFilters((prev) =>
+        prev.country === code ? prev : { ...prev, country: code },
+      );
+    }
+
+    setSidePanelOpen(true);
+    writeSidePanelOpen(true);
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (!params.has(COUNTRY_QUERY_PARAM)) return;
+    params.delete(COUNTRY_QUERY_PARAM);
+    if (!params.get(VIEW_QUERY_PARAM)) {
+      params.set(VIEW_QUERY_PARAM, "map");
+    }
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  }, [filterOptions.countries, pathname, router, searchParams, status]);
 
   const filteredForest = useMemo(
     () => filterOrgForest(forestRoots, filters),
