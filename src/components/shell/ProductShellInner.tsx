@@ -34,7 +34,7 @@ function navClass(active: boolean) {
   return `whitespace-nowrap rounded-norma-sm px-2.5 py-1.5 text-sm font-medium transition md:px-3 ${
     active
       ? "bg-norma-accent-soft text-norma-prussian"
-      : "text-norma-ink-muted hover:bg-white/70 hover:text-norma-prussian"
+      : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
   }`;
 }
 
@@ -56,7 +56,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="flex h-12 shrink-0 items-center gap-3 border-b border-norma-border bg-white px-3 text-norma-prussian md:h-14 md:gap-6 md:px-6"
+        className="flex h-12 shrink-0 items-center gap-3 border-b border-norma-border bg-norma-surface px-3 text-norma-prussian md:h-14 md:gap-6 md:px-6"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo withWordmark />
@@ -132,7 +132,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </main>
       <footer
         role="contentinfo"
-        className="flex h-7 shrink-0 items-center border-t border-norma-border bg-white px-4 text-[11px] text-norma-ink-muted md:px-6"
+        className="flex h-7 shrink-0 items-center border-t border-norma-border bg-norma-surface px-4 text-[11px] text-norma-ink-muted md:px-6"
       >
         {status ?? <span>Acme · Connected to Remote</span>}
       </footer>
