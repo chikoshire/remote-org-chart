@@ -70,6 +70,10 @@ import {
   exportChartDataUrl,
 } from "@/lib/org/export-chart";
 import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
+import {
+  reportingRelation,
+  type ReportingRelation,
+} from "@/lib/org/reporting-distance";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 
@@ -140,11 +144,19 @@ function applySelection(
   edges: Edge<ReportingEdgeData>[],
   selectedId: string | null,
   managerIndex: Map<string, { id: string; managerEmploymentId: string | null }>,
+  options?: {
+    highlightIds?: Set<string> | null;
+    secondaryId?: string | null;
+  },
 ): { nodes: Node<PersonNodeData>[]; edges: Edge<ReportingEdgeData>[] } {
   const isRoot = (id: string) =>
     !managerIndex.get(id)?.managerEmploymentId;
+  const secondaryId = options?.secondaryId ?? null;
+  const highlightIds =
+    options?.highlightIds ??
+    (selectedId ? pathIdsToRoot(selectedId, managerIndex) : null);
 
-  if (!selectedId) {
+  if (!selectedId && !secondaryId && !highlightIds?.size) {
     return {
       nodes: nodes.map((n) => {
         const variant: PersonNodeData["variant"] = isRoot(n.id)
@@ -165,11 +177,11 @@ function applySelection(
     };
   }
 
-  const path = pathIdsToRoot(selectedId, managerIndex);
+  const path = highlightIds ?? new Set<string>();
   return {
     nodes: nodes.map((n) => {
       const onPath = path.has(n.id);
-      const isSelected = n.id === selectedId;
+      const isSelected = n.id === selectedId || n.id === secondaryId;
       let variant: PersonNodeData["variant"] = "default";
       if (isRoot(n.id) && !onPath) variant = "root";
       if (onPath) variant = isSelected ? "selected" : "path";
@@ -229,6 +241,9 @@ function OrgChartInner() {
   const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
   const [urlSyncReady, setUrlSyncReady] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareA, setCompareA] = useState<string | null>(null);
+  const [compareB, setCompareB] = useState<string | null>(null);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
   const chartRootRef = useRef<HTMLDivElement>(null);
@@ -294,6 +309,9 @@ function OrgChartInner() {
     setUrlSyncReady(false);
     deepLinkResolved.current = false;
     pendingDeepLinkId.current = null;
+    setCompareMode(false);
+    setCompareA(null);
+    setCompareB(null);
     setCollapsedIds(new Set());
     setFilters(EMPTY_ORG_FILTERS);
     try {
@@ -395,34 +413,120 @@ function OrgChartInner() {
     filtersAreActive(filters) &&
     filteredForest.length === 0;
 
+  const relation = useMemo((): ReportingRelation | null => {
+    if (!compareMode || !compareA || !compareB) return null;
+    return reportingRelation(compareA, compareB, managerIndex);
+  }, [compareA, compareB, compareMode, managerIndex]);
+
   useEffect(() => {
     if (status !== "ready") return;
     if (selectedId && !baseNodes.some((n) => n.id === selectedId)) {
       setSelectedId(null);
       return;
     }
-    const next = applySelection(baseNodes, baseEdges, selectedId, managerIndex);
+    const highlightIds =
+      relation?.status === "ok" ? relation.highlightIds : null;
+    const secondaryId =
+      compareMode && compareB ? compareB : null;
+    const primaryId =
+      compareMode && compareA ? compareA : selectedId;
+    const next = applySelection(
+      baseNodes,
+      baseEdges,
+      primaryId,
+      managerIndex,
+      { highlightIds, secondaryId },
+    );
     setNodes(next.nodes);
     setEdges(next.edges);
   }, [
     baseEdges,
     baseNodes,
+    compareA,
+    compareB,
+    compareMode,
     managerIndex,
+    relation,
     selectedId,
     setEdges,
     setNodes,
     status,
   ]);
 
-  const onNodeClick: NodeMouseHandler = useCallback((_event, node) => {
-    setDeepLinkError(null);
-    setSelectedId((prev) => (prev === node.id ? null : node.id));
-  }, []);
+  const onNodeClick: NodeMouseHandler = useCallback(
+    (_event, node) => {
+      setDeepLinkError(null);
+      if (compareMode) {
+        if (!compareA || compareB) {
+          setCompareA(node.id);
+          setCompareB(null);
+          setSelectedId(node.id);
+          return;
+        }
+        if (compareA === node.id) return;
+        setCompareB(node.id);
+        setSelectedId(node.id);
+        return;
+      }
+      setSelectedId((prev) => (prev === node.id ? null : node.id));
+    },
+    [compareA, compareB, compareMode],
+  );
 
   const onPaneClick = useCallback(() => {
+    if (compareMode) return;
     setSelectedId(null);
     setDeepLinkError(null);
+  }, [compareMode]);
+
+  const exitCompare = useCallback(() => {
+    setCompareMode(false);
+    setCompareA(null);
+    setCompareB(null);
   }, []);
+
+  const enterCompare = useCallback(() => {
+    setCompareMode(true);
+    setCompareA(selectedId);
+    setCompareB(null);
+    setInsightsOpen(false);
+  }, [selectedId]);
+
+  const personLabel = useCallback(
+    (id: string | null) => {
+      if (!id) return "—";
+      const person = peopleIndex.get(id);
+      return person?.fullName?.trim() || "Unknown person";
+    },
+    [peopleIndex],
+  );
+
+  const compareHint = useMemo(() => {
+    if (!compareMode) return null;
+    if (!compareA) return "Select the first person";
+    if (!compareB) return "Select the second person";
+    if (!relation) return null;
+    switch (relation.status) {
+      case "ok": {
+        const lca =
+          relation.lowestCommonManagerId === relation.personAId ||
+          relation.lowestCommonManagerId === relation.personBId
+            ? `${personLabel(relation.lowestCommonManagerId)} (on the path)`
+            : personLabel(relation.lowestCommonManagerId);
+        return `Distance ${relation.distance} · Lowest common manager: ${lca}`;
+      }
+      case "same":
+        return "Pick two different people";
+      case "disconnected":
+        return "No shared manager — these people are in disconnected trees";
+      case "missing":
+        return "One of those people is no longer in the chart";
+      default: {
+        const _exhaustive: never = relation;
+        return _exhaustive;
+      }
+    }
+  }, [compareA, compareB, compareMode, personLabel, relation]);
 
   const suggestions = useMemo(
     () => searchPeople(peopleFromNodes(baseNodes), query),
@@ -435,6 +539,14 @@ function OrgChartInner() {
       setCollapsedIds((prev) =>
         expandCollapsedAncestors(id, managerIndex, prev),
       );
+      if (compareMode) {
+        if (!compareA || compareB) {
+          setCompareA(id);
+          setCompareB(null);
+        } else if (compareA !== id) {
+          setCompareB(id);
+        }
+      }
       setSelectedId(id);
       setQuery("");
       requestAnimationFrame(() => {
@@ -446,8 +558,20 @@ function OrgChartInner() {
         });
       });
     },
-    [fitView, managerIndex, reducedMotion],
+    [compareA, compareB, compareMode, fitView, managerIndex, reducedMotion],
   );
+
+  useEffect(() => {
+    if (relation?.status !== "ok") return;
+    requestAnimationFrame(() => {
+      void fitView({
+        nodes: [...relation.highlightIds].map((nodeId) => ({ id: nodeId })),
+        padding: 0.3,
+        duration: reducedMotion ? 0 : 420,
+      });
+    });
+  }, [fitView, reducedMotion, relation]);
+
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;
@@ -648,6 +772,18 @@ function OrgChartInner() {
     >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <div className="flex flex-wrap items-center justify-end gap-1 self-end">
+          <button
+            type="button"
+            aria-pressed={compareMode}
+            className={`rounded-norma-md border px-2 py-1 text-[11px] font-medium shadow-norma-sm ${
+              compareMode
+                ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
+                : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
+            }`}
+            onClick={() => (compareMode ? exitCompare() : enterCompare())}
+          >
+            {compareMode ? "Exit compare" : "Compare"}
+          </button>
           <div
             className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
             role="group"
@@ -793,6 +929,20 @@ function OrgChartInner() {
             </button>
           </p>
         ) : null}
+        {compareMode ? (
+          <div
+            role="status"
+            className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-2 text-xs text-norma-prussian shadow-norma-sm"
+          >
+            <p className="font-medium">Reporting distance</p>
+            <p className="mt-1 text-norma-ink-muted">
+              {personLabel(compareA)}
+              {" → "}
+              {personLabel(compareB)}
+            </p>
+            <p className="mt-1">{compareHint}</p>
+          </div>
+        ) : null}
       </div>
       {filterEmpty ? (
         <ChartEmptyState
@@ -862,7 +1012,7 @@ function OrgChartInner() {
             {filtersAreActive(filters) ? " · filters on" : ""}
             {isMobile ? " · pinch to zoom · drag to pan" : ""}
           </p>
-          {selectedDetail ? (
+          {selectedDetail && !compareMode ? (
             <PersonDetailDrawer
               person={selectedDetail.person}
               pathToRoot={selectedDetail.pathToRoot}
@@ -871,7 +1021,7 @@ function OrgChartInner() {
               onSelectPerson={focusPerson}
             />
           ) : null}
-          {!selectedDetail ? (
+          {!selectedDetail && !compareMode ? (
             <OrgInsightsPanel
               insights={insights}
               open={insightsOpen}

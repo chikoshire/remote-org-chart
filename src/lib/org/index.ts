@@ -29,3 +29,5 @@ export {
   exportChartDataUrl,
 } from "@/lib/org/export-chart";
 export { navigateReportingRelative } from "@/lib/org/keyboard-nav";
+export { reportingRelation } from "@/lib/org/reporting-distance";
+export type { ReportingRelation } from "@/lib/org/reporting-distance";
