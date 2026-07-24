@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { RemoteApiError } from "@/lib/remote/client";
+import { getRemoteEnv } from "@/lib/remote/env";
 import { fetchEmploymentsForOrgChart } from "@/lib/remote/employments";
 import { buildOrgForest, flattenOrgForest } from "@/lib/org";
 
@@ -8,11 +9,19 @@ export const runtime = "nodejs";
 /**
  * Hierarchy JSON for the chart (GH#4/5).
  * Strips work emails from the payload by default (PII minimization).
+ *
+ * On Cloudflare, detail enrichment fans out across sibling Worker invocations
+ * so we stay under the free-plan subrequest limit (GH#8).
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const env = getRemoteEnv();
     const records = await fetchEmploymentsForOrgChart({
       statusPolicy: "active_only",
+      fanOut: {
+        origin: new URL(request.url).origin,
+        secret: env.REMOTE_API_TOKEN,
+      },
     });
     const forest = buildOrgForest(records);
     const flat = flattenOrgForest(forest).map((n) => ({

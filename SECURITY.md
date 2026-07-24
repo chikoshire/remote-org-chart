@@ -20,6 +20,7 @@ Canonical for the Remote org-chart assessment. Re-check before every public depl
 - [x] Browser talks only to same-origin `/api/*` proxies — not directly to `gateway.remote-sandbox.com`
 - [x] Sandbox token is read-only (`ra_test_…`) against `gateway.remote-sandbox.com`
 - [x] Public preview tunnels (cloudflared / localtunnel) are for development; production uses Cloudflare Workers URL from #8
+- [x] `/api/org-chart/enrich-batch` is Worker-internal only — requires `x-org-enrich-secret` matching the server token (fan-out under Workers Free 50-subrequest cap)
 
 ## Audit commands
 
@@ -34,4 +35,4 @@ rg -n "REMOTE_API_TOKEN" src --glob '!**/env.ts' --glob '!**/client.ts'
 | Check | Date | Notes |
 |-------|------|-------|
 | Local audit green | 2026-07-24 | Vitest redaction + email strip |
-| Pre-deploy (#8) | _pending_ | Confirm Wrangler secrets set |
+| Pre-deploy (#8) | 2026-07-24 | Wrangler secret set; public URL live; enrich-batch gated by `x-org-enrich-secret` |

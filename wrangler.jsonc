@@ -8,6 +8,17 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "vars": {
+    "REMOTE_API_BASE_URL": "https://gateway.remote-sandbox.com"
+  },
+  // Self binding: fan-out enrich batches get a fresh 50-subrequest budget each
+  // (Workers Free). Same-Worker public URL fetch is unreliable with OpenNext assets.
+  "services": [
+    {
+      "binding": "WORKER_SELF",
+      "service": "remote-org-chart"
+    }
+  ],
   "observability": {
     "enabled": true
   }
