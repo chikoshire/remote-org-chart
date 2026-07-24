@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Departments live under People → Departments view. */
+/** Legacy Departments route — department key lives on Dashboard. */
 export default function DepartmentsRedirectPage() {
-  redirect("/app/people?view=departments");
+  redirect("/app/dashboard");
 }
