@@ -134,13 +134,16 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
   });
 
-  test("departments tab lists headcount and people", async ({ page }) => {
+  test("people departments view lists headcount and people", async ({ page }) => {
     await mockOrgChart(page, orgChartReadyFixture);
     await loginAsDemo(page);
-    await page.goto("/app/departments");
+    await page.goto("/app/people?view=departments");
     await expect(
-      page.getByRole("heading", { name: "Departments", exact: true }),
+      page.getByRole("heading", { name: "People", exact: true }),
     ).toBeVisible({ timeout: 20_000 });
+    await expect(
+      page.getByRole("button", { name: "Departments", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
     await expect(
       page.getByRole("list", { name: "Departments" }).getByText("Operations"),
     ).toBeVisible();

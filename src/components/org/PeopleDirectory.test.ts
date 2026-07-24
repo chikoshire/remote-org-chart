@@ -14,7 +14,9 @@ describe("PeopleDirectory visuals", () => {
     expect(directory).toContain("formatCountryLabel");
     expect(directory).toContain("Reports to");
     expect(directory).toContain('aria-label="Directory layout"');
-    expect(directory).toContain('aria-pressed={view === "list"}');
+    expect(directory).toContain('aria-pressed={view === id}');
+    expect(directory).toContain("DepartmentsBrowse");
+    expect(directory).toContain('"departments"');
     expect(directory).not.toContain("#1a1a1a");
   });
 });
