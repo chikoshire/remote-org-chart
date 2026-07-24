@@ -39,5 +39,6 @@ describe("cSuiteFocusNodeIds", () => {
       }),
     ];
     expect(cSuiteFocusNodeIds(roots, 3)).toEqual(["ceo", "cto", "cfo"]);
+    expect(cSuiteFocusNodeIds(roots)).toEqual(["ceo", "cto", "cfo", "cpo"]);
   });
 });

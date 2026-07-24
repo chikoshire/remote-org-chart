@@ -7,13 +7,14 @@ import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";
  */
 export function cSuiteFocusNodeIds(
   roots: OrgChartPayloadNode[],
-  maxPeople = 8,
+  maxPeople = 4,
 ): string[] {
   if (roots.length === 0) return [];
   const primary = [...roots].sort(
     (a, b) => (b.children?.length ?? 0) - (a.children?.length ?? 0),
   )[0]!;
   const ids: string[] = [primary.id];
+  // Only a few adjacent direct reports so fitView stays tight on leadership.
   for (const child of primary.children ?? []) {
     if (ids.length >= maxPeople) break;
     ids.push(child.id);
