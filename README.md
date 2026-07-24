@@ -1,6 +1,6 @@
 # Remote Org Chart (Acme Sandbox Corp)
 
-Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sandbox** REST API. Server-side Bearer auth, manager→reports hierarchy, Norma-inspired product chrome, and a public Cloudflare Workers deploy.
+Interactive **organisational intelligence** app for **Acme Sandbox Corp**, built against the **Remote sandbox** REST API. Server-side Bearer auth, manager→reports hierarchy, Norma-inspired product chrome, and a public Cloudflare Workers deploy.
 
 ## Live demo
 
@@ -10,6 +10,7 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 |-------|----------|
 | Home `/` | Marketing landing with Log in |
 | Login | Demo: `demo@acme.example` / `<scrubbed-old-demo-password>` → `/app` |
+| Product shell | Dashboard · Org Chart · People · Departments · Data Health · Settings |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
 | `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15–25s |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
@@ -24,6 +25,8 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 | Password | `<scrubbed-old-demo-password>` |
 
 Override with `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` / `APP_SESSION_SECRET` (Wrangler secrets in production). This **app session** is separate from `REMOTE_API_TOKEN` (server-only).
+
+Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handoff.md).
 
 ### Links for the interview team
 
@@ -40,21 +43,33 @@ Override with `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` / `APP_SESSION_SECRET` (Wra
 
 1. Authenticates to Remote sandbox with a **read-only** customer token (`ra_test_…`) — **server-side only**
 2. Paginates `GET /v1/employments`, then enriches each employment for `manager_employment_id`
-3. Builds a manager→reports forest (cycles / orphan managers surfaced as warnings)
-4. Renders an interactive chart (name, title, department, country, reporting edges)
-5. Search focuses a person and their path to root; pan/zoom works on desktop and mobile
-6. Shareable deep links (`/?person=<employmentId>`) select, center, and highlight path-to-root — **Copy link** in the person drawer
-7. Export the visible chart as **PNG** or **SVG**; keyboard: `/` search, arrows move manager/reports/siblings, `Esc` clears selection
-8. **Compare** two people for reporting distance and lowest common manager (highlights both paths)
-9. **KV snapshot cache** (15m TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
-10. **Sync log** (Cloudflare D1) records cold/refresh/cache-hit attempts — **Sync log** panel + `/api/sync-runs`
-11. **Webhooks** (`POST /api/webhooks/remote`) with HMAC verify + D1 inbox; **Live** poll + **Webhook events** panel
+3. Builds a manager→reports forest (cycles / orphan managers surfaced as warnings and badges)
+4. Renders an interactive Org Chart (name, title, department, country, reporting edges) plus optional Tree list
+5. Product surfaces: Dashboard insights, People directory, Departments, Data Health
+6. Search focuses a person and their path to root; pan/zoom works on desktop and mobile
+7. Shareable deep links (`/app?person=<employmentId>`) select, center, and highlight path-to-root — **Copy link** in the person drawer
+8. Command bar (⌘K / Ctrl+K) for people search and route jumps
+9. Soft morph + bloom navigation (View Transitions where supported; respects reduced motion)
+10. **KV snapshot cache** (15m TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
+11. Demo app login / logout on a marketing landing; Connect wizard in Settings (no secrets in the browser)
+
+### Product map (after login)
+
+| Route | Surface |
+|-------|---------|
+| `/app/dashboard` | Organisational insights |
+| `/app` | Org Chart (Chart \| Tree) |
+| `/app/people` | People directory |
+| `/app/departments` | Departments + mini people |
+| `/app/data-health` | Trust / edge-case review |
+| `/settings` | Remote connect + theme |
 
 ### Keyboard shortcuts
 
 | Key | Action |
 |-----|--------|
-| `/` | Focus people search |
+| `⌘K` / `Ctrl+K` | Open command bar |
+| `/` | Focus people search (Org Chart) |
 | `↑` | Select manager |
 | `↓` | Select first direct report |
 | `←` / `→` | Previous / next sibling |
@@ -81,6 +96,7 @@ Open [http://localhost:3000](http://localhost:3000).
 |--------|---------|
 | `npm run dev` | Next.js local server |
 | `npm test` | Vitest (hierarchy, redaction, schema) |
+| `npm run test:e2e` | Playwright smoke (fixture-mocked `/api/org-chart`) |
 | `npm run build` | Production Next build |
 | `npm run deploy` | OpenNext → Cloudflare Workers |
 | `npm run dev:tunnel` | Local Next + cloudflared public URL (optional) |
@@ -116,9 +132,10 @@ Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
 | Layer | Location | Role |
 |-------|----------|------|
 | Remote client | `src/lib/remote/` | Env, Bearer fetch, Zod schemas, PII redaction |
-| Hierarchy | `src/lib/org/` | `buildOrgForest`, Dagre layout helpers, search |
-| UI | `src/components/` | AppShell, PersonNode, ReportingEdge, chart states |
-| Chart page | `src/app/page.tsx` | Fetches `/api/org-chart`, React Flow canvas |
+| Hierarchy | `src/lib/org/` | `buildOrgForest`, Dagre layout helpers, search, health |
+| Auth | `src/lib/auth/` + middleware | Demo session cookie for `/app/*` and `/settings` |
+| UI | `src/components/` | Product shell, chart, People, Departments, Data Health |
+| Chart page | `src/app/app/` | Authenticated Org Intelligence routes |
 
 **Data note:** `GET /v1/employments` list items do **not** include manager fields. Hierarchy requires `GET /v1/employments/:id` per active employment.
 
@@ -130,9 +147,9 @@ Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
 
 | Situation | Behavior |
 |-----------|----------|
-| Missing title / department | Node still renders; fields omitted or shown as soft placeholders |
-| Orphan manager ID | Counted in API payload; warning surface when present |
-| Reporting cycles | Detected in forest build; nodes marked `inCycle` |
+| Missing title / department / country | **Incomplete** badge; fields show as **Not set** |
+| Orphan manager ID | **Unlinked** badge; listed on Data Health |
+| Reporting cycles | **Cycle** badge; listed on Data Health |
 | Empty active set | Empty state copy |
 | Remote / network errors | Error surface with retryable vs fatal mapping |
 | Auth / rate limit | Mapped to chart error codes (retryable where appropriate) |
@@ -145,6 +162,7 @@ Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
 - Browser talks **only** to same-origin `/api/*`
 - `/api/org-chart` strips work emails from the payload
 - Chart UI shows name / title / department / country — not emails or addresses
+- Demo login session is separate from the Remote API token
 - See [SECURITY.md](./SECURITY.md) for the checklist
 
 ---
@@ -157,7 +175,7 @@ Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
 | **Tailwind + Norma tokens** | Matches sandbox product chrome (Royal `#624DE3`, Prussian `#00234B`, Spray `#75E8F0`) |
 | **React Flow + Dagre** | Interactive pan/zoom + hierarchical layout |
 | **Zod** | Runtime validation of Remote JSON |
-| **Vitest** | Hierarchy + redaction tests without a browser |
+| **Vitest + Playwright** | Unit + fixture-mocked smoke without live sandbox flakiness |
 | **Cloudflare Workers (OpenNext + Wrangler)** | Public host with secrets; brief’s Vercel mention is a suggestion, not a requirement |
 
 Supabase is **off** by default — Remote is the source of truth. Stretch ideas for KV/D1/webhooks live in [DECISIONS.md](./DECISIONS.md) and the issue backlog.
@@ -194,7 +212,7 @@ Public URL pattern: `https://remote-org-chart.<account>.workers.dev`
 | [DECISIONS.md](./DECISIONS.md) | Living “why we chose X” log |
 | [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project mirror |
 
-Core ship path: **#1–#8** (scaffold → data → chart → UI → deploy) + **#9** (this handoff). Stretch / polish: a11y (#30), Playwright (#31), motion (#16), wow UX (#17–#29).
+Core brief: Tier 0 chart + deploy. **Org Intelligence wow track** (#58–#68, #70) adds product IA, insights, auth, morph polish, and this QA/handoff gate.
 
 ---
 

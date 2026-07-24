@@ -7,6 +7,7 @@ Canonical for the Remote org-chart assessment. Re-check before every public depl
 - [x] `REMOTE_API_TOKEN` only on the server (route handlers / `remoteFetch`) — never imported into client components
 - [x] `.env.local` gitignored; `.env.example` has empty placeholders only
 - [x] Cloudflare Workers secrets (prod) for `REMOTE_API_TOKEN` / `REMOTE_API_BASE_URL` — not baked into the client bundle
+- [x] Demo app login uses a separate session cookie (`APP_SESSION_SECRET`); Remote API token never enters that cookie
 - [x] Error paths run through `redactSecrets` / `toClientSafeMessage` before JSON responses
 
 ## PII minimization
@@ -36,3 +37,4 @@ rg -n "REMOTE_API_TOKEN" src --glob '!**/env.ts' --glob '!**/client.ts'
 |-------|------|-------|
 | Local audit green | 2026-07-24 | Vitest redaction + email strip |
 | Pre-deploy (#8) | 2026-07-24 | Wrangler secret set; public URL live; enrich-batch gated by `x-org-enrich-secret` |
+| Org Intelligence QA (#68) | 2026-07-24 | Demo session separate from API token; Playwright auth + surface tour |
