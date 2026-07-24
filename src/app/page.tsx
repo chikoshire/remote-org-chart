@@ -12,7 +12,7 @@ import { MarketingReveal } from "@/components/marketing/MarketingReveal";
 export const metadata: Metadata = {
   title: "Acme · People intelligence",
   description:
-    "Explore Acme’s reporting lines, people, and data health in one place — powered by Remote.",
+    "Explore Acme’s reporting lines, people, and data health in one place. Powered by Remote.",
 };
 
 const SURFACES = [
@@ -30,7 +30,7 @@ const SURFACES = [
   },
   {
     name: "Map",
-    line: "See where people sit geographically — country by country.",
+    line: "See where people sit by country across the company.",
     src: "/marketing/app-map.png",
     alt: "Acme world map",
   },
@@ -43,7 +43,7 @@ const SURFACES = [
 ] as const;
 
 /**
- * Marketing home — structured like remote.com (hero split, marquee,
+ * Marketing home structured like remote.com (hero split, marquee,
  * how-we-do-it accordion + product panel, surface cards, closing CTA),
  * with real Acme product screenshots instead of invented mocks.
  */
@@ -151,12 +151,12 @@ export default function MarketingHomePage() {
                 </span>
               </div>
               <h2 className="font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-[2.75rem] md:leading-[1.1]">
-                Built on Remote, not a shadow HRIS
+                Built on Remote. No second employee database.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-norma-ink-muted md:text-lg">
-                Employments and managers come from the Remote sandbox API. The
-                app shapes that graph into chart, tree, map, and people —
-                without inventing a second employee database.
+                Employments and managers come from the Remote sandbox API. This
+                app turns that graph into chart, tree, map, and people views,
+                without inventing another source of truth.
               </p>
             </MarketingReveal>
             <MarketingReveal delayMs={120}>
@@ -177,8 +177,8 @@ export default function MarketingHomePage() {
                 Ready to explore Acme?
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-base text-norma-ink-muted">
-                Log in with the demo credentials and walk Chart, Tree, Map, and
-                People on live Remote sandbox data.
+                Log in with the demo credentials shared for your interview, then
+                walk Chart, Tree, Map, and People on live Remote sandbox data.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Link href="/login" className="norma-cta min-h-11 px-8 text-sm">

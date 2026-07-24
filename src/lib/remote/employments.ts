@@ -15,7 +15,7 @@ export type EmploymentStatusPolicy = "active_only" | "all";
 
 /**
  * Workers Free allows 50 subrequests per invocation. List pages are cheap;
- * per-employment detail GETs are not — fan out in batches under this size.
+ * per-employment detail GETs are not - fan out in batches under this size.
  */
 export const ENRICH_BATCH_SIZE = 40;
 
@@ -25,7 +25,7 @@ export const ENRICH_DETAIL_CONCURRENCY = 6;
 export type EnrichFanOut = {
   /** Public origin of this Worker (e.g. https://….workers.dev). Fallback for non-binding fetch. */
   origin: string;
-  /** Shared secret — same value as REMOTE_API_TOKEN, never sent to browsers. */
+  /** Shared secret - same value as REMOTE_API_TOKEN, never sent to browsers. */
   secret: string;
 };
 
@@ -97,7 +97,7 @@ export async function fetchEmploymentPage(page: number, pageSize: number) {
 
 /**
  * Paginate GET /v1/employments.
- * Note: list responses do not include manager_* — callers that need hierarchy
+ * Note: list responses do not include manager_* - callers that need hierarchy
  * must run {@link enrichEmploymentsWithManagers}.
  */
 export async function fetchAllEmploymentListItems(
@@ -227,7 +227,7 @@ export async function fetchEmploymentsForOrgChart(
     options.detailConcurrency ?? ENRICH_DETAIL_CONCURRENCY;
 
   // Fan-out needs a real Worker self binding. Local `next dev` may expose a
-  // stub WORKER_SELF whose fetch cannot parse Request URLs — stay in-process.
+  // stub WORKER_SELF whose fetch cannot parse Request URLs - stay in-process.
   if (
     options.fanOut &&
     process.env.NODE_ENV === "production" &&

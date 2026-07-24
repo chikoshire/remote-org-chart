@@ -963,6 +963,27 @@ Vectorize RAG is needed, or demo password rotation after broader exposure.
 
 ---
 
+## 2026-07-24 — Copy: no em dashes; Remote-like tone; drop HRIS jargon
+
+**Status:** Accepted  
+
+**Context:**  
+Marketing and product copy used em dashes and jargon like “shadow HRIS.” Remote.com writing is short, confident, and plain (“One system of record…”). Interviewers should not need acronyms expanded mid-demo.
+
+**Decision:**  
+1. Ban typographic em/en dashes in product, marketing, Help, and public docs. Prefer periods, commas, or colons. Empty fields show “Not set,” not “—.”  
+2. Match Remote-like tone: clear benefit, system-of-record framing, no “Hire clarity” filler.  
+3. Replace HRIS with plain language (“No second employee database”).
+
+**Consequences:**  
+- Marketing source section and hero subcopy rewritten.  
+- Help KB regenerated without em dashes.
+
+**Revisit when:**  
+A brand/editorial pass asks for a different voice.
+
+---
+
 ## Template for future entries
 
 

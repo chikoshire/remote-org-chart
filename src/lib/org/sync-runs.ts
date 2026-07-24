@@ -74,7 +74,7 @@ export async function writeSyncRun(
       )
       .run();
   } catch {
-    // Local/dev D1 may lack migrations — never fail the org-chart response for telemetry.
+    // Local/dev D1 may lack migrations - never fail the org-chart response for telemetry.
   }
 }
 

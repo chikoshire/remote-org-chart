@@ -29,7 +29,7 @@ export function mapOrgChartHttpError(
         kind: "error",
         code,
         message:
-          "Remote couldn’t authorize this connection. Ask an admin to check the Acme–Remote integration.",
+          "Remote couldn’t authorize this connection. Ask an admin to check the Acme and Remote integration.",
         retryable: true,
       };
     case "rate_limited":

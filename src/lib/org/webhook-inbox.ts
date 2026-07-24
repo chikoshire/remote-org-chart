@@ -97,7 +97,7 @@ export async function listWebhookEvents(
   }));
 }
 
-/** Read signing key from Cloudflare secrets / process.env — never log it. */
+/** Read signing key from Cloudflare secrets / process.env - never log it. */
 export function getWebhookSigningKey(
   source: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
 ): string | null {

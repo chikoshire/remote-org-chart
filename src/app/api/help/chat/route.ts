@@ -121,7 +121,7 @@ export async function POST(request: Request) {
       peopleBlock = hits
         .map(
           (p) =>
-            `- ${p.fullName ?? "Unknown"} — ${p.jobTitle ?? "Title not set"} (profile /app/people/${p.id})`,
+            `- ${p.fullName ?? "Unknown"} (${p.jobTitle ?? "Title not set"}; profile /app/people/${p.id})`,
         )
         .join("\n");
     }

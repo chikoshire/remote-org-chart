@@ -20,7 +20,7 @@ export type PersonNodeData = {
   density?: "comfortable" | "compact";
   collapsed?: boolean;
   collapsedCount?: number;
-  /** Set by canvas — toggles subtree collapse for managers. */
+  /** Set by canvas - toggles subtree collapse for managers. */
   onToggleCollapse?: () => void;
   /** Owns shared-element morph when this node is the transition source. */
   morphActive?: boolean;

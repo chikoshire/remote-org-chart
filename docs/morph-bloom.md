@@ -6,7 +6,7 @@ Shared-element feel for Org Intelligence navigation. Optional wow polish (#70).
 
 1. **Morph** when the same entity continues across views (person card → detail drawer → full profile).
 2. **Bloom** when a new surface appears without a morph partner (panels, profile sections).
-3. **Respect `prefers-reduced-motion: reduce`** — skip View Transitions and bloom animations.
+3. **Respect `prefers-reduced-motion: reduce`** - skip View Transitions and bloom animations.
 
 ## Hooks
 

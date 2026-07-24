@@ -47,7 +47,7 @@ export function applyCollapseToForest(
       return {
         ...node,
         children: [],
-        // stash for UI badge — not part of API type, carried via passthrough on layout
+        // stash for UI badge - not part of API type, carried via passthrough on layout
         collapsedCount: countDescendants(children),
       } as OrgChartPayloadNode & { collapsedCount: number };
     }

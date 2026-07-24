@@ -17,7 +17,7 @@ const TABS = [
 ] as const;
 
 /**
- * Settings secondary nav — always rendered in the sticky strip under the
+ * Settings secondary nav - always rendered in the sticky strip under the
  * primary header (same position on Preferences and Data Health).
  */
 export function SettingsSubnav() {

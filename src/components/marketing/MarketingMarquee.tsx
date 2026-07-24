@@ -12,7 +12,7 @@ const ITEMS = [
 ] as const;
 
 /**
- * Trust / capability strip under the hero — remote.com logo-marquee structure.
+ * Trust / capability strip under the hero - remote.com logo-marquee structure.
  */
 export function MarketingMarquee() {
   const row = [...ITEMS, ...ITEMS];

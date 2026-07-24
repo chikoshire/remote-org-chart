@@ -282,7 +282,7 @@ function HorizontalBranch({
   );
 }
 
-/** Left-to-right reporting tree — secondary to React Flow chart. */
+/** Left-to-right reporting tree - secondary to React Flow chart. */
 export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [density, setDensity] = useState<TreeDensity>("comfortable");

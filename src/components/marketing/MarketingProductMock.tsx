@@ -1,5 +1,5 @@
 /**
- * Static product chrome mock for the marketing landing — no live data.
+ * Static product chrome mock for the marketing landing - no live data.
  * Floating status chips echo remote.com’s hero depth without copying assets.
  */
 export function MarketingProductMock() {

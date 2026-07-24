@@ -6,7 +6,7 @@ import {
 
 export const LIVE_STORAGE_KEY = "acme-org-chart:live-default";
 export const SIDE_PANEL_STORAGE_KEY = "acme-org-chart:side-panel-open";
-/** @deprecated Dark mode removed — key kept only to clear legacy values. */
+/** @deprecated Dark mode removed - key kept only to clear legacy values. */
 export const THEME_STORAGE_KEY = "acme-org-chart:theme";
 export const PREFS_CHANGED_EVENT = "acme-org-chart:prefs-changed";
 
@@ -59,7 +59,7 @@ export function writeSidePanelOpen(open: boolean): void {
   }
 }
 
-/** Always light — clears any leftover `html.dark` from earlier builds. */
+/** Always light - clears any leftover `html.dark` from earlier builds. */
 export function forceLightTheme(): void {
   if (typeof document === "undefined") return;
   document.documentElement.classList.remove("dark");

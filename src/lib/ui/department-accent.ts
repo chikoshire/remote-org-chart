@@ -1,5 +1,5 @@
 /**
- * Pastel department accents — wider set so sibling teams stay distinguishable.
+ * Pastel department accents - wider set so sibling teams stay distinguishable.
  */
 const PASTELS = [
   "#9b8ec4", // lavender
@@ -50,5 +50,5 @@ export function departmentAccentsForPeople(
     .map((entry) => entry.color);
 }
 
-/** Chart bar / progress accent — single quiet black, not a rainbow. */
+/** Chart bar / progress accent - single quiet black, not a rainbow. */
 export const CHART_BAR_ACCENT = "#121212";

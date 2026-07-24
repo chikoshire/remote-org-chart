@@ -28,7 +28,7 @@ export type DashboardInsights = {
   managerMissingCount: number;
   incompleteCount: number;
   rootCount: number;
-  /** 0–100 share of people with title, department, and country. */
+  /** 0-100 share of people with title, department, and country. */
   completenessScore: number;
   lastSyncedAt: string | null;
   cycleMemberCount: number;

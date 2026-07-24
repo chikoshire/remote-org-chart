@@ -29,5 +29,5 @@ Receiver: `POST /api/webhooks/remote`. Without `REMOTE_WEBHOOK_SIGNING_KEY` → 
 
 1. In sandbox **Company Settings → Integrations & APIs**, create a **write / company admin** API token (or one with `webhook:write`). Keep the app’s `REMOTE_API_TOKEN` read-only.
 2. Put it in `.env.local` as `REMOTE_WEBHOOK_ADMIN_TOKEN` (gitignored).
-3. Run `./scripts/subscribe-remote-webhook.sh` — stores Wrangler secret + `.env.local` signing key (never prints the key).
+3. Run `./scripts/subscribe-remote-webhook.sh` - stores Wrangler secret + `.env.local` signing key (never prints the key).
 4. Confirm: unsigned POST returns `401 invalid_signature` (not `503`); real Remote events show in **Webhook events**.

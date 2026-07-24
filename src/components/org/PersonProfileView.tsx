@@ -66,7 +66,7 @@ type ProfileResponse = {
 };
 
 function labelize(value: string | null | undefined): string {
-  if (!value?.trim()) return "—";
+  if (!value?.trim()) return "Not set";
   return value
     .trim()
     .replace(/_/g, " ")
@@ -74,7 +74,7 @@ function labelize(value: string | null | undefined): string {
 }
 
 function formatDate(value: string | null | undefined): string {
-  if (!value?.trim()) return "—";
+  if (!value?.trim()) return "Not set";
   const parsed = Date.parse(value);
   if (Number.isNaN(parsed)) return value;
   return new Intl.DateTimeFormat(undefined, {
@@ -716,7 +716,7 @@ function ProfileField({
   value: string | null | undefined;
   mono?: boolean;
 }) {
-  const display = value?.trim() || "—";
+  const display = value?.trim() || "Not set";
   return (
     <div>
       <dt className="text-xs text-norma-ink-muted">{label}</dt>

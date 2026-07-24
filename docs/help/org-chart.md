@@ -4,9 +4,9 @@ Interactive reporting hierarchy for Acme Sandbox Corp.
 
 ## Views
 
-- **Chart** — React Flow canvas (pan, zoom, collapse branches)
-- **Tree** — indented list of the same forest
-- **Map** — people by country (scroll-zoom stays on the map; it won’t pan the page when zoom is maxed)
+- **Chart:** canvas with pan, zoom, and collapse
+- **Tree:** indented list of the same hierarchy
+- **Map:** people by country (scroll-zoom stays on the map)
 
 ## Find someone
 
@@ -17,10 +17,10 @@ Interactive reporting hierarchy for Acme Sandbox Corp.
 
 ## Compare reporting distance
 
-Open **Compare** (or `?compare=1`, or ⌘K → Compare). Pick Person 1 and Person 2 to see how they connect through the tree. Clear or Exit when done.
+Open **Compare** (or `?compare=1`, or ⌘K then Compare). Pick Person 1 and Person 2 to see how they connect through the tree. Clear or Exit when done.
 
 ## Refresh and live updates
 
-- **Refresh** pulls a fresh snapshot from Remote (`?refresh=1`)
-- Live update badges / sync log reflect webhook or cache activity when available
-- Incomplete / Unlinked / Cycle badges flag data-quality issues — dig into Data Health for lists
+- **Refresh** pulls a fresh snapshot from Remote
+- Live update badges and the sync log reflect webhook or cache activity when available
+- Incomplete, Unlinked, and Cycle badges flag data-quality issues. Open Data Health for the full lists.
