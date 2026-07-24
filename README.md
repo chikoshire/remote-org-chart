@@ -1,129 +1,169 @@
 # Remote Org Chart (Acme Sandbox Corp)
 
-Headless HRIS org chart against the **Remote sandbox** REST API. Built as an interview assessment deliverable: interactive reporting hierarchy, edge-case UI, public deploy, and clear documentation.
+Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sandbox** REST API. Server-side Bearer auth, manager→reports hierarchy, Norma-inspired product chrome, and a public Cloudflare Workers deploy.
 
-> **Status:** Building — **GH#1–#2** In Review; next **GH#3** (branch `feat/remote-api-proxy`).  
-> **Issues:** [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) · [ISSUES.md](./ISSUES.md) serial build order  
-> **Decisions (living):** [DECISIONS.md](./DECISIONS.md) — update whenever we lock or reverse a choice  
-> **Linear:** [project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) · search `GH#N`
+## Live demo
 
-## What this ships
+**https://remote-org-chart.shirechiko.workers.dev**
 
-1. Server-side auth to Remote sandbox (`Bearer` token — never exposed to the browser)
-2. Fetch employments → build manager → reports hierarchy
-3. Interactive org chart (name, title, department, reporting line)
-4. Edge-case UI (missing manager / department / title, cycles, API failures, empty data)
-5. Local app + this README + **public deploy** + links for the interview team
+| Check | Expected |
+|-------|----------|
+| Home | Interactive React Flow chart (~149 people, ~10 roots) |
+| `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
+| `/api/org-chart` | Hierarchy JSON (emails stripped); cold build ~15–25s |
 
-## Stack (and why)
+> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker.
 
-| Choice | Why |
-|--------|-----|
-| **Next.js + TypeScript** | App Router server routes keep the API token off the client; typed contracts with Remote payloads |
-| **Tailwind CSS** | Fast iteration toward Remote sandbox / Norma product chrome |
-| **React Flow + Dagre** | Interactive pan/zoom tree with automatic hierarchical layout — standard for org charts |
-| **Zod** | Runtime validation of Remote responses so UI never trusts raw JSON |
-| **Vitest** | Unit-test hierarchy builder (cycles, orphans, missing fields) without a browser |
-| **Cloudflare (Pages / Workers via Wrangler)** | **Chosen public host** — secrets for `REMOTE_API_*`; preferred over Vercel |
+### Links for the interview team
 
-### Hosting note
+- **Live app:** https://remote-org-chart.shirechiko.workers.dev  
+- **Source:** https://github.com/chikoshire/remote-org-chart  
+- **Security notes:** [SECURITY.md](./SECURITY.md)  
+- **Decision log:** [DECISIONS.md](./DECISIONS.md)
 
-The brief lists **Vercel** in a *suggested* stack — it is **not** a hard requirement. Public deploy is the requirement; the platform is ours to choose. We are using **Cloudflare + Wrangler**.
+---
 
-### Supabase
+## What it does
 
-**Default: off.** Remote is the source of truth for employments.
+1. Authenticates to Remote sandbox with a **read-only** customer token (`ra_test_…`) — **server-side only**
+2. Paginates `GET /v1/employments`, then enriches each employment for `manager_employment_id`
+3. Builds a manager→reports forest (cycles / orphan managers surfaced as warnings)
+4. Renders an interactive chart (name, title, department, country, reporting edges)
+5. Search focuses a person and their path to root; pan/zoom works on desktop and mobile
 
-Use a free Supabase project only if we commit to **webhook ingest + queryable event/sync history + Realtime fanout**. For a simple employment snapshot/cache, prefer **Cloudflare KV or D1** (same vendor as hosting).
+---
 
-See the planning canvas “Brief + wow” tiers for the full stretch list.
+## Quick start (local)
 
-## Environment
+**Requirements:** Node 20+, a Remote sandbox API token with employment read access.
 
-Copy `.env.example` → `.env.local` (never commit secrets):
+```bash
+git clone https://github.com/chikoshire/remote-org-chart.git
+cd remote-org-chart
+npm install
+cp .env.example .env.local
+# Edit .env.local — paste your ra_test_… token
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Next.js local server |
+| `npm test` | Vitest (hierarchy, redaction, schema) |
+| `npm run build` | Production Next build |
+| `npm run deploy` | OpenNext → Cloudflare Workers |
+| `npm run dev:tunnel` | Local Next + cloudflared public URL (optional) |
+
+### Environment
 
 ```bash
 REMOTE_API_TOKEN=ra_test_…
 REMOTE_API_BASE_URL=https://gateway.remote-sandbox.com
 ```
 
-Token is a **read-only** customer API token from Company settings → Integrations & APIs → Remote API.
+Token source: sandbox Company settings → Integrations & APIs → Remote API (read-only).  
+**Never** commit `.env.local` or paste tokens into issues/PRs.
 
-## Branch strategy
+---
 
-Feature and UX/UI work stay on **separate** branches. One PR per issue where practical.
+## Architecture
 
-### Feature / ship (`feat/*`, `chore/*`, `docs/*`)
+```
+Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
+              │
+              ├─ /api/health/remote     smoke Remote reachability
+              ├─ /api/employments       count + redacted sample (dev)
+              ├─ /api/org-chart         forest JSON for the UI
+              └─ /api/org-chart/enrich-batch
+                                        internal fan-out (Workers Free)
+```
 
-| Issue | Branch |
-|-------|--------|
-| [#1](https://github.com/chikoshire/remote-org-chart/issues/1) | `chore/scaffold-next-app` |
-| [#2](https://github.com/chikoshire/remote-org-chart/issues/2) | `feat/remote-api-proxy` |
-| [#3](https://github.com/chikoshire/remote-org-chart/issues/3) | `feat/employments-client` |
-| [#4](https://github.com/chikoshire/remote-org-chart/issues/4) | `feat/org-hierarchy` |
-| [#5](https://github.com/chikoshire/remote-org-chart/issues/5) | `feat/org-chart-react-flow` |
-| [#6](https://github.com/chikoshire/remote-org-chart/issues/6) | `feat/edge-case-handling` |
-| [#7](https://github.com/chikoshire/remote-org-chart/issues/7) | `feat/search-and-focus` |
-| [#8](https://github.com/chikoshire/remote-org-chart/issues/8) | `feat/deploy-cloudflare` |
-| [#9](https://github.com/chikoshire/remote-org-chart/issues/9) | `docs/readme-and-handoff` |
+| Layer | Location | Role |
+|-------|----------|------|
+| Remote client | `src/lib/remote/` | Env, Bearer fetch, Zod schemas, PII redaction |
+| Hierarchy | `src/lib/org/` | `buildOrgForest`, Dagre layout helpers, search |
+| UI | `src/components/` | AppShell, PersonNode, ReportingEdge, chart states |
+| Chart page | `src/app/page.tsx` | Fetches `/api/org-chart`, React Flow canvas |
 
-### UX / UI (`ui/*`) — separate from feature work
+**Data note:** `GET /v1/employments` list items do **not** include manager fields. Hierarchy requires `GET /v1/employments/:id` per active employment.
 
-| Issue | Branch |
-|-------|--------|
-| [#10](https://github.com/chikoshire/remote-org-chart/issues/10) | `ui/norma-design-tokens` |
-| [#11](https://github.com/chikoshire/remote-org-chart/issues/11) | `ui/app-chrome` |
-| [#12](https://github.com/chikoshire/remote-org-chart/issues/12) | `ui/person-node` |
-| [#13](https://github.com/chikoshire/remote-org-chart/issues/13) | `ui/reporting-edges` |
-| [#14](https://github.com/chikoshire/remote-org-chart/issues/14) | `ui/state-surfaces` |
-| [#15](https://github.com/chikoshire/remote-org-chart/issues/15) | `ui/responsive-interaction` |
-| [#16](https://github.com/chikoshire/remote-org-chart/issues/16) | `ui/motion-polish` |
+**Cloudflare Free constraint:** Workers allow **50 subrequests** per invocation. Production fans enrichment through a `WORKER_SELF` service binding into `/api/org-chart/enrich-batch` (batches of 40), gated by `x-org-enrich-secret` (same value as the server token — never exposed to the browser).
 
-### Stretch — Tier 1 (wow UX, no DB)
+---
 
-| Issue | Branch |
-|-------|--------|
-| [#17](https://github.com/chikoshire/remote-org-chart/issues/17) | `feat/org-insights` |
-| [#18](https://github.com/chikoshire/remote-org-chart/issues/18) | `feat/person-detail-drawer` |
-| [#19](https://github.com/chikoshire/remote-org-chart/issues/19) | `feat/org-filters` |
-| [#20](https://github.com/chikoshire/remote-org-chart/issues/20) | `feat/deep-links` |
-| [#21](https://github.com/chikoshire/remote-org-chart/issues/21) | `feat/collapse-density` |
-| [#22](https://github.com/chikoshire/remote-org-chart/issues/22) | `feat/export-keyboard` |
-| [#23](https://github.com/chikoshire/remote-org-chart/issues/23) | `feat/reporting-distance` |
+## Edge cases (UI)
 
-### Stretch — Tier 2 (Cloudflare KV/D1)
+| Situation | Behavior |
+|-----------|----------|
+| Missing title / department | Node still renders; fields omitted or shown as soft placeholders |
+| Orphan manager ID | Counted in API payload; warning surface when present |
+| Reporting cycles | Detected in forest build; nodes marked `inCycle` |
+| Empty active set | Empty state copy |
+| Remote / network errors | Error surface with retryable vs fatal mapping |
+| Auth / rate limit | Mapped to chart error codes (retryable where appropriate) |
 
-| Issue | Branch |
-|-------|--------|
-| [#24](https://github.com/chikoshire/remote-org-chart/issues/24) | `feat/employment-snapshot-cache` |
-| [#25](https://github.com/chikoshire/remote-org-chart/issues/25) | `feat/manual-remote-refresh` |
-| [#26](https://github.com/chikoshire/remote-org-chart/issues/26) | `feat/sync-run-log` |
+---
 
-### Stretch — Tier 3 (webhooks / live; Supabase only if we commit)
+## Security
 
-| Issue | Branch |
-|-------|--------|
-| [#27](https://github.com/chikoshire/remote-org-chart/issues/27) | `feat/remote-webhooks` |
-| [#28](https://github.com/chikoshire/remote-org-chart/issues/28) | `feat/live-org-updates` |
-| [#29](https://github.com/chikoshire/remote-org-chart/issues/29) | `feat/event-history-ui` |
+- Token only in server routes / Wrangler **secrets** — never in client bundles
+- Browser talks **only** to same-origin `/api/*`
+- `/api/org-chart` strips work emails from the payload
+- Chart UI shows name / title / department / country — not emails or addresses
+- See [SECURITY.md](./SECURITY.md) for the checklist
 
-## Tracking
+---
+
+## Stack (and why)
+
+| Choice | Why |
+|--------|-----|
+| **Next.js + TypeScript** | App Router keeps the token off the client; typed Remote contracts |
+| **Tailwind + Norma tokens** | Matches sandbox product chrome (Royal `#624DE3`, Prussian `#00234B`, Spray `#75E8F0`) |
+| **React Flow + Dagre** | Interactive pan/zoom + hierarchical layout |
+| **Zod** | Runtime validation of Remote JSON |
+| **Vitest** | Hierarchy + redaction tests without a browser |
+| **Cloudflare Workers (OpenNext + Wrangler)** | Public host with secrets; brief’s Vercel mention is a suggestion, not a requirement |
+
+Supabase is **off** by default — Remote is the source of truth. Stretch ideas for KV/D1/webhooks live in [DECISIONS.md](./DECISIONS.md) and the issue backlog.
+
+---
+
+## Deploy (Cloudflare)
+
+```bash
+# One-time: wrangler login, then set the secret
+npx wrangler secret put REMOTE_API_TOKEN
+
+npm run deploy
+```
+
+`wrangler.jsonc` sets `REMOTE_API_BASE_URL` and the `WORKER_SELF` service binding.  
+Public URL pattern: `https://remote-org-chart.<account>.workers.dev`
+
+---
+
+## Brand
+
+- Royal Blue `#624DE3` · Prussian Blue `#00234B` · Spray `#75E8F0`
+- Design system nickname: **Norma** — sandbox product chrome, not marketing site
+
+---
+
+## Tracking / backlog
 
 | Surface | Purpose |
 |---------|---------|
-| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | **Executable backlog** (#1–#29 + comments) |
-| [DECISIONS.md](./DECISIONS.md) | Living “why we chose X” log (update as we go) |
-| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project + [backlog](https://linear.app/orbit-linear/document/implementation-backlog-and-branch-map-bb3e70c30991) + [decision mirror](https://linear.app/orbit-linear/document/decision-log-living-950e21cfce96) (issue create blocked by free-tier limit) |
-| Orbit Kanban | Day-to-day board — **pending** Orbit Main JWT refresh |
+| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | Executable backlog |
+| [ISSUES.md](./ISSUES.md) | Serial build order |
+| [DECISIONS.md](./DECISIONS.md) | Living “why we chose X” log |
+| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project mirror |
 
-Comments are written in first person as project notes — no tooling slash-commands or agent branding.
+Core ship path: **#1–#8** (scaffold → data → chart → UI → deploy) + **#9** (this handoff). Stretch / polish: a11y (#30), Playwright (#31), motion (#16), wow UX (#17–#29).
 
-## Brand cues
-
-- Royal Blue `#624DE3`
-- Prussian Blue `#00234B`
-- Spray `#75E8F0`
-- Design system nickname: **Norma** — match **sandbox product chrome**, not the marketing site
+---
 
 ## Docs / refs
 
