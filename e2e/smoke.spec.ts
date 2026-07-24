@@ -42,7 +42,6 @@ test.describe("org chart smoke", () => {
     for (const { path, heading } of [
       { path: "/app/dashboard", heading: "Dashboard" },
       { path: "/app/departments", heading: "Departments" },
-      { path: "/app/data-health", heading: "Data Health" },
     ]) {
       await page.goto(path);
       await expect(
@@ -54,6 +53,21 @@ test.describe("org chart smoke", () => {
         }),
       ).toHaveAttribute("aria-current", "page");
     }
+  });
+
+  test("data health route lists trust sections", async ({ page }) => {
+    await mockOrgChart(page, orgChartReadyFixture);
+    await page.goto("/app/data-health");
+    await expect(
+      page.getByRole("heading", { name: "Data Health", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/trust the org chart/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Reporting cycles" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Manager missing" }),
+    ).toBeVisible();
   });
 
   test("settings route loads preferences and integrations", async ({ page }) => {

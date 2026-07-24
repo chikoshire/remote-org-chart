@@ -1,5 +1,6 @@
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import { isIncompletePerson } from "@/lib/org/data-health";
 
 export type PersonNodeVariant = "default" | "selected" | "path" | "root";
 
@@ -10,6 +11,8 @@ export type PersonNodeData = {
   country: string | null;
   directReports: number;
   inCycle?: boolean;
+  managerMissing?: boolean;
+  incompleteFields?: boolean;
   variant?: PersonNodeVariant;
   density?: "comfortable" | "compact";
   collapsed?: boolean;
@@ -40,6 +43,8 @@ export function PersonNodeCard({
   country,
   directReports,
   inCycle = false,
+  managerMissing = false,
+  incompleteFields,
   variant = "default",
   density = "comfortable",
   collapsed = false,
@@ -51,11 +56,22 @@ export function PersonNodeCard({
   const isRoot = variant === "root";
   const countryLabel = formatCountryLabel(country);
   const accent = departmentAccent(department);
+  const incomplete =
+    incompleteFields ??
+    isIncompletePerson({
+      id: "card",
+      fullName,
+      jobTitle,
+      department,
+      country,
+      managerEmploymentId: null,
+    });
+  const titleLabel = jobTitle?.trim() || "Not set";
   const reportsLabel =
     directReports === 1 ? "1 report" : `${directReports} reports`;
   const accessibleName = [
     name,
-    jobTitle?.trim() || "No title",
+    titleLabel,
     department?.trim() || null,
     countryLabel,
     directReports === 1
@@ -63,6 +79,8 @@ export function PersonNodeCard({
       : `${directReports} direct reports`,
     collapsed ? `${collapsedCount} hidden in collapsed branch` : null,
     inCycle ? "reporting cycle" : null,
+    managerMissing ? "manager missing" : null,
+    incomplete ? "incomplete fields" : null,
   ]
     .filter(Boolean)
     .join(", ");
@@ -76,6 +94,8 @@ export function PersonNodeCard({
       data-variant={variant}
       data-density={density}
       data-in-cycle={inCycle ? "true" : "false"}
+      data-manager-missing={managerMissing ? "true" : "false"}
+      data-incomplete={incomplete ? "true" : "false"}
     >
       <span
         aria-hidden
@@ -112,7 +132,7 @@ export function PersonNodeCard({
               compact ? "text-[10px]" : "text-xs leading-relaxed"
             }`}
           >
-            {jobTitle?.trim() || "No title"}
+            {titleLabel}
           </p>
           {!compact ? (
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -125,12 +145,20 @@ export function PersonNodeCard({
                 >
                   {department.trim()}
                 </span>
-              ) : null}
+              ) : (
+                <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink-muted">
+                  Dept not set
+                </span>
+              )}
               {countryLabel ? (
                 <span className="truncate text-[11px] text-norma-ink-subtle">
                   {countryLabel}
                 </span>
-              ) : null}
+              ) : (
+                <span className="truncate text-[11px] text-norma-ink-muted">
+                  Country not set
+                </span>
+              )}
             </div>
           ) : null}
         </div>
@@ -159,6 +187,16 @@ export function PersonNodeCard({
           {inCycle ? (
             <span className="rounded-norma-sm bg-norma-danger-soft px-1.5 py-0.5 text-[10px] font-medium text-norma-danger">
               Cycle
+            </span>
+          ) : null}
+          {managerMissing ? (
+            <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
+              Unlinked
+            </span>
+          ) : null}
+          {incomplete ? (
+            <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink-muted">
+              Incomplete
             </span>
           ) : null}
           {directReports > 0 && onToggleCollapse ? (
