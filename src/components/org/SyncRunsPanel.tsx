@@ -119,7 +119,7 @@ export function SyncRunsPanel({
               <span className="text-norma-ink-subtle">
                 {run.employmentCount != null
                   ? `${run.employmentCount} people`
-                  : "—"}
+                  : "Not set"}
               </span>
             </div>
             <p className="mt-0.5 text-norma-ink-muted">
@@ -165,7 +165,7 @@ export function SyncRunsPanel({
       </ul>
 
       <p className="mt-2 border-t border-norma-border/70 px-1 pt-2 text-[10px] text-norma-ink-subtle">
-        Counts / event types only — no emails. Storage: D1.
+        Counts / event types only. No emails. Storage: D1.
       </p>
     </div>
   );

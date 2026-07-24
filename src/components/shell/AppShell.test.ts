@@ -27,7 +27,7 @@ describe("ProductShell", () => {
     expect(shell).toContain("People");
     expect(shell).toContain("Departments");
     expect(shell).toContain("Data Health");
-    expect(shell).toContain("bg-white");
+    expect(shell).toContain("bg-norma-surface");
     expect(shell).not.toContain('href="/welcome"');
     expect(shell).not.toContain("view=directory");
     expect(shell).toContain("h-dvh");

@@ -656,7 +656,7 @@ function OrgChartInner() {
 
   const personLabel = useCallback(
     (id: string | null) => {
-      if (!id) return "—";
+      if (!id) return "Not set";
       const person = peopleIndex.get(id);
       return person?.fullName?.trim() || "Unknown person";
     },
@@ -680,7 +680,7 @@ function OrgChartInner() {
       case "same":
         return "Pick two different people";
       case "disconnected":
-        return "No shared manager — these people are in disconnected trees";
+        return "No shared manager. These people are in disconnected trees";
       case "missing":
         return "One of those people is no longer in the chart";
       default: {
@@ -1129,7 +1129,7 @@ function OrgChartInner() {
                   role="status"
                   className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-1.5 text-xs text-norma-danger shadow-norma-sm"
                 >
-                  Refresh failed — kept the previous chart. {refreshError}{" "}
+                  Refresh failed. Kept the previous chart. {refreshError}{" "}
                   <button
                     type="button"
                     className="font-medium text-norma-royal underline"
