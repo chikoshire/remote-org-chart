@@ -716,6 +716,24 @@ Surface a **Start compare** callout in the Org Chart workspace (plus ⌘K nav hi
 
 ---
 
+## 2026-07-24 — Color restraint (premium, not rainbow)
+
+**Status:** Accepted  
+
+**Context:**  
+Department hash pastels painted charts and avatars in unrelated hues (purple, pink, cobalt, teal, orange). Read as cartoonish next to Aurum-style craft references that use one accent and mute everything else.
+
+**Decision:**  
+1. Chart bars use a single Acme orange (`CHART_BAR_ACCENT`), with opacity by rank — not per-department colors.  
+2. `departmentAccent` limited to a muted Prussian/Spray family for initials and thin strips.  
+3. Cooler canvas (`#e8eef0`) and quieter shell glow (orange + Prussian only, lower opacity).  
+4. Keep Acme orange / Prussian / Spray — do not adopt Aurum gold or dark-first shell.
+
+**Consequences:**  
+- Color means brand or status; charts read as one system, not a sticker pack.
+
+---
+
 ## Template for future entries
 
 

@@ -113,10 +113,10 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-0 opacity-[0.55]"
+          className="pointer-events-none absolute inset-0 -z-0 opacity-[0.4]"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse 70% 50% at 0% 0%, rgb(232 93 4 / 0.14) 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 100% 100%, rgb(42 157 143 / 0.12) 0%, transparent 50%)",
+              "radial-gradient(ellipse 65% 45% at 100% 0%, rgb(232 93 4 / 0.08) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 0% 100%, rgb(11 42 50 / 0.06) 0%, transparent 50%)",
           }}
         />
         <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden">
