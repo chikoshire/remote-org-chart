@@ -29,8 +29,8 @@ export function mapOrgChartHttpError(
         kind: "error",
         code,
         message:
-          "Remote sandbox rejected the token. Confirm the read-only sandbox key still works.",
-        retryable: false,
+          "Remote sandbox rejected the token. Confirm the read-only sandbox key still works, then retry.",
+        retryable: true,
       };
     case "rate_limited":
       return {

@@ -6,9 +6,9 @@ import {
 } from "@/lib/org/chart-state";
 
 describe("mapOrgChartHttpError", () => {
-  it("marks auth problems as non-retryable", () => {
+  it("marks auth problems as retryable so a transient sandbox blip can recover", () => {
     const err = mapOrgChartHttpError(401, { code: "unauthorized" });
-    expect(err.retryable).toBe(false);
+    expect(err.retryable).toBe(true);
     expect(err.message).toMatch(/token/i);
   });
 
