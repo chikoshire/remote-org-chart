@@ -16,7 +16,7 @@ export function ProductPageFrame({
 }: ProductPageFrameProps) {
   return (
     <div className={`min-h-0 flex-1 overflow-auto ${className}`.trim()}>
-      <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8 xl:px-10">
+      <div className="w-full px-5 py-8 md:px-8 md:py-10 lg:px-10 xl:px-12">
         {children}
       </div>
     </div>

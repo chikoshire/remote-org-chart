@@ -6,16 +6,14 @@ import {
 
 export const LIVE_STORAGE_KEY = "acme-org-chart:live-default";
 export const SIDE_PANEL_STORAGE_KEY = "acme-org-chart:side-panel-open";
+/** @deprecated Dark mode removed — key kept only to clear legacy values. */
 export const THEME_STORAGE_KEY = "acme-org-chart:theme";
 export const PREFS_CHANGED_EVENT = "acme-org-chart:prefs-changed";
-
-export type AppTheme = "light" | "dark";
 
 export type AppPrefs = {
   density: ChartDensity;
   liveDefault: boolean;
   sidePanelOpen: boolean;
-  theme: AppTheme;
 };
 
 function emitPrefsChanged(): void {
@@ -61,30 +59,16 @@ export function writeSidePanelOpen(open: boolean): void {
   }
 }
 
-export function readThemePref(): AppTheme {
-  if (typeof window === "undefined") return "light";
+/** Always light — clears any leftover `html.dark` from earlier builds. */
+export function forceLightTheme(): void {
+  if (typeof document === "undefined") return;
+  document.documentElement.classList.remove("dark");
+  document.documentElement.style.colorScheme = "light";
   try {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) === "dark"
-      ? "dark"
-      : "light";
-  } catch {
-    return "light";
-  }
-}
-
-export function writeThemePref(theme: AppTheme): void {
-  try {
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-    emitPrefsChanged();
+    window.localStorage.removeItem(THEME_STORAGE_KEY);
   } catch {
     // ignore
   }
-}
-
-export function applyThemeClass(theme: AppTheme): void {
-  if (typeof document === "undefined") return;
-  document.documentElement.classList.toggle("dark", theme === "dark");
-  document.documentElement.style.colorScheme = theme;
 }
 
 export function readAppPrefs(): AppPrefs {
@@ -92,7 +76,6 @@ export function readAppPrefs(): AppPrefs {
     density: readStoredDensity(),
     liveDefault: readLiveDefault(),
     sidePanelOpen: readSidePanelOpen(),
-    theme: readThemePref(),
   };
 }
 

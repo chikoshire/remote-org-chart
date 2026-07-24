@@ -16,7 +16,7 @@ import {
   type NamedCount,
 } from "@/lib/org/dashboard-insights";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
-import { CHART_BAR_ACCENT } from "@/lib/ui/department-accent";
+import { departmentAccent } from "@/lib/ui/department-accent";
 import { withViewTransition } from "@/lib/ui/motion";
 import {
   readRemoteConnected,
@@ -32,7 +32,7 @@ type OrgChartResponse = {
   code?: string;
 };
 
-type KpiTone = "default" | "accent" | "warn" | "success";
+type KpiTone = "lavender" | "peach" | "mint" | "sky" | "rose";
 
 type KpiCardProps = {
   label: string;
@@ -41,8 +41,60 @@ type KpiCardProps = {
   href: string;
   onNavigate: (href: string) => void;
   icon: ReactNode;
-  tone?: KpiTone;
+  tone: KpiTone;
+  delayClass?: string;
+  tall?: boolean;
+  meter?: number;
 };
+
+const TONE_STYLES: Record<KpiTone, string> = {
+  lavender:
+    "border-norma-lavender/80 bg-gradient-to-br from-norma-lavender via-norma-lavender/80 to-white/70",
+  peach:
+    "border-norma-peach/80 bg-gradient-to-br from-norma-peach via-norma-peach/75 to-white/70",
+  mint: "border-norma-mint/80 bg-gradient-to-br from-norma-mint via-norma-mint/80 to-white/65",
+  sky: "border-norma-sky/80 bg-gradient-to-br from-norma-sky via-norma-sky/75 to-white/70",
+  rose: "border-norma-rose/80 bg-gradient-to-br from-norma-rose via-norma-rose/75 to-white/70",
+};
+
+function CompletenessMeter({ score }: { score: number }) {
+  const size = 52;
+  const stroke = 5;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const offset = c - (Math.min(100, Math.max(0, score)) / 100) * c;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      className="absolute inset-0 -rotate-90"
+      aria-hidden
+      style={{ ["--meter-circumference" as string]: String(c) }}
+    >
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="rgb(18 18 18 / 0.12)"
+        strokeWidth={stroke}
+      />
+      <circle
+        className="meter-ring-progress"
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={c}
+        strokeDashoffset={offset}
+      />
+    </svg>
+  );
+}
 
 function KpiCard({
   label,
@@ -51,36 +103,41 @@ function KpiCard({
   href,
   onNavigate,
   icon,
-  tone = "default",
+  tone,
+  delayClass = "",
+  tall = false,
+  meter,
 }: KpiCardProps) {
-  const toneClass =
-    tone === "accent"
-      ? "border-norma-peach/80 bg-norma-peach/70"
-      : tone === "warn"
-        ? "border-norma-rose/80 bg-norma-rose/70"
-        : tone === "success"
-          ? "border-norma-mint/80 bg-norma-mint/70"
-          : "border-norma-lavender/60 bg-norma-lavender/50";
-
   return (
     <button
       type="button"
       onClick={() => onNavigate(href)}
-      className={`bloom-enter group flex min-h-[7.5rem] flex-col rounded-norma-lg border p-4 text-left shadow-norma-sm transition hover:-translate-y-0.5 hover:shadow-norma-md ${toneClass}`}
+      className={`bloom-enter group flex flex-col rounded-norma-lg border p-5 text-left shadow-norma-sm transition hover:-translate-y-1 hover:shadow-norma-md ${
+        tall ? "min-h-[9.5rem]" : "min-h-[8.25rem]"
+      } ${TONE_STYLES[tone]} ${delayClass}`}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-norma-ink text-norma-ink-inverse">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-norma-ink text-norma-ink-inverse shadow-norma-sm">
           {icon}
         </span>
-        <span className="font-[family-name:var(--font-norma-display)] text-3xl font-semibold tracking-tight text-norma-ink tabular-nums">
-          {value}
-        </span>
+        {typeof meter === "number" ? (
+          <span className="relative inline-flex h-[52px] w-[52px] items-center justify-center text-norma-ink">
+            <CompletenessMeter score={meter} />
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[11px] font-bold tabular-nums">
+              {value}
+            </span>
+          </span>
+        ) : (
+          <span className="font-[family-name:var(--font-norma-display)] text-3xl font-semibold tracking-tight text-norma-ink tabular-nums md:text-4xl">
+            {value}
+          </span>
+        )}
       </div>
-      <p className="mt-auto pt-3 text-sm font-semibold text-norma-ink">
-        {label}
-      </p>
+      <p className="mt-auto pt-4 text-sm font-semibold text-norma-ink">{label}</p>
       {hint ? (
-        <p className="mt-0.5 line-clamp-1 text-xs text-norma-ink-muted">{hint}</p>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-norma-ink-muted">
+          {hint}
+        </p>
       ) : null}
     </button>
   );
@@ -132,46 +189,158 @@ function IconAlert() {
   );
 }
 
-function CountBars({
-  title,
+/** Donut share for departments — not another bar list. */
+function DepartmentShare({
   items,
   empty,
 }: {
-  title: string;
   items: NamedCount[];
   empty: string;
 }) {
-  const max = items[0]?.count ?? 1;
+  const top = items.slice(0, 6);
+  const total = top.reduce((sum, item) => sum + item.count, 0) || 1;
+  const size = 168;
+  const stroke = 22;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+
+  let offset = 0;
+  const arcs = top.map((item) => {
+    const share = item.count / total;
+    const length = share * c;
+    const arc = {
+      ...item,
+      length,
+      offset,
+      color: departmentAccent(item.name),
+      pct: Math.round(share * 100),
+    };
+    offset += length;
+    return arc;
+  });
+
   return (
-    <section className="bloom-enter norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm">
-      <h2 className="text-sm font-semibold text-norma-ink">{title}</h2>
-      {items.length === 0 ? (
-        <p className="mt-4 text-sm text-norma-ink-muted">{empty}</p>
+    <section className="bloom-enter bloom-enter-delay-4 flex min-h-[22rem] flex-col rounded-norma-lg border border-norma-border/70 bg-gradient-to-br from-white/90 via-norma-lavender/25 to-norma-surface p-6 shadow-norma-sm">
+      <h2 className="text-sm font-semibold text-norma-ink">
+        Headcount by department
+      </h2>
+      <p className="mt-1 text-xs text-norma-ink-muted">Share of people · top teams</p>
+      {top.length === 0 ? (
+        <p className="mt-6 text-sm text-norma-ink-muted">{empty}</p>
       ) : (
-        <ul className="mt-4 space-y-3" aria-label={title}>
-          {items.slice(0, 8).map((item, index) => {
-            const width = Math.max(8, Math.round((item.count / max) * 100));
-            // Soften lower ranks with opacity — one hue, ranked intensity
-            const opacity = Math.max(0.45, 1 - index * 0.07);
+        <div className="mt-6 flex flex-1 flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <div className="relative shrink-0">
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+              <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                fill="none"
+                stroke="rgb(18 18 18 / 0.06)"
+                strokeWidth={stroke}
+              />
+              {arcs.map((arc) => (
+                <circle
+                  key={arc.name}
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={r}
+                  fill="none"
+                  stroke={arc.color}
+                  strokeWidth={stroke}
+                  strokeDasharray={`${arc.length} ${c - arc.length}`}
+                  strokeDashoffset={-arc.offset}
+                  strokeLinecap="butt"
+                />
+              ))}
+            </svg>
+            <div className="absolute inset-0 flex rotate-0 flex-col items-center justify-center">
+              <span className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tabular-nums text-norma-ink">
+                {total}
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-norma-ink-muted">
+                people
+              </span>
+            </div>
+          </div>
+          <ul className="w-full space-y-2.5" aria-label="Headcount by department">
+            {arcs.map((arc) => (
+              <li key={arc.name} className="flex items-center gap-3 text-sm">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: arc.color }}
+                />
+                <span className="min-w-0 flex-1 truncate font-medium text-norma-ink">
+                  {arc.name}
+                </span>
+                <span className="shrink-0 tabular-nums text-norma-ink-muted">
+                  {arc.count}
+                  <span className="ml-1 text-[11px] text-norma-ink-subtle">
+                    ({arc.pct}%)
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** Proportional dots for countries — distinct from the department donut. */
+function CountryDots({
+  items,
+  empty,
+}: {
+  items: NamedCount[];
+  empty: string;
+}) {
+  const top = items.slice(0, 8);
+  const max = top[0]?.count ?? 1;
+  const PALETTE = [
+    "bg-norma-sky",
+    "bg-norma-mint",
+    "bg-norma-peach",
+    "bg-norma-lavender",
+    "bg-norma-rose",
+    "bg-norma-sky/80",
+    "bg-norma-mint/80",
+    "bg-norma-peach/80",
+  ] as const;
+
+  return (
+    <section className="bloom-enter bloom-enter-delay-5 flex min-h-[22rem] flex-col rounded-norma-lg border border-norma-border/70 bg-gradient-to-br from-white/90 via-norma-mint/30 to-norma-sky/20 p-6 shadow-norma-sm">
+      <h2 className="text-sm font-semibold text-norma-ink">Headcount by country</h2>
+      <p className="mt-1 text-xs text-norma-ink-muted">
+        Each dot ≈ relative size · denser = larger team
+      </p>
+      {top.length === 0 ? (
+        <p className="mt-6 text-sm text-norma-ink-muted">{empty}</p>
+      ) : (
+        <ul className="mt-5 space-y-4" aria-label="Headcount by country">
+          {top.map((item, index) => {
+            const dots = Math.max(1, Math.round((item.count / max) * 12));
             return (
               <li key={item.name}>
-                <div className="flex items-baseline justify-between gap-2 text-sm">
-                  <span className="min-w-0 truncate font-medium text-norma-ink">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-sm font-semibold text-norma-ink">
                     {item.name}
                   </span>
-                  <span className="shrink-0 tabular-nums text-norma-ink-muted">
+                  <span className="shrink-0 text-sm tabular-nums text-norma-ink-muted">
                     {item.count}
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-norma-surface-muted">
-                  <div
-                    className="h-full rounded-full"
-                    style={{
-                      width: `${width}%`,
-                      backgroundColor: CHART_BAR_ACCENT,
-                      opacity,
-                    }}
-                  />
+                <div className="mt-2 flex flex-wrap gap-1.5" aria-hidden>
+                  {Array.from({ length: dots }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-2.5 w-2.5 rounded-full ${PALETTE[index % PALETTE.length]}`}
+                      style={{
+                        opacity: 0.45 + (i / Math.max(dots - 1, 1)) * 0.55,
+                      }}
+                    />
+                  ))}
                 </div>
               </li>
             );
@@ -346,25 +515,25 @@ export function DashboardWorkspace() {
 
   const completenessTone: KpiTone =
     insights.completenessScore >= 90
-      ? "success"
+      ? "mint"
       : insights.completenessScore >= 70
-        ? "default"
-        : "warn";
+        ? "sky"
+        : "rose";
 
   return (
     <ProductPageFrame>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+          <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-ink md:text-3xl">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-norma-ink-muted">
+          <p className="mt-2 text-sm text-norma-ink-muted">
             Acme structure at a glance · synced {syncedLabel}
           </p>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="People"
           value={String(insights.headcount)}
@@ -372,7 +541,9 @@ export function DashboardWorkspace() {
           href="/app/people"
           onNavigate={navigate}
           icon={<IconPeople />}
-          tone="accent"
+          tone="peach"
+          delayClass="bloom-enter-delay-1"
+          tall
         />
         <KpiCard
           label="Departments"
@@ -385,6 +556,8 @@ export function DashboardWorkspace() {
           href="/app/dashboard#departments"
           onNavigate={navigate}
           icon={<IconBuilding />}
+          tone="lavender"
+          delayClass="bloom-enter-delay-2"
         />
         <KpiCard
           label="Managers"
@@ -393,6 +566,8 @@ export function DashboardWorkspace() {
           href="/app"
           onNavigate={navigate}
           icon={<IconNetwork />}
+          tone="sky"
+          delayClass="bloom-enter-delay-3"
         />
         <KpiCard
           label="Completeness"
@@ -402,28 +577,27 @@ export function DashboardWorkspace() {
           onNavigate={navigate}
           icon={<IconShield />}
           tone={completenessTone}
+          delayClass="bloom-enter-delay-4"
+          tall
+          meter={insights.completenessScore}
         />
       </div>
 
-      <div className="mt-5 grid scroll-mt-4 gap-4 lg:grid-cols-2" id="departments">
-        <CountBars
-          title="Headcount by department"
+      <div className="mt-6 grid scroll-mt-4 gap-5 lg:grid-cols-2" id="departments">
+        <DepartmentShare
           items={insights.departments}
           empty="No departments on file yet."
         />
-        <CountBars
-          title="Headcount by country"
+        <CountryDots
           items={insights.countries}
           empty="No countries on file yet."
         />
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+      <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <section className="bloom-enter bloom-enter-delay-5 min-h-[18rem] rounded-norma-lg border border-norma-peach/50 bg-gradient-to-br from-norma-peach/40 via-white/80 to-norma-surface p-6 shadow-norma-sm">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-norma-prussian">
-              Largest teams
-            </h2>
+            <h2 className="text-sm font-semibold text-norma-ink">Largest teams</h2>
             <Link
               href="/app"
               className="text-xs font-semibold text-norma-ink hover:underline"
@@ -440,11 +614,11 @@ export function DashboardWorkspace() {
               No managers with direct reports yet.
             </p>
           ) : (
-            <ul className="mt-3 divide-y divide-norma-border/70" aria-label="Largest teams">
+            <ul className="mt-4 divide-y divide-norma-border/60" aria-label="Largest teams">
               {insights.topManagers.map((manager) => (
-                <li key={manager.id} className="flex items-center gap-3 py-2.5">
+                <li key={manager.id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-norma-prussian">
+                    <p className="truncate text-sm font-semibold text-norma-ink">
                       {manager.fullName}
                     </p>
                     <p className="truncate text-xs text-norma-ink-muted">
@@ -452,7 +626,7 @@ export function DashboardWorkspace() {
                       {manager.department ? ` · ${manager.department}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-norma-sm bg-norma-surface-muted px-2 py-1 text-[11px] font-semibold tabular-nums text-norma-prussian">
+                  <span className="shrink-0 rounded-full bg-norma-ink px-2.5 py-1 text-[11px] font-semibold tabular-nums text-norma-ink-inverse">
                     {manager.directReports}
                   </span>
                 </li>
@@ -461,11 +635,9 @@ export function DashboardWorkspace() {
           )}
         </section>
 
-        <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+        <section className="bloom-enter bloom-enter-delay-6 min-h-[18rem] rounded-norma-lg border border-norma-rose/45 bg-gradient-to-br from-norma-rose/35 via-white/85 to-norma-surface p-6 shadow-norma-sm">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-norma-prussian">
-              Needs attention
-            </h2>
+            <h2 className="text-sm font-semibold text-norma-ink">Needs attention</h2>
             <Link
               href="/settings/data-health"
               className="text-xs font-semibold text-norma-ink hover:underline"
@@ -478,31 +650,31 @@ export function DashboardWorkspace() {
             </Link>
           </div>
           {attentionItems.length === 0 ? (
-            <p className="mt-4 flex items-center gap-2 rounded-norma-md bg-norma-success-soft px-3 py-3 text-sm text-norma-success">
+            <p className="mt-4 flex items-center gap-2 rounded-norma-md bg-norma-success-soft px-4 py-4 text-sm text-norma-success">
               <IconShield />
               All clear — no flags right now.
             </p>
           ) : (
-            <ul className="mt-3 space-y-2" aria-label="Needs attention">
+            <ul className="mt-4 space-y-2.5" aria-label="Needs attention">
               {attentionItems.map((item) => (
                 <li key={item.label}>
                   <button
                     type="button"
-                    className="flex w-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/30 px-3 py-2.5 text-left transition hover:border-norma-ink/40 hover:bg-white"
+                    className="flex w-full items-center gap-3 rounded-norma-md border border-white/70 bg-white/70 px-3.5 py-3 text-left shadow-norma-sm transition hover:-translate-y-0.5 hover:border-norma-ink/20 hover:shadow-norma-md"
                     onClick={() => navigate(item.href)}
                   >
                     <span
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-norma-md ${
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
                         item.tone === "danger"
                           ? "bg-norma-danger-soft text-norma-danger"
                           : item.tone === "warn"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-norma-surface-muted text-norma-prussian"
+                            ? "bg-amber-100 text-amber-900"
+                            : "bg-norma-lavender text-norma-ink"
                       }`}
                     >
                       <IconAlert />
                     </span>
-                    <span className="min-w-0 flex-1 text-sm font-medium text-norma-prussian">
+                    <span className="min-w-0 flex-1 text-sm font-medium text-norma-ink">
                       {item.label}
                     </span>
                     <span className="tabular-nums text-sm font-semibold text-norma-ink">

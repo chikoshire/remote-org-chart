@@ -24,9 +24,9 @@ describe("Acme design tokens", () => {
     expect(css).toContain("--font-display:");
   });
 
-  it("supports explicit dark class theme (Settings-driven, not OS invert)", () => {
+  it("is light-only (no dark class theme)", () => {
     expect(css).toContain("color-scheme: light");
-    expect(css).toContain("html.dark");
+    expect(css).not.toContain("html.dark");
     expect(css).not.toContain("prefers-color-scheme: dark");
   });
 });
