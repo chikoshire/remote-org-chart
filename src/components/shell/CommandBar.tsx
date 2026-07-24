@@ -46,6 +46,12 @@ const NAV_ACTIONS: NavAction[] = [
     href: "/settings/data-health",
   },
   {
+    id: "nav-help",
+    label: "Go to Help",
+    hint: "How-tos and assistant",
+    href: "/help",
+  },
+  {
     id: "nav-settings",
     label: "Go to Settings",
     hint: "Remote connect and preferences",

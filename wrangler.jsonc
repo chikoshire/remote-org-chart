@@ -25,6 +25,9 @@
       "id": "58bdbc1d85944a6fa304010c1803597c"
     }
   ],
+  "ai": {
+    "binding": "AI"
+  },
   "d1_databases": [
     {
       "binding": "SYNC_RUNS_DB",
