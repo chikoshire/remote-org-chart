@@ -149,7 +149,7 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setWizardOpen(true)}
-                  className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ff7a2f]"
+                  className="norma-cta px-5 py-2 text-sm"
                 >
                   Connect
                 </button>
@@ -184,16 +184,16 @@ export default function SettingsPage() {
                 Card size
               </h3>
               <div
-                className="mt-3 inline-flex gap-1 rounded-norma-md border border-norma-border bg-norma-surface-muted/50 p-1"
+                className="mt-3 inline-flex gap-1 rounded-full border border-norma-border bg-norma-surface-muted/50 p-1"
                 role="group"
                 aria-label="Default density"
               >
                 <button
                   type="button"
                   aria-pressed={density === "comfortable"}
-                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                  className={`rounded-full px-3 py-2 text-sm font-medium ${
                     density === "comfortable"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
@@ -206,9 +206,9 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   aria-pressed={density === "compact"}
-                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                  className={`rounded-full px-3 py-2 text-sm font-medium ${
                     density === "compact"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
@@ -226,16 +226,16 @@ export default function SettingsPage() {
                 Appearance
               </h3>
               <div
-                className="mt-3 inline-flex gap-1 rounded-norma-md border border-norma-border bg-norma-surface-muted/50 p-1"
+                className="mt-3 inline-flex gap-1 rounded-full border border-norma-border bg-norma-surface-muted/50 p-1"
                 role="group"
                 aria-label="Color theme"
               >
                 <button
                   type="button"
                   aria-pressed={theme === "light"}
-                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                  className={`rounded-full px-3 py-2 text-sm font-medium ${
                     theme === "light"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
@@ -249,9 +249,9 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   aria-pressed={theme === "dark"}
-                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                  className={`rounded-full px-3 py-2 text-sm font-medium ${
                     theme === "dark"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-ink"
                   }`}
                   onClick={() => {
@@ -286,7 +286,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={save}
-              className="rounded-norma-sm bg-norma-prussian px-4 py-2 text-sm font-semibold text-white hover:bg-[#143a44]"
+              className="norma-cta px-5 py-2 text-sm"
             >
               {saved ? "Saved" : "Save preferences"}
             </button>

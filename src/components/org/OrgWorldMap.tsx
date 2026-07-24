@@ -332,7 +332,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   dx="0"
                   dy="1"
                   stdDeviation="1.2"
-                  floodColor="#0b2a32"
+                  floodColor="#121212"
                   floodOpacity="0.12"
                 />
               </filter>
@@ -375,9 +375,9 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   d={d}
                   fill={
                     isActive || selectedHere
-                      ? "#2a9d8f"
+                      ? "#6aae96"
                       : hasPeople
-                        ? "#0b2a32"
+                        ? "#121212"
                         : "#d7e4d2"
                   }
                   fillOpacity={
@@ -385,7 +385,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   }
                   stroke={
                     isActive || selectedHere
-                      ? "#e85d04"
+                      ? "#121212"
                       : hasPeople
                         ? "#75E8F0"
                         : "#7a9578"
@@ -430,7 +430,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
             <path
               d={spherePath}
               fill="none"
-              stroke="#0b2a32"
+              stroke="#121212"
               strokeOpacity={0.18}
               strokeWidth={1.2 / Math.sqrt(zoomLevel)}
             />
@@ -467,7 +467,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                     <circle
                       r={ring}
                       fill="none"
-                      stroke="#e85d04"
+                      stroke="#121212"
                       strokeWidth={2.4 * screenScale}
                       opacity={0.95}
                       className="pointer-events-none"
@@ -480,7 +480,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   />
                   <circle
                     r={size}
-                    fill={open || selectedHere ? "#e85d04" : "#0b2a32"}
+                    fill={open || selectedHere ? "#121212" : "#121212"}
                     role="button"
                     tabIndex={0}
                     data-map-interactive="true"
@@ -538,7 +538,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                       <text
                         textAnchor="middle"
                         dominantBaseline="central"
-                        fill="#0b2a32"
+                        fill="#121212"
                         fontSize={9 * screenScale}
                         fontWeight={600}
                         className="select-none"

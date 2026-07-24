@@ -22,10 +22,10 @@ const PRIMARY_NAV = [
 ] as const;
 
 function navClass(active: boolean) {
-  return `whitespace-nowrap rounded-norma-sm px-2.5 py-1.5 text-sm font-medium transition md:px-3 ${
+  return `whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition md:px-4 ${
     active
-      ? "bg-norma-accent-soft text-norma-ink"
-      : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
+      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
+      : "text-norma-ink-muted hover:bg-norma-surface-muted/80 hover:text-norma-ink"
   }`;
 }
 
@@ -48,7 +48,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="norma-glass flex h-12 shrink-0 items-center gap-3 border-b border-norma-border px-3 text-norma-ink md:h-14 md:gap-6 md:px-6"
+        className="norma-glass flex h-12 shrink-0 items-center gap-3 border-b border-norma-border/80 px-3 text-norma-ink md:h-14 md:gap-6 md:px-6"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo withWordmark />
@@ -76,15 +76,15 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           <button
             type="button"
             onClick={() => void logout()}
-            className="rounded-norma-sm px-2.5 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
+            className="rounded-full px-3 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
           >
             Log out
           </button>
           <Link
             href="/settings"
-            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-norma-sm transition ${
+            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
               settingsActive
-                ? "bg-norma-accent-soft text-norma-ink"
+                ? "bg-norma-ink text-norma-ink-inverse"
                 : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
             }`}
             aria-label="Settings"
@@ -113,10 +113,10 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 -z-0 opacity-[0.4]"
+          className="pointer-events-none absolute inset-0 -z-0 opacity-70"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse 65% 45% at 100% 0%, rgb(232 93 4 / 0.08) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 0% 100%, rgb(11 42 50 / 0.06) 0%, transparent 50%)",
+              "radial-gradient(ellipse 60% 40% at 100% 0%, rgb(232 224 245 / 0.45) 0%, transparent 55%), radial-gradient(ellipse 50% 35% at 0% 100%, rgb(217 235 248 / 0.4) 0%, transparent 50%)",
           }}
         />
         <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -125,7 +125,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </main>
       <footer
         role="contentinfo"
-        className="flex h-7 shrink-0 items-center border-t border-norma-border bg-norma-surface px-4 text-[11px] text-norma-ink-muted md:px-6"
+        className="norma-glass flex h-7 shrink-0 items-center border-t border-norma-border/80 px-4 text-[11px] text-norma-ink-muted md:px-6"
       >
         {status ?? <span>Acme · Connected to Remote</span>}
       </footer>

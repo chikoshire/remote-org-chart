@@ -86,7 +86,7 @@ function HealthSection({
             const href = `/app${withPersonSearchParam("", person.id)}`;
             return (
               <li key={person.id}>
-                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-white to-norma-surface-muted/50 px-3.5 py-3.5">
+                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-lavender/40 px-3.5 py-3.5">
                   <PersonAvatar
                     personId={person.id}
                     fullName={person.fullName}
@@ -106,7 +106,7 @@ function HealthSection({
                     </p>
                     <Link
                       href={href}
-                      className="mt-1 inline-block text-xs font-semibold text-[#e85d04] hover:underline"
+                      className="mt-1 inline-block text-xs font-semibold text-norma-ink hover:underline"
                     >
                       Chart
                     </Link>
@@ -240,7 +240,7 @@ export function DataHealthWorkspace() {
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-norma-lg border border-norma-border bg-gradient-to-br from-white to-[#fff4ec] px-5 py-4 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-norma-peach/50 px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               People
             </p>

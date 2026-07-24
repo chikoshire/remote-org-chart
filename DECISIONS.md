@@ -757,6 +757,28 @@ Remote adds stable public photo URLs or we need salary-safe compensation bands f
 
 ---
 
+## 2026-07-24 — Pastel liquid-glass visual identity
+
+**Status:** Accepted (supersedes product chrome use of Acme orange / Prussian)
+
+**Context:**  
+References (soft cream canvases, pastel card fills, black pill CTAs, glass panels) fit the product better than orange/Prussian chrome. Assessment still says “Acme” and Remote remains the data source.
+
+**Decision:**  
+1. Cream canvas `#f4f1eb`, black ink/CTAs `#121212`, pastel fills (lavender / mint / peach / sky / rose).  
+2. ACME wordmark stays — black mark, no orange plate.  
+3. Norma CSS aliases (`norma-royal` / `norma-prussian`) remap to black so existing utilities pick up the system.  
+4. Keep Remote-as-source; no emoji status badges; no photographic landscape backgrounds.
+
+**Consequences:**  
+- Every product and marketing surface shares one soft / glass language.  
+- Earlier “color restraint” orange chart bars become black/quiet progress bars.
+
+**Revisit when:**  
+Interview feedback asks for stronger Remote/Acme orange recognition in the UI.
+
+---
+
 ## Template for future entries
 
 
