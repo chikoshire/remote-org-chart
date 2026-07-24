@@ -760,7 +760,7 @@ function OrgChartInner() {
     const tryFitCSuite = () => {
       if (cancelled || initialFitDone.current) return;
       attempts += 1;
-      const focusIds = cSuiteFocusNodeIds(forestRoots, 9);
+      const focusIds = cSuiteFocusNodeIds(forestRoots, 4);
       const measured = getNodes().filter(
         (n) =>
           focusIds.includes(n.id) &&
@@ -776,10 +776,9 @@ function OrgChartInner() {
       initialFitDone.current = true;
       void fitView({
         nodes: measured.length > 0 ? measured : focusIds.map((id) => ({ id })),
-        padding: 0.22,
-        // Floor keeps cards readable even if the focus set is wide.
-        maxZoom: 1.2,
-        minZoom: 0.82,
+        padding: 0.35,
+        maxZoom: 1.15,
+        minZoom: 0.85,
         duration: reducedMotion ? 0 : 420,
       });
     };
