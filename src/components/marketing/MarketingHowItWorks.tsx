@@ -14,7 +14,7 @@ const FEATURES = [
   {
     id: "tree",
     title: "Reporting tree",
-    body: "Walk the hierarchy left to right — expand or collapse any branch without losing place.",
+    body: "Walk the hierarchy left to right. Expand or collapse any branch without losing place.",
     src: "/marketing/app-tree.png",
     alt: "Acme reporting tree view",
   },

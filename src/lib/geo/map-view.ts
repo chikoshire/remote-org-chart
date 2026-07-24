@@ -48,7 +48,7 @@ export function zoomAtPoint(
     Math.max(MAP_HEIGHT / MAX_ZOOM, view.h / factor),
   );
 
-  // Hit the zoom floor/ceiling — keep position stable.
+  // Hit the zoom floor/ceiling - keep position stable.
   if (nextW === view.w && nextH === view.h) {
     return view;
   }

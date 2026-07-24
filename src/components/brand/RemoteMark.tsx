@@ -1,5 +1,5 @@
 /**
- * Official Remote mark — the chunky lowercase “r” from remote.com’s
+ * Official Remote mark - the chunky lowercase “r” from remote.com’s
  * `remote-logo.svg` wordmark (Contentstack). Black monochrome for product UI.
  */
 export function RemoteMark({

@@ -168,7 +168,7 @@ export default function SettingsPage() {
             </div>
             <p className="mt-3 text-xs text-norma-ink-muted">
               Disconnect pauses org data in this browser. Credentials stay on the
-              server. This is not a Remote OAuth login — the company token is
+              server. This is not a Remote OAuth login. The company token is
               already configured server-side.
             </p>
             {wizardOpen && !connected ? (
@@ -233,7 +233,7 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   <p className="mt-2 text-xs text-norma-ink-muted">
-                    Applies on the org chart as soon as you choose — Save keeps
+                    Applies on the org chart as soon as you choose. Save keeps
                     it for next visits.
                   </p>
                 </div>

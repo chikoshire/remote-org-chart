@@ -2,7 +2,7 @@ import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";
 
 /**
  * Node ids for the initial org-chart viewport.
- * Prefer the largest root only — including distant direct reports in fitView
+ * Prefer the largest root only - including distant direct reports in fitView
  * stretches the bounds across the full reports row and leaves leadership
  * off-screen.
  */

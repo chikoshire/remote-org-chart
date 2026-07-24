@@ -17,7 +17,7 @@ type DepartmentFilterSelectProps = {
 
 /**
  * Department filter with colour swatches in the menu (matches avatar accents).
- * Replaces the always-visible side legend — colours live in the filter itself.
+ * Replaces the always-visible side legend - colours live in the filter itself.
  */
 export function DepartmentFilterSelect({
   departments,

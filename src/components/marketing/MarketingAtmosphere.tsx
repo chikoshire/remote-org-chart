@@ -1,6 +1,6 @@
 /**
  * Soft mesh + film grain atmosphere inspired by remote.com’s homepage washes.
- * Pure CSS — no third-party brand assets.
+ * Pure CSS - no third-party brand assets.
  */
 export function MarketingAtmosphere({
   variant = "top",

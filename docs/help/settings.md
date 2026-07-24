@@ -4,11 +4,11 @@ Preferences and Remote connection for the demo app.
 
 ## Remote connect
 
-The Connect wizard resumes org data using the **server-side** read-only Remote token. You never paste an API token in the browser. Disconnect pauses org fetch in this session; Connect turns it back on.
+The Connect wizard resumes org data using the **server-side** read-only Remote token. You never paste an API token in the browser. Disconnect pauses org fetch in this session. Connect turns it back on.
 
 ## Appearance
 
-Toggle light / dark theme and density. Preferences persist on this device.
+Toggle density preferences. Preferences persist on this device.
 
 ## Session
 

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("theme preference", () => {
-  it("forces light only — no dark mode controls", () => {
+  it("forces light only - no dark mode controls", () => {
     const prefs = readFileSync(
       join(process.cwd(), "src/lib/ui/prefs.ts"),
       "utf8",

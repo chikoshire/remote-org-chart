@@ -193,7 +193,7 @@ function IconAlert() {
   );
 }
 
-/** Donut share for departments — not another bar list. */
+/** Donut share for departments - not another bar list. */
 function DepartmentShare({
   items,
   empty,
@@ -292,7 +292,7 @@ function DepartmentShare({
   );
 }
 
-/** Mid-tone country dots — richer than soft fills so they read on cream/white. */
+/** Mid-tone country dots - richer than soft fills so they read on cream/white. */
 const COUNTRY_DOT_PALETTE = [
   "#5a9ec8", // sky
   "#4f9f82", // mint
@@ -304,7 +304,7 @@ const COUNTRY_DOT_PALETTE = [
   "#c9a04a", // gold
 ] as const;
 
-/** Proportional dots for countries — distinct from the department donut. */
+/** Proportional dots for countries - distinct from the department donut. */
 function CountryDots({
   items,
   empty,
@@ -718,7 +718,7 @@ export function DashboardWorkspace() {
           {attentionItems.length === 0 ? (
             <p className="mt-4 flex items-center gap-2 rounded-norma-md bg-norma-success-soft px-4 py-4 text-sm text-norma-success">
               <IconShield />
-              All clear — no flags right now.
+              All clear. No flags right now.
             </p>
           ) : (
             <ul className="mt-4 space-y-2.5" aria-label="Needs attention">

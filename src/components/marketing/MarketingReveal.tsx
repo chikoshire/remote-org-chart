@@ -16,7 +16,7 @@ type MarketingRevealProps = {
 };
 
 /**
- * Scroll-triggered rise — mirrors remote.com section entrances without a motion library.
+ * Scroll-triggered rise - mirrors remote.com section entrances without a motion library.
  */
 export function MarketingReveal({
   children,

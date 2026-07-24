@@ -8,7 +8,7 @@ type AcmeLogoProps = {
 };
 
 /**
- * Acme company mark — ascending bars (signal / growth).
+ * Acme company mark - ascending bars (signal / growth).
  * Black mark on cream / white; light mark when inverse.
  */
 export function AcmeLogo({

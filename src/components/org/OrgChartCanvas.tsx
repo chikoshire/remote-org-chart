@@ -1401,7 +1401,7 @@ function OrgChartInner() {
                         {personLabel(compareB) ??
                           (compareA
                             ? "Waiting for second click…"
-                            : "—")}
+                            : "Empty")}
                       </p>
                     </li>
                   </ol>

@@ -10,7 +10,7 @@ type MarketingAppShotProps = {
 };
 
 /**
- * Real product screenshot — used instead of invented marketing mocks.
+ * Real product screenshot - used instead of invented marketing mocks.
  */
 export function MarketingAppShot({
   src,

@@ -4,24 +4,24 @@ Canonical for the Remote org-chart assessment. Re-check before every public depl
 
 ## Token & secrets
 
-- [x] `REMOTE_API_TOKEN` only on the server (route handlers / `remoteFetch`) — never imported into client components
+- [x] `REMOTE_API_TOKEN` only on the server (route handlers / `remoteFetch`) - never imported into client components
 - [x] `.env.local` gitignored; `.env.example` has empty placeholders only
-- [x] Cloudflare Workers secrets (prod) for `REMOTE_API_TOKEN` / `REMOTE_API_BASE_URL` — not baked into the client bundle
+- [x] Cloudflare Workers secrets (prod) for `REMOTE_API_TOKEN` / `REMOTE_API_BASE_URL` - not baked into the client bundle
 - [x] Demo app login uses a separate session cookie (`APP_SESSION_SECRET`); Remote API token never enters that cookie
 - [x] Error paths run through `redactSecrets` / `toClientSafeMessage` before JSON responses
 
 ## PII minimization
 
 - [x] `/api/org-chart` strips `workEmail` from roots and flat nodes
-- [x] Chart UI shows name / title / department / country only — no emails, phones, or addresses
+- [x] Chart UI shows name / title / department / country only. No emails, phones, or addresses
 - [x] Client logs must not dump employment payloads (fetch results stay in React state, not `console.log`)
 
 ## Transport & runtime
 
-- [x] Browser talks only to same-origin `/api/*` proxies — not directly to `gateway.remote-sandbox.com`
+- [x] Browser talks only to same-origin `/api/*` proxies, not directly to `gateway.remote-sandbox.com`
 - [x] Sandbox token is read-only (`ra_test_…`) against `gateway.remote-sandbox.com`
 - [x] Public preview tunnels (cloudflared / localtunnel) are for development; production uses Cloudflare Workers URL from #8
-- [x] `/api/org-chart/enrich-batch` is Worker-internal only — requires `x-org-enrich-secret` matching the server token (fan-out under Workers Free 50-subrequest cap)
+- [x] `/api/org-chart/enrich-batch` is Worker-internal only. Requires `x-org-enrich-secret` matching the server token (fan-out under Workers Free 50-subrequest cap)
 
 ## Audit commands
 

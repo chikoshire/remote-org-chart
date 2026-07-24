@@ -29,8 +29,8 @@ export function MarketingHero() {
             See how Acme is organised
           </h1>
           <p className="marketing-hero-copy mt-5 max-w-md text-base leading-relaxed text-norma-ink-muted md:text-lg">
-            Hire clarity for reporting lines, people, and data health — built on
-            Remote so the chart stays close to the source of truth.
+            Reporting lines, people, and data health in one place. Built on
+            Remote so the chart stays close to live employment data.
           </p>
           <div className="marketing-hero-cta mt-9 flex flex-wrap items-center gap-3">
             <Link href="/login" className="norma-cta min-h-11 px-7 text-sm">

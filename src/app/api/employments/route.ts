@@ -9,7 +9,7 @@ import {
 export const runtime = "nodejs";
 
 /**
- * Dev/inspection route — returns counts only (no PII dump by default).
+ * Dev/inspection route - returns counts only (no PII dump by default).
  * Pass ?sample=1 to include a redacted sample of field presence.
  */
 export async function GET(request: Request) {

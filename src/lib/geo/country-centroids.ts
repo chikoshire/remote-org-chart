@@ -122,7 +122,7 @@ export function countryCentroid(code: string | null | undefined): CountryCentroi
   return { code: key, lat: hit.lat, lng: hit.lng };
 }
 
-/** Equirectangular projection into 0–100% of a map frame. */
+/** Equirectangular projection into 0-100% of a map frame. */
 export function projectToMapPercent(lat: number, lng: number): {
   x: number;
   y: number;

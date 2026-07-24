@@ -19,7 +19,7 @@
   --norma-sky: #d9ebf8;
   --norma-rose: #f5dce6;
 
-  /* Surfaces — warm cream */
+  /* Surfaces - warm cream */
   --norma-canvas: #f4f1eb;
   --norma-surface: #ffffff;
   --norma-surface-muted: #ebe6de;
@@ -60,7 +60,7 @@
   --norma-leading-normal: 1.5;
   --norma-tracking-label: 0.14em;
 
-  /* Radius & elevation — squircles */
+  /* Radius & elevation - squircles */
   --norma-radius-sm: 0.625rem;
   --norma-radius-md: 1rem;
   --norma-radius-lg: 1.5rem;
@@ -200,7 +200,7 @@
     opacity 220ms ease;
 }
 
-/* Skip link — visible on keyboard focus only */
+/* Skip link - visible on keyboard focus only */
 .skip-link {
   position: absolute;
   left: 0.75rem;
@@ -230,7 +230,7 @@
   outline: none !important;
 }
 
-/* Morph + bloom (#70) — gradual; avoid scale on surfaces that also morph. */
+/* Morph + bloom (#70) - gradual; avoid scale on surfaces that also morph. */
 .bloom-enter {
   animation: bloom-enter 560ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
@@ -265,7 +265,7 @@
   }
 }
 
-/* Drawer / dock: fade + soft slide only (no scale — fights shared-element morph). */
+/* Drawer / dock: fade + soft slide only (no scale - fights shared-element morph). */
 .bloom-drawer {
   animation: bloom-drawer 520ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
@@ -353,7 +353,7 @@
   }
 }
 
-/* Marketing landing — remote.com-inspired motion + atmosphere */
+/* Marketing landing - remote.com-inspired motion + atmosphere */
 .marketing-grain {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
   background-size: 180px 180px;

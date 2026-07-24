@@ -18,6 +18,12 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(page).toContain("MarketingMarquee");
     expect(page).toContain("MarketingHowItWorks");
     expect(hero).toContain("See how Acme is organised");
+    expect(hero).toContain("Reporting lines, people, and data health in one place.");
+    expect(hero).toContain("live employment data");
+    expect(page).toContain("Built on Remote. No second employee database.");
+    expect(page).not.toContain("HRIS");
+    expect(page).not.toMatch(/\u2014|\u2013/);
+    expect(hero).not.toMatch(/\u2014|\u2013/);
     expect(page).not.toContain("MarketingProductMock");
 
     expect(hero).toContain("md:grid-cols-12");

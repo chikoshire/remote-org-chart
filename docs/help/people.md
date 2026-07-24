@@ -14,4 +14,4 @@ Open a person for title, department, country, manager, and avatar. From Data Hea
 
 ## Local profile fixes
 
-Because the Remote sandbox token is **read-only**, edits you make on a profile (title, department, country, manager) are saved **locally in this browser**. They update the chart and health views immediately, but they are **not** PATCH’d back to Remote. Clearing site data removes local overlays.
+The Remote sandbox token used by this app is **read-only**, so edits you make on a profile (title, department, country, manager) are saved **locally in this browser**. They update the chart and health views immediately, but they are not written back to Remote. Clearing site data removes local overlays.

@@ -7,7 +7,7 @@ type ProductPageFrameProps = {
 };
 
 /**
- * Full-bleed product content frame — consistent horizontal padding, no narrow max-width.
+ * Full-bleed product content frame - consistent horizontal padding, no narrow max-width.
  * Use for Dashboard, Preferences, Data Health, and similar scrolled surfaces.
  */
 export function ProductPageFrame({

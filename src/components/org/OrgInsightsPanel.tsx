@@ -13,7 +13,7 @@ function formatSpan(value: number | null): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-/** Docked insights body — open/close is owned by the side panel Tools. */
+/** Docked insights body - open/close is owned by the side panel Tools. */
 export function OrgInsightsPanel({
   insights,
   open,

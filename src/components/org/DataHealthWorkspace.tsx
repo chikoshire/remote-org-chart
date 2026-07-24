@@ -324,7 +324,7 @@ export function DataHealthWorkspace() {
               {refreshing ? " · refreshing…" : ""}. Open{" "}
               <span className="font-medium text-norma-ink">Fix in profile</span>{" "}
               to fill missing fields on the People page (saved locally on this
-              device — not written back to Remote).
+              device, not written back to Remote).
             </p>
             {refreshError ? (
               <p className="mt-2 text-sm text-norma-danger" role="alert">
@@ -385,14 +385,14 @@ export function DataHealthWorkspace() {
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <HealthSection
             title="Reporting cycles"
-            description="Looped reporting chains — fix by changing a manager on the profile"
+            description="Looped reporting chains. Fix by changing a manager on the profile."
             people={report.inCycle}
             empty="No reporting cycles detected."
             tone="danger"
           />
           <HealthSection
             title="Manager missing"
-            description="Manager id set but person not in the active set — assign a manager on the profile"
+            description="Manager id set but person not in the active set. Assign a manager on the profile."
             people={report.managerMissing}
             empty="Every manager link resolves."
             tone="warn"
@@ -406,7 +406,7 @@ export function DataHealthWorkspace() {
           />
           <HealthSection
             title="Incomplete profiles"
-            description="Missing title, department, or country — edit those fields on the profile"
+            description="Missing title, department, or country. Edit those fields on the profile."
             people={report.incompleteFields}
             empty="Every profile has title, department, and country."
             tone="neutral"
