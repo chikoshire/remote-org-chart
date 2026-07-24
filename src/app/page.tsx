@@ -6,17 +6,20 @@ export default function Home() {
     <AppShell
       status={
         <span className="truncate">
-          Live sandbox org chart · select a person for path + profile details
+          Acme Sandbox · chart or directory · select someone for path + profile
         </span>
       }
     >
       <div className="flex min-h-[100dvh] flex-1 flex-col gap-2 p-2 md:min-h-0 md:gap-3 md:p-6">
         <div className="max-w-2xl px-1">
-          <h1 className="font-[family-name:var(--font-norma-display)] text-xl text-norma-prussian md:text-[length:var(--norma-text-2xl)]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-norma-royal">
+            Acme Sandbox Corp
+          </p>
+          <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-xl tracking-tight text-norma-prussian md:text-[length:var(--norma-text-2xl)]">
             Organization
           </h1>
           <p className="mt-1 hidden text-sm text-norma-ink-muted sm:block">
-            Acme Sandbox Corp via Remote — interactive React Flow chart.
+            Live hierarchy from Remote — toggle Chart or Directory in the panel.
           </p>
         </div>
         <section
