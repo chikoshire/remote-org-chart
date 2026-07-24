@@ -59,5 +59,10 @@ describe("computeDashboardInsights", () => {
     expect(insights.rootCount).toBe(2);
     expect(insights.completenessScore).toBe(75);
     expect(insights.lastSyncedAt).toBe("2026-07-24T12:00:00Z");
+    expect(insights.incompleteCount).toBe(1);
+    expect(insights.departments[0]).toEqual({ name: "Eng", count: 2 });
+    expect(insights.countries[0]?.count).toBeGreaterThanOrEqual(1);
+    expect(insights.topManagers[0]?.id).toBe("ceo");
+    expect(insights.topManagers[0]?.directReports).toBe(2);
   });
 });
