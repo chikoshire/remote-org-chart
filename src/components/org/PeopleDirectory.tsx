@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import { isIncompletePerson } from "@/lib/org/data-health";
@@ -130,7 +129,7 @@ export function PeopleDirectory({
           </div>
           <div className="flex flex-wrap items-end gap-3">
             <div
-              className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
+              className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted/60 p-1"
               role="group"
               aria-label="Directory layout"
             >
@@ -139,7 +138,7 @@ export function PeopleDirectory({
                 aria-pressed={view === "grid"}
                 className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                   view === "grid"
-                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    ? "bg-[#e85d04] text-white shadow-norma-sm"
                     : "text-norma-ink-muted hover:text-norma-prussian"
                 }`}
                 onClick={() => setView("grid")}
@@ -151,7 +150,7 @@ export function PeopleDirectory({
                 aria-pressed={view === "list"}
                 className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                   view === "list"
-                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    ? "bg-[#e85d04] text-white shadow-norma-sm"
                     : "text-norma-ink-muted hover:text-norma-prussian"
                 }`}
                 onClick={() => setView("list")}
@@ -185,24 +184,16 @@ export function PeopleDirectory({
                 onChange={(e) => setIncompleteOnly(e.target.checked)}
                 className="rounded border-norma-border text-norma-royal focus:ring-norma-royal"
               />
-              Incomplete only
+              Incomplete
               {incompleteCount > 0 ? (
-                <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-semibold text-norma-prussian">
+                <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-norma-prussian">
                   {incompleteCount}
                 </span>
               ) : null}
             </label>
-            {incompleteCount > 0 ? (
-              <Link
-                href="/settings/data-health"
-                className="self-end pb-2.5 text-xs font-semibold text-norma-royal hover:underline"
-              >
-                Data Health
-              </Link>
-            ) : null}
           </div>
         </div>
-        <label className="mt-4 block">
+        <label className="mt-3 block">
           <span className="sr-only">Filter this directory</span>
           <input
             type="search"
@@ -215,9 +206,6 @@ export function PeopleDirectory({
             className="w-full rounded-norma-md border border-norma-border bg-white px-3.5 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
             autoComplete="off"
           />
-          <span className="mt-1.5 block text-[11px] text-norma-ink-subtle">
-            Filters this list · ⌘K jumps to a person or page
-          </span>
         </label>
       </div>
 
