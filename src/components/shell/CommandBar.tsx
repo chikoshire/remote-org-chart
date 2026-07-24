@@ -37,7 +37,7 @@ const NAV_ACTIONS: NavAction[] = [
     id: "nav-compare",
     label: "Compare reporting distance",
     hint: "Org Chart — pick two people",
-    href: "/app",
+    href: "/app?compare=1",
   },
   {
     id: "nav-health",

@@ -63,9 +63,11 @@ import {
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
 import {
+  COMPARE_QUERY_PARAM,
   expandCollapsedAncestors,
   readPersonIdFromSearch,
   resolvePersonDeepLink,
+  withCompareSearchParam,
   withPersonSearchParam,
 } from "@/lib/org/deep-links";
 import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
@@ -83,7 +85,7 @@ import {
   readSessionOrgPayload,
   writeSessionOrgPayload,
 } from "@/lib/ui/remote-connection";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   reportingRelation,
   type ReportingRelation,
@@ -272,6 +274,14 @@ function OrgChartInner() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareA, setCompareA] = useState<string | null>(null);
   const [compareB, setCompareB] = useState<string | null>(null);
+  const compareRef = useRef({
+    mode: false,
+    a: null as string | null,
+    b: null as string | null,
+  });
+  compareRef.current = { mode: compareMode, a: compareA, b: compareB };
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
   const [refreshing, setRefreshing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [fromCache, setFromCache] = useState(false);
@@ -285,6 +295,8 @@ function OrgChartInner() {
   const [remoteConnected, setRemoteConnected] = useState(true);
   const [viewMode, setViewMode] = useState<"chart" | "tree" | "map">("chart");
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const initialFitDone = useRef(false);
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
@@ -514,6 +526,20 @@ function OrgChartInner() {
   }, [router]);
 
   useEffect(() => {
+    if (status !== "ready") return;
+    const flag = searchParams.get(COMPARE_QUERY_PARAM);
+    if (flag !== "1" && flag !== "true") return;
+    setCompareMode(true);
+    setCompareA((prev) => prev ?? selectedIdRef.current);
+    setCompareB(null);
+    setInsightsOpen(false);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(COMPARE_QUERY_PARAM);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  }, [pathname, router, searchParams, status]);
+
+  useEffect(() => {
     if (!liveUpdates || status !== "ready") return;
     if (typeof window === "undefined" || typeof EventSource === "undefined") {
       return;
@@ -591,8 +617,15 @@ function OrgChartInner() {
       setSelectedId(null);
       return;
     }
+    // In compare mode, only highlight the shared path once both people resolve.
+    // Passing null falls back to "path to root" for person A and looks broken
+    // when the pair is incomplete or disconnected.
     const highlightIds =
-      relation?.status === "ok" ? relation.highlightIds : null;
+      relation?.status === "ok"
+        ? relation.highlightIds
+        : compareMode
+          ? new Set<string>()
+          : null;
     const secondaryId =
       compareMode && compareB ? compareB : null;
     const primaryId =
@@ -620,20 +653,25 @@ function OrgChartInner() {
     status,
   ]);
 
+  const applyComparePick = useCallback((id: string) => {
+    const { a, b } = compareRef.current;
+    if (!a || b) {
+      setCompareA(id);
+      setCompareB(null);
+      setSelectedId(id);
+      return;
+    }
+    if (a === id) return;
+    setCompareB(id);
+    setSelectedId(id);
+  }, []);
+
   const onNodeClick: NodeMouseHandler = useCallback(
     (_event, node) => {
       setDeepLinkError(null);
-      if (compareMode) {
+      if (compareRef.current.mode) {
         void withViewTransition(() => {
-          if (!compareA || compareB) {
-            setCompareA(node.id);
-            setCompareB(null);
-            setSelectedId(node.id);
-            return;
-          }
-          if (compareA === node.id) return;
-          setCompareB(node.id);
-          setSelectedId(node.id);
+          applyComparePick(node.id);
         });
         return;
       }
@@ -641,21 +679,29 @@ function OrgChartInner() {
         setSelectedId((prev) => (prev === node.id ? null : node.id));
       });
     },
-    [compareA, compareB, compareMode],
+    [applyComparePick],
   );
 
   const onPaneClick = useCallback(() => {
-    if (compareMode) return;
+    if (compareRef.current.mode) return;
     void withViewTransition(() => {
       setSelectedId(null);
       setDeepLinkError(null);
     });
-  }, [compareMode]);
+  }, []);
 
   const exitCompare = useCallback(() => {
     setCompareMode(false);
     setCompareA(null);
     setCompareB(null);
+    if (typeof window !== "undefined") {
+      const next = withCompareSearchParam(window.location.search, false);
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${next}${window.location.hash}`,
+      );
+    }
   }, []);
 
   const enterCompare = useCallback(() => {
@@ -665,35 +711,57 @@ function OrgChartInner() {
     setInsightsOpen(false);
   }, [selectedId]);
 
+  const clearComparePicks = useCallback(() => {
+    setCompareA(null);
+    setCompareB(null);
+  }, []);
+
   const personLabel = useCallback(
     (id: string | null) => {
-      if (!id) return "Not set";
+      if (!id) return null;
       const person = peopleIndex.get(id);
       return person?.fullName?.trim() || "Unknown person";
     },
     [peopleIndex],
   );
 
-  const compareHint = useMemo(() => {
-    if (!compareMode) return null;
-    if (!compareA) return "Select the first person";
-    if (!compareB) return "Select the second person";
-    if (!relation) return null;
+  const compareResult = useMemo(() => {
+    if (!compareMode || !compareA || !compareB || !relation) return null;
     switch (relation.status) {
       case "ok": {
-        const lca =
-          relation.lowestCommonManagerId === relation.personAId ||
-          relation.lowestCommonManagerId === relation.personBId
-            ? `${personLabel(relation.lowestCommonManagerId)} (on the path)`
-            : personLabel(relation.lowestCommonManagerId);
-        return `Distance ${relation.distance} · Lowest common manager: ${lca}`;
+        const hops = relation.distance;
+        const hopLabel = hops === 1 ? "1 hop" : `${hops} hops`;
+        const lcaId = relation.lowestCommonManagerId;
+        const lcaIsEndpoint =
+          lcaId === relation.personAId || lcaId === relation.personBId;
+        const lcaName = personLabel(lcaId) ?? "Unknown";
+        return {
+          tone: "ok" as const,
+          title: hopLabel,
+          detail: lcaIsEndpoint
+            ? `${lcaName} is on the reporting path between them`
+            : `Shared manager: ${lcaName}`,
+        };
       }
       case "same":
-        return "Pick two different people";
+        return {
+          tone: "warn" as const,
+          title: "Same person",
+          detail: "Pick two different people to compare.",
+        };
       case "disconnected":
-        return "No shared manager. These people are in disconnected trees";
+        return {
+          tone: "warn" as const,
+          title: "Different trees",
+          detail:
+            "These people don’t share a reporting line. Pick two people in the same org tree.",
+        };
       case "missing":
-        return "One of those people is no longer in the chart";
+        return {
+          tone: "warn" as const,
+          title: "Person missing",
+          detail: "One of those people is no longer in the chart.",
+        };
       default: {
         const _exhaustive: never = relation;
         return _exhaustive;
@@ -701,6 +769,11 @@ function OrgChartInner() {
     }
   }, [compareA, compareB, compareMode, personLabel, relation]);
 
+  const compareStepHint = !compareA
+    ? "Click someone on the chart, or search above."
+    : !compareB
+      ? "Now click a second person (same tree works best)."
+      : "Click anyone to start a new comparison.";
   const suggestions = useMemo(
     () => searchPeople(peopleFromNodes(baseNodes), query),
     [baseNodes, query],
@@ -713,15 +786,11 @@ function OrgChartInner() {
         setCollapsedIds((prev) =>
           expandCollapsedAncestors(id, managerIndex, prev),
         );
-        if (compareMode) {
-          if (!compareA || compareB) {
-            setCompareA(id);
-            setCompareB(null);
-          } else if (compareA !== id) {
-            setCompareB(id);
-          }
+        if (compareRef.current.mode) {
+          applyComparePick(id);
+        } else {
+          setSelectedId(id);
         }
-        setSelectedId(id);
         setQuery("");
       });
       requestAnimationFrame(() => {
@@ -734,7 +803,7 @@ function OrgChartInner() {
         });
       });
     },
-    [compareA, compareB, compareMode, fitView, managerIndex, reducedMotion],
+    [applyComparePick, fitView, managerIndex, reducedMotion],
   );
 
   useEffect(() => {
@@ -1164,7 +1233,11 @@ function OrgChartInner() {
                       focusPerson(suggestions[0].id);
                     }
                   }}
-                  placeholder="Filter the chart… (/)"
+                  placeholder={
+                    compareMode
+                      ? "Search to pick someone…"
+                      : "Filter the chart… (/)"
+                  }
                   className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
                   autoComplete="off"
                 />
@@ -1247,16 +1320,80 @@ function OrgChartInner() {
               ) : null}
               {compareMode ? (
                 <div
-                  role="status"
-                  className="rounded-norma-sm border border-norma-border bg-norma-surface px-3 py-2 text-xs text-norma-prussian shadow-norma-sm"
+                  aria-live="polite"
+                  className="rounded-norma-md border border-norma-royal/35 bg-norma-accent-soft/40 px-3 py-2.5 text-xs text-norma-prussian shadow-norma-sm"
                 >
-                  <p className="font-medium">Reporting distance</p>
-                  <p className="mt-1 text-norma-ink-muted">
-                    {personLabel(compareA)}
-                    {" → "}
-                    {personLabel(compareB)}
-                  </p>
-                  <p className="mt-1">{compareHint}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-norma-prussian">
+                      Compare reporting lines
+                    </p>
+                    <button
+                      type="button"
+                      className="shrink-0 text-[11px] font-medium text-norma-royal underline-offset-2 hover:underline"
+                      onClick={() => exitCompare()}
+                    >
+                      Exit
+                    </button>
+                  </div>
+                  <ol className="mt-2 space-y-1.5">
+                    <li
+                      className={`rounded-norma-sm border px-2 py-1.5 ${
+                        !compareA
+                          ? "border-norma-royal bg-norma-surface"
+                          : "border-norma-border bg-norma-surface/80"
+                      }`}
+                    >
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-norma-ink-subtle">
+                        Person 1
+                      </span>
+                      <p className="mt-0.5 font-medium text-norma-prussian">
+                        {personLabel(compareA) ?? "Waiting for first click…"}
+                      </p>
+                    </li>
+                    <li
+                      className={`rounded-norma-sm border px-2 py-1.5 ${
+                        compareA && !compareB
+                          ? "border-norma-royal bg-norma-surface"
+                          : "border-norma-border bg-norma-surface/80"
+                      }`}
+                    >
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-norma-ink-subtle">
+                        Person 2
+                      </span>
+                      <p className="mt-0.5 font-medium text-norma-prussian">
+                        {personLabel(compareB) ??
+                          (compareA
+                            ? "Waiting for second click…"
+                            : "—")}
+                      </p>
+                    </li>
+                  </ol>
+                  {compareResult ? (
+                    <div
+                      className={`mt-2 rounded-norma-sm border px-2 py-1.5 ${
+                        compareResult.tone === "ok"
+                          ? "border-norma-border bg-norma-surface"
+                          : "border-norma-border bg-norma-highlight-soft/80"
+                      }`}
+                    >
+                      <p className="font-semibold">{compareResult.title}</p>
+                      <p className="mt-0.5 text-norma-ink-muted">
+                        {compareResult.detail}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-norma-ink-muted">{compareStepHint}</p>
+                  )}
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-40"
+                      disabled={!compareA && !compareB}
+                      onClick={() => clearComparePicks()}
+                    >
+                      Clear picks
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="rounded-norma-md border border-dashed border-norma-border bg-norma-surface/80 px-3 py-2.5">
@@ -1264,7 +1401,8 @@ function OrgChartInner() {
                     Compare
                   </p>
                   <p className="mt-1 text-xs text-norma-ink-muted">
-                    Pick two people on the chart to see reporting distance.
+                    Pick two people to see how far apart they sit on the
+                    reporting line.
                   </p>
                   <button
                     type="button"
@@ -1298,16 +1436,6 @@ function OrgChartInner() {
                   >
                     {liveUpdates ? "Live updates on" : "Live updates off"}
                   </button>
-                  {compareMode ? (
-                    <button
-                      type="button"
-                      aria-pressed
-                      className="rounded-norma-sm border border-norma-royal bg-norma-accent-soft px-2 py-1.5 text-left text-[11px] font-medium text-norma-royal"
-                      onClick={() => exitCompare()}
-                    >
-                      Exit compare mode
-                    </button>
-                  ) : null}
                   <div
                     className="flex flex-wrap gap-1"
                     role="group"
