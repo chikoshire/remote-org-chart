@@ -45,7 +45,10 @@ type OrgChartResponse = {
   code?: string;
 };
 
-function toDetail(person: FlatPerson): PersonDetail {
+function toDetail(
+  person: FlatPerson,
+  byId: Map<string, FlatPerson>,
+): PersonDetail {
   return {
     id: person.id,
     fullName: person.fullName,
@@ -55,6 +58,9 @@ function toDetail(person: FlatPerson): PersonDetail {
     directReports: person.directReports,
     inCycle: person.inCycle,
     isRoot: !person.managerEmploymentId,
+    managerMissing: Boolean(
+      person.managerEmploymentId && !byId.has(person.managerEmploymentId),
+    ),
   };
 }
 
@@ -138,14 +144,14 @@ export function PeopleWorkspace() {
       guard.add(current);
       const node = byId.get(current);
       if (!node) break;
-      path.push(toDetail(node));
+      path.push(toDetail(node, byId));
       current = node.managerEmploymentId;
     }
     path.reverse();
     const reports = people
       .filter((p) => p.managerEmploymentId === selectedId)
-      .map(toDetail);
-    return { person: toDetail(person), pathToRoot: path, reports };
+      .map((p) => toDetail(p, byId));
+    return { person: toDetail(person, byId), pathToRoot: path, reports };
   }, [people, selectedId]);
 
   if (status === "loading") {

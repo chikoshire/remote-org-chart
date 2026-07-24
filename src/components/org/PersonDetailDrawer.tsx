@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { personDeepLinkHref } from "@/lib/org/deep-links";
+import { formatCountryLabel } from "@/lib/ui/format-country";
 
 export type PersonDetail = {
   id: string;
@@ -12,6 +13,7 @@ export type PersonDetail = {
   directReports: number;
   inCycle?: boolean;
   isRoot?: boolean;
+  managerMissing?: boolean;
 };
 
 export type PersonDetailDrawerProps = {
@@ -38,6 +40,7 @@ export function PersonDetailDrawer({
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const name = person.fullName?.trim() || "Unknown person";
+  const countryLabel = formatCountryLabel(person.country);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -91,8 +94,27 @@ export function PersonDetailDrawer({
             {name}
           </h2>
           <p className="truncate text-sm text-norma-ink-muted">
-            {person.jobTitle?.trim() || "No title"}
+            {person.jobTitle?.trim() || "Not set"}
           </p>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {person.inCycle ? (
+              <span className="rounded-norma-sm bg-norma-danger-soft px-1.5 py-0.5 text-[10px] font-medium text-norma-danger">
+                Cycle
+              </span>
+            ) : null}
+            {person.managerMissing ? (
+              <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
+                Manager missing
+              </span>
+            ) : null}
+            {!person.jobTitle?.trim() ||
+            !person.department?.trim() ||
+            !person.country?.trim() ? (
+              <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink-muted">
+                Incomplete fields
+              </span>
+            ) : null}
+          </div>
           <button
             type="button"
             onClick={() => void copyLink()}
@@ -101,7 +123,7 @@ export function PersonDetailDrawer({
             {copyState === "copied"
               ? "Link copied"
               : copyState === "failed"
-                ? "Copy failed — select from address bar"
+                ? "Copy failed. Select the URL from the address bar."
                 : "Copy link"}
           </button>
         </div>
@@ -122,24 +144,33 @@ export function PersonDetailDrawer({
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm">
           <dt className="text-norma-ink-subtle">Department</dt>
           <dd className="text-norma-prussian">
-            {person.department?.trim() || "—"}
+            {person.department?.trim() || "Not set"}
           </dd>
           <dt className="text-norma-ink-subtle">Country</dt>
-          <dd className="text-norma-prussian">{person.country?.trim() || "—"}</dd>
+          <dd className="text-norma-prussian">{countryLabel || "Not set"}</dd>
           <dt className="text-norma-ink-subtle">Reports</dt>
           <dd className="text-norma-prussian">
             {person.directReports} direct
           </dd>
-          {person.isRoot ? (
+          {person.managerMissing ? (
             <>
-              <dt className="text-norma-ink-subtle">Role</dt>
-              <dd className="text-norma-prussian">Organization root</dd>
+              <dt className="text-norma-ink-subtle">Manager</dt>
+              <dd className="text-amber-900">
+                No manager on file (linked id missing from Remote)
+              </dd>
+            </>
+          ) : person.isRoot ? (
+            <>
+              <dt className="text-norma-ink-subtle">Manager</dt>
+              <dd className="text-norma-prussian">No manager on file</dd>
             </>
           ) : null}
           {person.inCycle ? (
             <>
               <dt className="text-norma-ink-subtle">Data</dt>
-              <dd className="text-norma-danger">On a reporting cycle</dd>
+              <dd className="text-norma-danger">
+                Reporting chain loops back on itself
+              </dd>
             </>
           ) : null}
         </dl>
@@ -151,6 +182,12 @@ export function PersonDetailDrawer({
           >
             Path to root
           </h3>
+          {person.managerMissing ? (
+            <p className="mt-2 text-sm text-norma-ink-muted">
+              Reporting chain has a gap. Fix the manager link in Remote so this
+              person connects to the rest of the org.
+            </p>
+          ) : null}
           <ol className="mt-2 space-y-1">
             {pathToRoot.map((step, index) => {
               const isSelf = step.id === person.id;
@@ -172,7 +209,7 @@ export function PersonDetailDrawer({
                     <span className="min-w-0 truncate">
                       {step.fullName?.trim() || "Unknown"}
                       <span className="block truncate text-xs font-normal text-norma-ink-muted">
-                        {step.jobTitle?.trim() || "No title"}
+                        {step.jobTitle?.trim() || "Not set"}
                       </span>
                     </span>
                   </button>
@@ -204,7 +241,7 @@ export function PersonDetailDrawer({
                       {report.fullName?.trim() || "Unknown"}
                     </span>
                     <span className="truncate text-xs text-norma-ink-muted">
-                      {report.jobTitle?.trim() || "No title"}
+                      {report.jobTitle?.trim() || "Not set"}
                     </span>
                   </button>
                 </li>

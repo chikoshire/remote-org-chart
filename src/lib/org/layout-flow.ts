@@ -67,6 +67,12 @@ export function layoutOrgChart(
       country: node.country,
       directReports: node.directReports,
       inCycle: node.inCycle,
+      managerMissing:
+        parentId === null && Boolean(node.managerEmploymentId?.trim()),
+      incompleteFields:
+        !node.jobTitle?.trim() ||
+        !node.department?.trim() ||
+        !node.country?.trim(),
       variant: parentId === null ? "root" : "default",
       density,
       collapsed: collapsedCount > 0,

@@ -32,4 +32,11 @@ describe("PersonNodeCard", () => {
     expect(card).toContain("w-[260px]");
     expect(card).toContain("reports");
   });
+
+  it("surfaces Cycle, Unlinked, and Incomplete badges", () => {
+    expect(card).toContain("Cycle");
+    expect(card).toContain("Unlinked");
+    expect(card).toContain("Incomplete");
+    expect(card).toContain("Not set");
+  });
 });
