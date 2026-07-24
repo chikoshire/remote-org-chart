@@ -49,6 +49,7 @@ import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
 import { WebhookEventsPanel } from "@/components/org/WebhookEventsPanel";
 import { OrgTreeList } from "@/components/org/OrgTreeList";
+import { OrgWorldMap } from "@/components/org/OrgWorldMap";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -95,6 +96,7 @@ type FlatPerson = {
   jobTitle?: string | null;
   department?: string | null;
   country?: string | null;
+  avatarUrl?: string | null;
   managerEmploymentId: string | null;
   directReports?: number;
   inCycle?: boolean;
@@ -127,6 +129,7 @@ function toDetail(
     jobTitle: nodeData?.jobTitle ?? flat?.jobTitle ?? null,
     department: nodeData?.department ?? flat?.department ?? null,
     country: nodeData?.country ?? flat?.country ?? null,
+    avatarUrl: nodeData?.avatarUrl ?? flat?.avatarUrl ?? null,
     directReports: nodeData?.directReports ?? flat?.directReports ?? 0,
     inCycle: nodeData?.inCycle ?? flat?.inCycle ?? false,
     isRoot: !flat?.managerEmploymentId,
@@ -288,7 +291,7 @@ function OrgChartInner() {
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
   const [remoteConnected, setRemoteConnected] = useState(true);
-  const [viewMode, setViewMode] = useState<"chart" | "tree">("chart");
+  const [viewMode, setViewMode] = useState<"chart" | "tree" | "map">("chart");
   const router = useRouter();
   const initialFitDone = useRef(false);
   const hasReadyData = useRef(false);
@@ -1045,7 +1048,7 @@ function OrgChartInner() {
                 <button
                   type="button"
                   aria-pressed={viewMode === "chart"}
-                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "chart"
                       ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
@@ -1057,7 +1060,7 @@ function OrgChartInner() {
                 <button
                   type="button"
                   aria-pressed={viewMode === "tree"}
-                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "tree"
                       ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
@@ -1065,6 +1068,18 @@ function OrgChartInner() {
                   onClick={() => setViewMode("tree")}
                 >
                   Tree
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "map"}
+                  className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
+                    viewMode === "map"
+                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
+                  }`}
+                  onClick={() => setViewMode("map")}
+                >
+                  Map
                 </button>
               </div>
               <Link
@@ -1348,6 +1363,19 @@ function OrgChartInner() {
           ) : viewMode === "tree" ? (
             <OrgTreeList
               roots={filteredForest}
+              selectedId={selectedId}
+              onSelect={focusPerson}
+            />
+          ) : viewMode === "map" ? (
+            <OrgWorldMap
+              people={Array.from(peopleIndex.values()).map((p) => ({
+                id: p.id,
+                fullName: p.fullName ?? null,
+                jobTitle: p.jobTitle ?? null,
+                department: p.department ?? null,
+                country: p.country ?? null,
+                avatarUrl: p.avatarUrl ?? null,
+              }))}
               selectedId={selectedId}
               onSelect={focusPerson}
             />
