@@ -5,3 +5,5 @@ export {
   pathIdsToRoot,
   walkOrgTree,
 } from "@/lib/org/layout-flow";
+export { computeOrgInsights } from "@/lib/org/insights";
+export type { OrgInsights } from "@/lib/org/insights";
