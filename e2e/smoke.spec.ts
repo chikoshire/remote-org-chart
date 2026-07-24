@@ -160,7 +160,7 @@ test.describe("org chart smoke", () => {
     await expect(
       page.getByRole("heading", { name: "Data Health", exact: true }),
     ).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText(/trust the org chart/i)).toBeVisible();
+    await expect(page.getByText(/synced/i).first()).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Reporting cycles" }),
     ).toBeVisible();
