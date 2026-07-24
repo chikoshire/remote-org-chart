@@ -266,6 +266,34 @@ TTL feels wrong in demos, or we add D1 sync-run history (#26).
 
 ---
 
+## 2026-07-24 — Sync run log in Cloudflare D1
+
+**Status:** Accepted  
+
+**Context:**  
+After KV snapshot caching, we still need an ops trail of cold fetches, refreshes, cache hits, and failures — without Supabase.
+
+**Decision:**  
+D1 database `remote-org-chart-sync` (binding `SYNC_RUNS_DB`), table `sync_runs`:
+
+| Column | Notes |
+|--------|-------|
+| `started_at` / `finished_at` | ISO timestamps |
+| `ok` | 0/1 |
+| `employment_count` | nullable on failure |
+| `error_summary` | sanitized (tokens redacted), max ~400 chars |
+| `trigger` | `cold` \| `refresh` \| `cache_hit` |
+
+`GET /api/sync-runs` returns the last N rows (summaries only). UI: **Sync log** panel on the chart.
+
+**Consequences:**  
+Local `next dev` without D1 returns an empty list. Migrations live in `/migrations`.
+
+**Revisit when:**  
+Webhooks (#27) need a richer event inbox (#29).
+
+---
+
 ## Template for future entries
 
 

@@ -7,6 +7,7 @@ import {
   readOrgChartSnapshot,
   writeOrgChartSnapshot,
 } from "@/lib/org/snapshot-cache";
+import { writeSyncRun } from "@/lib/org/sync-runs";
 
 export const runtime = "nodejs";
 
@@ -19,15 +20,24 @@ export const runtime = "nodejs";
  *
  * Snapshot cache (GH#24): KV hit returns lastSyncedAt quickly; `?refresh=1`
  * bypasses cache and rewrites the snapshot (GH#25).
+ * Sync runs (GH#26): every Remote sync (and cache hit) writes a D1 row.
  */
 export async function GET(request: Request) {
-  try {
-    const url = new URL(request.url);
-    const forceRefresh = url.searchParams.get("refresh") === "1";
+  const startedAt = new Date().toISOString();
+  const url = new URL(request.url);
+  const forceRefresh = url.searchParams.get("refresh") === "1";
 
+  try {
     if (!forceRefresh) {
       const cached = await readOrgChartSnapshot();
       if (cached) {
+        await writeSyncRun({
+          startedAt,
+          finishedAt: new Date().toISOString(),
+          ok: true,
+          employmentCount: cached.nodeCount,
+          trigger: "cache_hit",
+        });
         return NextResponse.json({
           ...cached,
           cached: true,
@@ -61,12 +71,35 @@ export async function GET(request: Request) {
       nodes: flat,
     });
 
+    await writeSyncRun({
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      ok: true,
+      employmentCount: forest.nodeCount,
+      trigger: forceRefresh ? "refresh" : "cold",
+    });
+
     return NextResponse.json({
       ...snapshot,
       cached: false,
       source: "remote",
     });
   } catch (err) {
+    const message =
+      err instanceof RemoteApiError
+        ? err.body.message
+        : err instanceof Error
+          ? err.message
+          : "Org chart build failed";
+
+    await writeSyncRun({
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      ok: false,
+      errorSummary: message,
+      trigger: forceRefresh ? "refresh" : "cold",
+    });
+
     if (err instanceof RemoteApiError) {
       return NextResponse.json(err.body, {
         status: err.body.status && err.body.status >= 400 ? err.body.status : 502,
