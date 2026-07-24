@@ -25,9 +25,14 @@ describe("PersonDetailDrawer", () => {
     expect(drawer).toContain("personDeepLinkHref");
   });
 
-  it("is wired into the org chart canvas on selection", () => {
-    expect(canvas).toContain("PersonDetailDrawer");
-    expect(canvas).toContain("selectedDetail");
-    expect(canvas).toContain("readPersonIdFromSearch");
+  it("supports docked People layout without covering the grid", () => {
+    expect(drawer).toContain('placement?: "overlay" | "dock"');
+    expect(drawer).toContain('data-drawer-placement');
+    const people = readFileSync(
+      join(process.cwd(), "src/components/org/PeopleWorkspace.tsx"),
+      "utf8",
+    );
+    expect(people).toContain('placement="dock"');
+    expect(people).toContain("md:flex-row");
   });
 });
