@@ -32,6 +32,7 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 5. Search focuses a person and their path to root; pan/zoom works on desktop and mobile
 6. Shareable deep links (`/?person=<employmentId>`) select, center, and highlight path-to-root — **Copy link** in the person drawer
 7. Export the visible chart as **PNG** or **SVG**; keyboard: `/` search, arrows move manager/reports/siblings, `Esc` clears selection
+8. **Compare** two people for reporting distance and lowest common manager (highlights both paths)
 
 ### Keyboard shortcuts
 
