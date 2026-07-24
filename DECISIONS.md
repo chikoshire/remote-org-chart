@@ -469,6 +469,22 @@ Remote documents a customer-API way to read `employment.user.profilePicture`, or
 
 ---
 
+## 2026-07-24 — Tree view visual polish
+
+**Status:** Accepted  
+
+**Context:**  
+The optional Tree mode read like a bare file browser (`+/-`, flat rows). Chart cards already had stronger Norma chrome.
+
+**Decision:**  
+Treat Tree as nested **person cards** with department accent rails, department/country chips, report + team-size pills, chevron expand, Expand/Collapse all, and soft team wells — still a list hierarchy (not a second React Flow canvas).
+
+**Consequences:**  
+- Tree feels closer to Chart card language while staying scannable for deep hierarchies.  
+- Photos still depend on REST `avatarUrl` (same avatar policy as elsewhere).
+
+---
+
 ## Template for future entries
 
 
