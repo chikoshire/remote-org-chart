@@ -176,8 +176,8 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:items-start">
-              <div className="space-y-5">
+            <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)] lg:items-stretch lg:gap-10">
+              <div className="space-y-5 lg:pt-1">
                 <div>
                   <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
                     Card size
