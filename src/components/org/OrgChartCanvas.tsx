@@ -75,6 +75,13 @@ import {
   writeSidePanelOpen,
 } from "@/lib/ui/prefs";
 import {
+  clearSessionOrgPayload,
+  readRemoteConnected,
+  readSessionOrgPayload,
+  writeSessionOrgPayload,
+} from "@/lib/ui/remote-connection";
+import { useSearchParams } from "next/navigation";
+import {
   reportingRelation,
   type ReportingRelation,
 } from "@/lib/org/reporting-distance";
@@ -212,6 +219,22 @@ function applySelection(
   };
 }
 
+
+function collapseManagersBeyondDepthOne(
+  roots: OrgChartPayloadNode[],
+): Set<string> {
+  const collapsed = new Set<string>();
+  const walk = (node: OrgChartPayloadNode, depth: number) => {
+    const kids = node.children ?? [];
+    if (depth >= 1 && kids.length > 0) collapsed.add(node.id);
+    for (const child of kids) walk(child, depth + 1);
+  };
+  for (const root of roots) {
+    for (const child of root.children ?? []) walk(child, 1);
+  }
+  return collapsed;
+}
+
 function OrgChartInner() {
   const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
   const reducedMotion = usePrefersReducedMotion();
@@ -261,6 +284,9 @@ function OrgChartInner() {
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
   const [viewMode, setViewMode] = useState<"chart" | "directory">("chart");
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
+  const [remoteConnected, setRemoteConnected] = useState(true);
+  const searchParams = useSearchParams();
+  const initialFitDone = useRef(false);
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
@@ -316,12 +342,21 @@ function OrgChartInner() {
     writeStoredDensity(next);
   }, []);
 
-  const load = useCallback(async (opts?: { refresh?: boolean }) => {
+  const load = useCallback(async (opts?: { refresh?: boolean; silent?: boolean }) => {
     const isRefresh = opts?.refresh === true;
+    const silent = opts?.silent === true;
     setRefreshError(null);
+    if (!readRemoteConnected()) {
+      setRemoteConnected(false);
+      setStatus("empty");
+      setForestRoots([]);
+      hasReadyData.current = false;
+      return;
+    }
+    setRemoteConnected(true);
     if (isRefresh) {
       setRefreshing(true);
-    } else {
+    } else if (!silent) {
       setStatus("loading");
       setErrorMessage(null);
       setErrorRetryable(true);
@@ -393,6 +428,11 @@ function OrgChartInner() {
       setFromCache(body.cached === true || body.source === "cache");
       hasReadyData.current = true;
       setStatus("ready");
+      writeSessionOrgPayload(body);
+      if (!isRefresh && !silent) {
+        setCollapsedIds(collapseManagersBeyondDepthOne(body.roots));
+        initialFitDone.current = false;
+      }
       if (isRefresh) setSyncLogToken((n) => n + 1);
     } catch (err) {
       const mapped = mapOrgChartHttpError(0, {
@@ -412,8 +452,56 @@ function OrgChartInner() {
   }, []);
 
   useEffect(() => {
+    const connected = readRemoteConnected();
+    setRemoteConnected(connected);
+    if (!connected) {
+      setStatus("empty");
+      setErrorMessage(null);
+      return;
+    }
+    const session = readSessionOrgPayload() as OrgChartResponse | null;
+    if (
+      session &&
+      session.ok &&
+      session.roots &&
+      session.roots.length > 0 &&
+      (session.nodeCount ?? 0) > 0
+    ) {
+      const flatPeople = session.nodes ?? [];
+      const index = new Map(
+        flatPeople.map((n) => [
+          n.id,
+          { id: n.id, managerEmploymentId: n.managerEmploymentId },
+        ]),
+      );
+      const people = new Map(flatPeople.map((n) => [n.id, n]));
+      const nextMeta = {
+        nodeCount: session.nodeCount,
+        rootCount: session.rootCount,
+        cycleCount: session.cycleCount,
+        orphanManagerCount: session.orphanManagerCount,
+      };
+      setManagerIndex(index);
+      setPeopleIndex(people);
+      setForestRoots(session.roots);
+      setMeta(nextMeta);
+      setWarnings(warningsFromMeta(nextMeta));
+      setLastSyncedAt(session.lastSyncedAt ?? null);
+      setFromCache(true);
+      hasReadyData.current = true;
+      setCollapsedIds(collapseManagersBeyondDepthOne(session.roots));
+      initialFitDone.current = false;
+      setStatus("ready");
+      void load({ silent: true });
+      return;
+    }
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const view = searchParams.get("view");
+    setViewMode(view === "directory" ? "directory" : "chart");
+  }, [searchParams]);
 
   useEffect(() => {
     if (!liveUpdates || status !== "ready") return;
@@ -643,6 +731,21 @@ function OrgChartInner() {
     });
   }, [fitView, reducedMotion, relation]);
 
+  useEffect(() => {
+    if (status !== "ready" || nodes.length === 0 || initialFitDone.current) {
+      return;
+    }
+    if (viewMode !== "chart") return;
+    initialFitDone.current = true;
+    requestAnimationFrame(() => {
+      void fitView({
+        padding: 0.3,
+        maxZoom: 1.2,
+        minZoom: 0.45,
+        duration: reducedMotion ? 0 : 380,
+      });
+    });
+  }, [fitView, nodes.length, reducedMotion, status, viewMode]);
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;
@@ -811,14 +914,12 @@ function OrgChartInner() {
     if (status === "error") return "Org chart error";
     if (status === "empty") return "Empty org chart";
     const synced = lastSyncedAt
-      ? ` · synced ${new Date(lastSyncedAt).toLocaleString()}`
+      ? ` · updated ${new Date(lastSyncedAt).toLocaleString()}`
       : "";
-    const cacheNote = fromCache ? " · from cache" : "";
-    return `${meta.nodeCount} people · ${meta.rootCount} roots · ${meta.cycleCount} cycles${
+    return `${meta.nodeCount} people · ${meta.rootCount} teams${
       selectedId ? " · path highlighted" : ""
-    }${cacheNote}${synced}${refreshing ? " · refreshing…" : ""}`;
+    }${synced}${refreshing ? " · refreshing…" : ""}`;
   }, [
-    fromCache,
     lastSyncedAt,
     meta,
     refreshing,
@@ -891,7 +992,26 @@ function OrgChartInner() {
       <div className="flex h-full min-h-0 flex-1 flex-col">
         <div className="min-h-0 flex-1">
           <ChartEmptyState
-            action={<RetryButton onClick={() => void load()} />}
+            title={
+              remoteConnected ? "No people to show" : "Remote is disconnected"
+            }
+            description={
+              remoteConnected
+                ? undefined
+                : "Connect Remote in Settings to load your organization chart."
+            }
+            action={
+              remoteConnected ? (
+                <RetryButton onClick={() => void load()} />
+              ) : (
+                <RetryButton
+                  label="Open Settings"
+                  onClick={() => {
+                    window.location.href = "/settings";
+                  }}
+                />
+              )
+            }
           />
         </div>
         {statusLine}
@@ -906,7 +1026,7 @@ function OrgChartInner() {
           <ChartErrorState
             description={
               errorMessage ??
-              "The Remote API request failed. Token stays server-side — retry, or check /api/health/remote."
+              "Something went wrong loading people from Remote. Please try again."
             }
             action={
               errorRetryable ? (
@@ -942,7 +1062,7 @@ function OrgChartInner() {
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="flex flex-col gap-3">
               <div
-                className="flex items-center gap-0.5 rounded-norma-md border border-[#1a1a1a]/15 bg-[#1a1a1a] p-1"
+                className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
                 role="group"
                 aria-label="View mode"
               >
@@ -951,10 +1071,13 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "chart"}
                   className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "chart"
-                      ? "bg-[#e85d04] text-[#1a1a1a]"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
-                  onClick={() => setViewMode("chart")}
+                  onClick={() => {
+                    setViewMode("chart");
+                    window.history.replaceState(null, "", "/app");
+                  }}
                 >
                   Chart
                 </button>
@@ -963,21 +1086,24 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "directory"}
                   className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "directory"
-                      ? "bg-[#e85d04] text-[#1a1a1a]"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
-                  onClick={() => setViewMode("directory")}
+                  onClick={() => {
+                    setViewMode("directory");
+                    window.history.replaceState(null, "", "/app?view=directory");
+                  }}
                 >
                   Directory
                 </button>
               </div>
               <button
                 type="button"
-                disabled={refreshing}
+                disabled={refreshing || !remoteConnected}
                 className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
                 onClick={() => void load({ refresh: true })}
               >
-                {refreshing ? "Refreshing…" : "Refresh from Remote"}
+                {refreshing ? "Refreshing…" : "Refresh people"}
               </button>
               <OrgFiltersBar
                 filters={filters}
@@ -1264,8 +1390,7 @@ function OrgChartInner() {
               edgeTypes={edgeTypes}
               onNodeClick={onNodeClick}
               onPaneClick={onPaneClick}
-              fitView
-              fitViewOptions={{ padding: 0.2, maxZoom: 1.05 }}
+              fitView={false}
               minZoom={0.15}
               maxZoom={1.6}
               proOptions={{ hideAttribution: true }}

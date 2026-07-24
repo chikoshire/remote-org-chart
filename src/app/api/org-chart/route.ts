@@ -31,18 +31,25 @@ export async function GET(request: Request) {
     if (!forceRefresh) {
       const cached = await readOrgChartSnapshot();
       if (cached) {
-        await writeSyncRun({
+        void writeSyncRun({
           startedAt,
           finishedAt: new Date().toISOString(),
           ok: true,
           employmentCount: cached.nodeCount,
           trigger: "cache_hit",
         });
-        return NextResponse.json({
-          ...cached,
-          cached: true,
-          source: "cache",
-        });
+        return NextResponse.json(
+          {
+            ...cached,
+            cached: true,
+            source: "cache",
+          },
+          {
+            headers: {
+              "Cache-Control": "private, max-age=30, stale-while-revalidate=120",
+            },
+          },
+        );
       }
     }
 
