@@ -869,17 +869,17 @@ function OrgChartInner() {
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <div className="flex flex-wrap items-center justify-end gap-1 self-end">
           <div
-            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
+            className="flex items-center gap-0.5 rounded-norma-md border border-[#0b2a32]/15 bg-[#0b2a32] p-1 shadow-norma-md"
             role="group"
             aria-label="View mode"
           >
             <button
               type="button"
               aria-pressed={viewMode === "chart"}
-              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+              className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                 viewMode === "chart"
-                  ? "bg-norma-accent-soft text-norma-royal"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
+                  ? "bg-[#e85d04] text-[#0b2a32]"
+                  : "text-[#9fd5de] hover:text-[#f4f7f5]"
               }`}
               onClick={() => setViewMode("chart")}
             >
@@ -888,10 +888,10 @@ function OrgChartInner() {
             <button
               type="button"
               aria-pressed={viewMode === "directory"}
-              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+              className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
                 viewMode === "directory"
-                  ? "bg-norma-accent-soft text-norma-royal"
-                  : "text-norma-ink-muted hover:text-norma-prussian"
+                  ? "bg-[#e85d04] text-[#0b2a32]"
+                  : "text-[#9fd5de] hover:text-[#f4f7f5]"
               }`}
               onClick={() => setViewMode("directory")}
             >
@@ -1169,7 +1169,7 @@ function OrgChartInner() {
             preventScrolling
             aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
           >
-            <Background color="#d0ddd9" gap={isMobile ? 16 : 20} size={1} />
+            <Background color="#c5d5d1" gap={isMobile ? 16 : 22} size={1} />
             <Controls
               showInteractive={false}
               position={isMobile ? "bottom-right" : "bottom-left"}
