@@ -397,13 +397,13 @@ function PersonCard({
     >
       <button
         type="button"
-        className="flex w-full flex-1 flex-col items-center px-4 pb-4 pt-0 text-center"
+        className="flex w-full flex-1 flex-col items-center pb-4 text-center"
         onClick={() => onSelect(person.id)}
         aria-pressed={selected}
       >
         <div
           aria-hidden
-          className="mb-0 h-16 w-full bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint"
+          className="mb-0 h-16 w-full self-stretch bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint"
         />
         <div className="-mt-10 rounded-full bg-norma-surface p-1 shadow-norma-sm ring-1 ring-norma-border/60">
           <PersonAvatar
@@ -416,7 +416,7 @@ function PersonCard({
           />
         </div>
         <span
-          className="mt-3 block w-full truncate font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-ink"
+          className="mt-3 block w-full truncate px-4 font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-ink"
           style={
             morph
               ? { viewTransitionName: personNameMorphName(person.id) }
@@ -426,10 +426,10 @@ function PersonCard({
         >
           {name}
         </span>
-        <span className="mt-1 line-clamp-2 w-full text-sm leading-snug text-norma-ink-muted">
+        <span className="mt-1 line-clamp-2 w-full px-4 text-sm leading-snug text-norma-ink-muted">
           {person.jobTitle?.trim() || "No title"}
         </span>
-        <span className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+        <span className="mt-2 flex flex-wrap items-center justify-center gap-1.5 px-4">
           {person.department?.trim() ? (
             <span className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink">
               {person.department.trim()}
@@ -442,15 +442,15 @@ function PersonCard({
           ) : null}
         </span>
         {person.managerName ? (
-          <span className="mt-2 block w-full truncate text-xs text-norma-ink-muted">
+          <span className="mt-2 block w-full truncate px-4 text-xs text-norma-ink-muted">
             Reports to {person.managerName}
           </span>
         ) : (
-          <span className="mt-2 block w-full truncate text-xs text-norma-ink-muted">
+          <span className="mt-2 block w-full truncate px-4 text-xs text-norma-ink-muted">
             Top of reporting line
           </span>
         )}
-        <span className="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5">
+        <span className="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5 px-4">
           <span className="inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-ink">
             {reports === 1 ? "1 report" : `${reports} reports`}
           </span>
