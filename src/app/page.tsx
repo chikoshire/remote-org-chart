@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
+import { MarketingAtmosphere } from "@/components/marketing/MarketingAtmosphere";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { MarketingMarquee } from "@/components/marketing/MarketingMarquee";
 import { MarketingProductMock } from "@/components/marketing/MarketingProductMock";
+import { MarketingReveal } from "@/components/marketing/MarketingReveal";
+import { RemoteMark } from "@/components/brand/RemoteMark";
 
 export const metadata: Metadata = {
   title: "Acme · People intelligence",
@@ -9,36 +14,26 @@ export const metadata: Metadata = {
     "Explore Acme’s reporting lines, people, and data health in one place — powered by Remote.",
 };
 
-const NAV = [
-  { href: "#product", label: "Product" },
-  { href: "#surfaces", label: "Surfaces" },
-  { href: "#source", label: "Source of truth" },
-] as const;
-
 const SURFACES = [
   {
     name: "Chart",
     line: "Interactive reporting lines with pan, zoom, and compare.",
-    tint: "bg-gradient-to-br from-norma-lavender via-norma-lavender/80 to-white",
-    art: "radial-gradient(circle at 30% 20%, #fff 0%, transparent 40%), linear-gradient(135deg, #c4b5e8 0%, #e8e0f5 50%, #f4f1eb 100%)",
+    tint: "from-norma-lavender via-norma-lavender/70 to-white",
   },
   {
     name: "Tree",
     line: "Expand and collapse the hierarchy without losing context.",
-    tint: "bg-gradient-to-br from-norma-mint via-norma-mint/75 to-white",
-    art: "radial-gradient(circle at 70% 30%, #fff 0%, transparent 45%), linear-gradient(160deg, #9dd9c0 0%, #d8f0e6 55%, #f4f1eb 100%)",
+    tint: "from-norma-mint via-norma-mint/70 to-white",
   },
   {
     name: "Map",
     line: "See where people sit geographically — country by country.",
-    tint: "bg-gradient-to-br from-norma-sky via-norma-sky/75 to-white",
-    art: "radial-gradient(circle at 40% 70%, #fff 0%, transparent 40%), linear-gradient(200deg, #8ec5e8 0%, #d9ebf8 50%, #f4f1eb 100%)",
+    tint: "from-norma-sky via-norma-sky/70 to-white",
   },
   {
     name: "People",
     line: "Search the directory, open profiles, spot incomplete data.",
-    tint: "bg-gradient-to-br from-norma-peach via-norma-peach/80 to-white",
-    art: "radial-gradient(circle at 60% 25%, #fff 0%, transparent 42%), linear-gradient(145deg, #f0c090 0%, #ffe8cc 55%, #f4f1eb 100%)",
+    tint: "from-norma-peach via-norma-peach/70 to-white",
   },
 ] as const;
 
@@ -62,194 +57,157 @@ const BEATS = [
 
 export default function MarketingHomePage() {
   return (
-    <div className="relative flex min-h-[100dvh] flex-col bg-norma-canvas text-norma-ink">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[70vh]"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 80% 60% at 85% 20%, rgb(232 224 245 / 0.65) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 5% 0%, rgb(255 232 204 / 0.5) 0%, transparent 50%)",
-        }}
-      />
-
-      <header className="norma-glass relative z-20 border-b border-norma-border/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 md:px-8">
-          <a href="#top" className="shrink-0 transition hover:opacity-80" id="top">
-            <AcmeLogo withWordmark />
-          </a>
-          <nav
-            aria-label="Marketing"
-            className="hidden items-center gap-8 md:flex"
-          >
-            {NAV.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-norma-ink-muted transition hover:text-norma-ink"
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <Link href="/login" className="norma-cta min-h-10 px-5 text-sm">
-            Log in
-          </Link>
-        </div>
-      </header>
+    <div className="relative flex min-h-[100dvh] flex-col overflow-x-hidden bg-norma-canvas text-norma-ink">
+      <MarketingHeader />
 
       <main className="relative z-10 flex-1">
-        <section className="mx-auto grid max-w-6xl gap-12 px-5 pb-0 pt-12 md:grid-cols-12 md:gap-10 md:px-8 md:pt-16 lg:pt-20">
-          <div className="marketing-hero-copy flex flex-col justify-center md:col-span-5 md:pb-16">
-            <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.22em] text-norma-ink-muted">
-              Acme · People intelligence
-            </p>
-            <h1 className="mt-5 font-[family-name:var(--font-norma-display)] text-[clamp(2.4rem,6vw,3.75rem)] leading-[1.05] tracking-tight text-norma-ink">
+        {/* Hero — remote.com-style: copy first, full-bleed product visual */}
+        <section className="relative">
+          <MarketingAtmosphere variant="top" />
+
+          <div className="relative mx-auto max-w-4xl px-5 pb-12 pt-16 text-center md:px-8 md:pb-16 md:pt-24">
+            <div className="marketing-hero-brand mx-auto flex justify-center">
+              <AcmeLogo
+                withWordmark
+                className="origin-center scale-[1.55] md:scale-[1.75]"
+                markClassName="!h-10 !w-10 md:!h-12 md:!w-12"
+              />
+            </div>
+            <h1 className="marketing-hero-title mt-12 font-[family-name:var(--font-norma-display)] text-[clamp(2.75rem,7.5vw,4.5rem)] leading-[1.02] tracking-tight text-norma-ink">
               See how Acme is organised
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-norma-ink-muted md:text-lg">
+            <p className="marketing-hero-copy mx-auto mt-6 max-w-xl text-base leading-relaxed text-norma-ink-muted md:text-lg">
               Explore reporting lines, people, and data health in one place —
               built on Remote so the chart stays close to the source of truth.
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href="/login" className="norma-cta min-h-11 px-6 text-sm">
+            <div className="marketing-hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Link href="/login" className="norma-cta min-h-11 px-7 text-sm">
                 Log in to the app
               </Link>
               <a
-                href="https://github.com/chikoshire/remote-org-chart"
-                className="text-sm font-medium text-norma-ink-muted underline-offset-4 transition hover:text-norma-ink hover:underline"
+                href="#product"
+                className="inline-flex min-h-11 items-center rounded-full border border-norma-border bg-white/70 px-6 text-sm font-medium text-norma-ink shadow-norma-sm backdrop-blur transition hover:border-norma-ink/25 hover:bg-white"
               >
-                Source on GitHub
+                See how it works
               </a>
             </div>
           </div>
 
-          <div className="marketing-hero-visual relative md:col-span-7 md:-mr-8 lg:-mr-[max(0px,calc((100vw-72rem)/2+2rem))]">
-            <div className="h-[min(70vh,34rem)] w-full overflow-hidden rounded-tl-norma-lg border border-norma-border/60 border-b-0 border-r-0 shadow-norma-md transition duration-500 hover:shadow-[0_24px_60px_rgb(18_18_18/0.12)] md:h-[min(75vh,38rem)]">
-              <MarketingProductMock />
+          <div className="marketing-hero-visual relative w-full">
+            <div className="mx-auto max-w-[78rem] overflow-hidden rounded-t-[1.75rem] border border-b-0 border-norma-border/70 shadow-[0_40px_100px_rgb(18_18_18/0.14)] ring-1 ring-white/70 md:rounded-t-[2rem]">
+              <div className="h-[min(64vh,38rem)] w-full md:h-[min(72vh,44rem)]">
+                <MarketingProductMock />
+              </div>
             </div>
           </div>
         </section>
 
-        <section
-          aria-hidden
-          className="mx-auto grid max-w-6xl gap-4 px-5 py-10 md:grid-cols-3 md:gap-5 md:px-8"
-        >
-          <div
-            className="marketing-editorial marketing-surface-card rounded-norma-lg border border-norma-border/50 shadow-norma-sm"
-            style={{
-              backgroundImage:
-                "linear-gradient(145deg, #e8e0f5 0%, #d9ebf8 45%, #f4f1eb 100%)",
-              minHeight: "14rem",
-            }}
-          />
-          <div
-            className="marketing-editorial marketing-surface-card rounded-norma-lg border border-norma-border/50 shadow-norma-sm md:mt-8"
-            style={{
-              backgroundImage:
-                "linear-gradient(200deg, #ffe8cc 0%, #d8f0e6 50%, #f4f1eb 100%)",
-              minHeight: "16rem",
-            }}
-          />
-          <div
-            className="marketing-editorial marketing-surface-card rounded-norma-lg border border-norma-border/50 shadow-norma-sm"
-            style={{
-              backgroundImage:
-                "linear-gradient(160deg, #f5d6de 0%, #e8e0f5 40%, #ffe8cc 100%)",
-              minHeight: "14rem",
-            }}
-          />
-        </section>
+        <MarketingMarquee />
 
         <section
           id="product"
-          className="scroll-mt-20 border-t border-norma-border/80 bg-norma-surface/50"
+          className="scroll-mt-24 border-t border-norma-border/60 bg-norma-surface/40"
         >
           <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-            <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.2em] text-norma-ink-muted">
-              Product
-            </p>
-            <h2 className="mt-4 max-w-2xl font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-4xl">
-              Organisational intelligence without another spreadsheet
-            </h2>
-            <ul className="mt-14 divide-y divide-norma-border border-y border-norma-border">
-              {BEATS.map((beat) => (
-                <li
-                  key={beat.kicker}
-                  className="marketing-beat-row grid gap-3 py-10 md:grid-cols-[5rem_1fr_1.2fr] md:gap-8 md:py-12"
-                >
-                  <span className="font-[family-name:var(--font-norma-mono)] text-sm text-norma-ink-muted">
-                    {beat.kicker}
-                  </span>
-                  <h3 className="font-[family-name:var(--font-norma-display)] text-xl text-norma-ink md:text-2xl">
-                    {beat.title}
-                  </h3>
-                  <p className="text-base leading-relaxed text-norma-ink-muted">
-                    {beat.body}
-                  </p>
+            <MarketingReveal>
+              <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.2em] text-norma-ink-muted">
+                How we do it
+              </p>
+              <h2 className="mt-4 max-w-2xl font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-[2.75rem] md:leading-[1.1]">
+                One system of record. Every organisational lens.
+              </h2>
+            </MarketingReveal>
+
+            <ul className="mt-16 divide-y divide-norma-border border-y border-norma-border">
+              {BEATS.map((beat, index) => (
+                <li key={beat.kicker}>
+                  <MarketingReveal delayMs={index * 90}>
+                    <div className="marketing-beat-row grid gap-3 py-10 md:grid-cols-[5rem_1fr_1.25fr] md:gap-10 md:py-14">
+                      <span className="font-[family-name:var(--font-norma-mono)] text-sm text-norma-ink-muted">
+                        {beat.kicker}
+                      </span>
+                      <h3 className="font-[family-name:var(--font-norma-display)] text-xl text-norma-ink md:text-2xl">
+                        {beat.title}
+                      </h3>
+                      <p className="text-base leading-relaxed text-norma-ink-muted">
+                        {beat.body}
+                      </p>
+                    </div>
+                  </MarketingReveal>
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
-        <section id="surfaces" className="scroll-mt-20 border-t border-norma-border/80">
-          <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-            <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.2em] text-norma-ink-muted">
-              Surfaces
-            </p>
-            <h2 className="mt-4 max-w-xl font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-4xl">
-              Four ways into the same company
-            </h2>
-            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {SURFACES.map((surface) => (
-                <div
-                  key={surface.name}
-                  className={`marketing-surface-card overflow-hidden rounded-norma-lg border border-norma-border/60 shadow-norma-sm ${surface.tint}`}
-                >
-                  <div
-                    className="marketing-editorial h-28 w-full"
-                    style={{ backgroundImage: surface.art }}
-                  />
-                  <div className="p-5 pt-4">
-                    <p className="font-[family-name:var(--font-norma-display)] text-2xl text-norma-ink">
+        <section id="surfaces" className="relative scroll-mt-24 overflow-hidden">
+          <MarketingAtmosphere variant="bottom" />
+          <div className="relative mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+            <MarketingReveal>
+              <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.2em] text-norma-ink-muted">
+                Surfaces
+              </p>
+              <h2 className="mt-4 max-w-xl font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-[2.75rem] md:leading-[1.1]">
+                Four ways into the same company
+              </h2>
+            </MarketingReveal>
+
+            <div className="mt-14 grid gap-5 sm:grid-cols-2">
+              {SURFACES.map((surface, index) => (
+                <MarketingReveal key={surface.name} delayMs={index * 80}>
+                  <Link
+                    href="/login"
+                    className={`marketing-surface-panel group relative flex min-h-[14rem] flex-col justify-end overflow-hidden rounded-[1.5rem] border border-norma-border/60 bg-gradient-to-br ${surface.tint} p-7 shadow-norma-sm transition`}
+                  >
+                    <div className="marketing-surface-sheen absolute inset-0" />
+                    <p className="relative font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-4xl">
                       {surface.name}
                     </p>
-                    <p className="mt-3 text-sm leading-relaxed text-norma-ink-muted">
+                    <p className="relative mt-3 max-w-sm text-sm leading-relaxed text-norma-ink-muted md:text-base">
                       {surface.line}
                     </p>
-                  </div>
-                </div>
+                    <span className="relative mt-6 inline-flex items-center gap-2 text-sm font-semibold text-norma-ink opacity-80 transition group-hover:opacity-100">
+                      Open in app
+                      <span aria-hidden className="transition group-hover:translate-x-1">
+                        →
+                      </span>
+                    </span>
+                  </Link>
+                </MarketingReveal>
               ))}
             </div>
           </div>
         </section>
 
-        <section
-          id="source"
-          className="scroll-mt-20 border-t border-norma-border/80 bg-gradient-to-br from-norma-lavender/50 via-norma-mint/30 to-norma-peach/40"
-        >
-          <div className="mx-auto flex max-w-6xl flex-col gap-10 px-5 py-20 md:flex-row md:items-end md:justify-between md:px-8 md:py-28">
-            <div className="max-w-xl">
-              <p className="font-[family-name:var(--font-norma-mono)] text-[11px] uppercase tracking-[0.2em] text-norma-ink-muted">
-                Source of truth
-              </p>
-              <h2 className="mt-4 font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-4xl">
+        <section id="source" className="relative scroll-mt-24 overflow-hidden">
+          <MarketingAtmosphere variant="band" />
+          <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-5 py-20 md:flex-row md:items-end md:justify-between md:px-8 md:py-28">
+            <MarketingReveal className="max-w-2xl">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-norma-border/80 bg-white/70 px-3 py-1.5 shadow-norma-sm backdrop-blur">
+                <RemoteMark className="h-4 w-4" />
+                <span className="text-xs font-medium text-norma-ink-muted">
+                  Powered by Remote
+                </span>
+              </div>
+              <h2 className="font-[family-name:var(--font-norma-display)] text-3xl tracking-tight text-norma-ink md:text-[2.75rem] md:leading-[1.1]">
                 Built on Remote, not a shadow HRIS
               </h2>
-              <p className="mt-5 text-base leading-relaxed text-norma-ink-muted">
+              <p className="mt-5 text-base leading-relaxed text-norma-ink-muted md:text-lg">
                 Employments and managers come from the Remote sandbox API. The
                 app shapes that graph into chart, tree, map, and people —
                 without inventing a second employee database.
               </p>
-            </div>
-            <Link href="/login" className="norma-cta min-h-11 shrink-0 px-6 text-sm">
-              Open the workspace
-            </Link>
+            </MarketingReveal>
+            <MarketingReveal delayMs={120}>
+              <Link href="/login" className="norma-cta min-h-12 shrink-0 px-8 text-sm">
+                Open the workspace
+              </Link>
+            </MarketingReveal>
           </div>
         </section>
       </main>
 
-      <footer className="norma-glass relative z-10 border-t border-norma-border/80">
+      <footer className="relative z-10 border-t border-norma-border/80 bg-norma-surface/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-norma-ink-muted md:flex-row md:items-center md:justify-between md:px-8">
           <AcmeLogo withWordmark className="opacity-90" />
           <div className="flex flex-wrap gap-6">

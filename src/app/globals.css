@@ -353,79 +353,178 @@
   }
 }
 
-/* Marketing landing (#114) */
-.marketing-hero-copy {
+/* Marketing landing — remote.com-inspired motion + atmosphere */
+.marketing-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: soft-light;
+}
+
+.marketing-orb {
+  animation: marketing-orb-drift 14s ease-in-out infinite alternate;
+}
+
+.marketing-orb-b {
+  animation-delay: -5s;
+  animation-duration: 18s;
+}
+
+.marketing-hero-brand {
   animation: marketing-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.marketing-hero-title {
+  animation: marketing-rise 800ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+.marketing-hero-copy {
+  animation: marketing-rise 850ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
+}
+
+.marketing-hero-cta {
+  animation: marketing-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+}
+
 .marketing-hero-visual {
-  animation: marketing-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  animation: marketing-hero-stage 1100ms cubic-bezier(0.22, 1, 0.36, 1) 240ms both;
+}
+
+.marketing-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--marketing-reveal-delay, 0ms);
+}
+
+.marketing-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.marketing-marquee-track {
+  animation: marketing-marquee 42s linear infinite;
+}
+
+.marketing-marquee:hover .marketing-marquee-track {
+  animation-play-state: paused;
+}
+
+.marketing-mock-path {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: marketing-path-draw 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.45s forwards;
+}
+
+.marketing-mock-pop {
+  opacity: 0;
+  animation:
+    marketing-node-in 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    marketing-float 5.5s ease-in-out 1s infinite;
 }
 
 .marketing-mock-node {
-  animation: marketing-float 5.5s ease-in-out infinite;
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .marketing-mock-node:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-5px) scale(1.03);
   box-shadow: var(--norma-shadow-md);
 }
 
 .marketing-mock-node-delay {
-  animation-delay: 0.6s;
+  animation-delay: 0.55s, 1.4s;
 }
 
 .marketing-mock-node-delay-2 {
-  animation-delay: 1.2s;
+  animation-delay: 0.7s, 1.6s;
 }
 
-.marketing-surface-card {
+.marketing-mock-node-delay-3 {
+  animation-delay: 0.85s, 1.8s;
+}
+
+.marketing-mock-node-delay-4 {
+  animation-delay: 1s, 2s;
+}
+
+.marketing-mock-drawer {
+  opacity: 0;
+  transform: translateX(12px);
+  animation: marketing-drawer-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 1.15s forwards;
+}
+
+.marketing-float-chip {
+  opacity: 0;
+  animation:
+    marketing-node-in 750ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    marketing-chip-float 6.5s ease-in-out 1.2s infinite;
+}
+
+.marketing-float-chip-a {
+  animation-delay: 1.05s, 1.9s;
+}
+
+.marketing-float-chip-b {
+  animation-delay: 1.25s, 2.2s;
+}
+
+.marketing-surface-panel {
   transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 220ms ease,
-    border-color 220ms ease;
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms ease,
+    border-color 320ms ease;
 }
 
-.marketing-surface-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--norma-shadow-md);
-  border-color: color-mix(in srgb, var(--norma-ink) 18%, transparent);
+.marketing-surface-panel:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 24px 50px rgb(18 18 18 / 0.1);
+  border-color: color-mix(in srgb, var(--norma-ink) 16%, transparent);
 }
 
-.marketing-editorial {
-  position: relative;
-  overflow: hidden;
-  min-height: 12rem;
-}
-
-.marketing-editorial::after {
-  content: "";
-  position: absolute;
-  inset: 0;
+.marketing-surface-sheen {
   background:
-    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.45), transparent 45%),
-    radial-gradient(circle at 80% 70%, rgb(18 18 18 / 0.06), transparent 40%);
+    radial-gradient(circle at 18% 20%, rgb(255 255 255 / 0.55), transparent 42%),
+    radial-gradient(circle at 85% 75%, rgb(18 18 18 / 0.05), transparent 40%);
   pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+.marketing-surface-panel:hover .marketing-surface-sheen {
+  opacity: 0.85;
 }
 
 .marketing-beat-row {
-  transition: background-color 200ms ease, padding-left 200ms ease;
+  transition: background-color 220ms ease, padding-left 220ms ease;
 }
 
 .marketing-beat-row:hover {
-  background-color: color-mix(in srgb, var(--norma-lavender) 35%, transparent);
-  padding-left: 0.5rem;
+  background-color: color-mix(in srgb, var(--norma-lavender) 40%, transparent);
+  padding-left: 0.65rem;
 }
 
 @keyframes marketing-rise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(22px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes marketing-hero-stage {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -435,21 +534,105 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes marketing-orb-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-3%, 4%, 0) scale(1.06);
+  }
+}
+
+@keyframes marketing-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marketing-path-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes marketing-node-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes marketing-drawer-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes marketing-chip-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .marketing-hero-brand,
+  .marketing-hero-title,
   .marketing-hero-copy,
+  .marketing-hero-cta,
   .marketing-hero-visual,
-  .marketing-mock-node,
-  .marketing-surface-card,
-  .marketing-beat-row {
+  .marketing-mock-pop,
+  .marketing-mock-path,
+  .marketing-mock-drawer,
+  .marketing-float-chip,
+  .marketing-orb,
+  .marketing-marquee-track {
     animation: none !important;
+  }
+
+  .marketing-reveal {
+    opacity: 1 !important;
+    transform: none !important;
     transition: none !important;
   }
 
-  .marketing-surface-card:hover,
+  .marketing-mock-pop,
+  .marketing-float-chip {
+    opacity: 1;
+  }
+
+  .marketing-mock-drawer {
+    opacity: 1;
+    transform: none;
+  }
+
+  .marketing-mock-path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .marketing-surface-panel,
+  .marketing-beat-row,
+  .marketing-mock-node {
+    transition: none !important;
+  }
+
+  .marketing-surface-panel:hover,
   .marketing-mock-node:hover,
   .marketing-beat-row:hover {
     transform: none;

@@ -882,6 +882,25 @@ Remote publishes a formal press-kit URL we should prefer.
 
 ---
 
+## 2026-07-24 — Marketing landing motion inspired by remote.com
+
+**Status:** Accepted  
+
+**Context:**  
+Our `/` marketing page felt static next to remote.com’s homepage (atmospheric washes, staged hero, marquee, scroll reveals, product stage).
+
+**Decision:**  
+Rebuild `/` with remote.com *composition and motion language* while keeping Acme/Norma branding (not a Remote marketing skin): centered brand-forward hero, full-bleed product mock stage, capability marquee, IntersectionObserver reveals, CSS grain/mesh atmosphere, path-draw + node pop on the mock. No Remote CDN backgrounds.
+
+**Consequences:**  
+- More client JS on marketing (`MarketingHeader`, `MarketingReveal`, `MarketingMarquee`).  
+- Prefer `prefers-reduced-motion` cutoffs for all new animations.
+
+**Revisit when:**  
+Interviewers want a darker Prussian Remote chrome instead of cream pastels.
+
+---
+
 ## Template for future entries
 
 
