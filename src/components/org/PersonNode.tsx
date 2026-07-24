@@ -9,7 +9,7 @@ import {
 
 type PersonData = PersonNodeData & Record<string, unknown>;
 
-export function PersonNode({ data, selected }: NodeProps) {
+export function PersonNode({ data, selected, id }: NodeProps) {
   const person = data as PersonData;
   const variant: PersonNodeVariant =
     person.variant ?? (selected ? "selected" : "default");
@@ -25,8 +25,14 @@ export function PersonNode({ data, selected }: NodeProps) {
         directReports={person.directReports ?? 0}
         inCycle={Boolean(person.inCycle)}
         variant={variant}
+        density={person.density}
+        collapsed={person.collapsed}
+        collapsedCount={person.collapsedCount}
+        onToggleCollapse={person.onToggleCollapse}
       />
       <Handle type="source" position={Position.Bottom} />
+      {/* id kept for React Flow focus targeting */}
+      <span className="sr-only">{id}</span>
     </div>
   );
 }

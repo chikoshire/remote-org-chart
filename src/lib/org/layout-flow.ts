@@ -4,12 +4,19 @@ import type { OrgNode } from "@/lib/org/types";
 import type { PersonNodeData } from "@/components/org/PersonNodeCard";
 import type { ReportingEdgeData } from "@/components/org/ReportingEdge";
 import { personAccessibleName } from "@/lib/org/person-a11y";
-
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 96;
+import {
+  densityMetrics,
+  type ChartDensity,
+} from "@/lib/org/collapse";
 
 export type OrgChartPayloadNode = Omit<OrgNode, "children"> & {
   children?: OrgChartPayloadNode[];
+  /** Hidden descendant count when this manager is collapsed. */
+  collapsedCount?: number;
+};
+
+export type LayoutOrgChartOptions = {
+  density?: ChartDensity;
 };
 
 export function walkOrgTree(
@@ -30,10 +37,19 @@ export function walkOrgTree(
 
 export function layoutOrgChart(
   roots: OrgChartPayloadNode[],
+  options: LayoutOrgChartOptions = {},
 ): { nodes: Node<PersonNodeData>[]; edges: Edge<ReportingEdgeData>[] } {
+  const density = options.density ?? "comfortable";
+  const metrics = densityMetrics(density);
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
-  g.setGraph({ rankdir: "TB", nodesep: 36, ranksep: 72, marginx: 24, marginy: 24 });
+  g.setGraph({
+    rankdir: "TB",
+    nodesep: metrics.nodesep,
+    ranksep: metrics.ranksep,
+    marginx: 24,
+    marginy: 24,
+  });
 
   const nodes: Node<PersonNodeData>[] = [];
   const edges: Edge<ReportingEdgeData>[] = [];
@@ -42,29 +58,26 @@ export function layoutOrgChart(
   walkOrgTree(roots, (node, parentId) => {
     if (seen.has(node.id)) return;
     seen.add(node.id);
-    g.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
+    g.setNode(node.id, { width: metrics.width, height: metrics.height });
+    const collapsedCount = node.collapsedCount ?? 0;
+    const data: PersonNodeData = {
+      fullName: node.fullName,
+      jobTitle: node.jobTitle,
+      department: node.department,
+      country: node.country,
+      directReports: node.directReports,
+      inCycle: node.inCycle,
+      variant: parentId === null ? "root" : "default",
+      density,
+      collapsed: collapsedCount > 0,
+      collapsedCount,
+    };
     nodes.push({
       id: node.id,
       type: "person",
       position: { x: 0, y: 0 },
-      ariaLabel: personAccessibleName({
-        fullName: node.fullName,
-        jobTitle: node.jobTitle,
-        department: node.department,
-        country: node.country,
-        directReports: node.directReports,
-        inCycle: node.inCycle,
-        variant: parentId === null ? "root" : "default",
-      }),
-      data: {
-        fullName: node.fullName,
-        jobTitle: node.jobTitle,
-        department: node.department,
-        country: node.country,
-        directReports: node.directReports,
-        inCycle: node.inCycle,
-        variant: parentId === null ? "root" : "default",
-      },
+      ariaLabel: personAccessibleName(data),
+      data,
     });
     if (parentId) {
       g.setEdge(parentId, node.id);
@@ -85,8 +98,8 @@ export function layoutOrgChart(
     return {
       ...node,
       position: {
-        x: pos.x - NODE_WIDTH / 2,
-        y: pos.y - NODE_HEIGHT / 2,
+        x: pos.x - metrics.width / 2,
+        y: pos.y - metrics.height / 2,
       },
     };
   });
