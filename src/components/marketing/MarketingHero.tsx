@@ -47,16 +47,18 @@ export function MarketingHero() {
 
         <div className="marketing-hero-visual relative md:col-span-7">
           <div className="relative">
-            <div className="overflow-hidden rounded-[1.75rem] border border-norma-border/70 bg-white shadow-[0_32px_90px_rgb(18_18_18/0.14)] ring-1 ring-white/80">
-              <Image
-                src="/marketing/hero-org-chart.png"
-                alt="Acme org chart workspace with Chart, Tree, and Map views"
-                width={1600}
-                height={900}
-                priority
-                className="h-auto w-full object-cover object-top"
-                sizes="(max-width: 768px) 100vw, 55vw"
-              />
+            <div className="overflow-hidden rounded-[1.75rem] border border-norma-border/70 bg-norma-canvas shadow-[0_32px_90px_rgb(18_18_18/0.14)] ring-1 ring-white/80">
+              <div className="p-3 sm:p-4">
+                <Image
+                  src="/marketing/hero-org-chart.png"
+                  alt="Acme org chart workspace with Chart, Tree, and Map views"
+                  width={1728}
+                  height={1128}
+                  priority
+                  className="h-auto w-full rounded-[0.85rem] object-contain object-top"
+                  sizes="(max-width: 768px) 100vw, 55vw"
+                />
+              </div>
             </div>
 
             <div className="marketing-float-chip marketing-float-chip-a absolute -left-3 top-[18%] hidden max-w-[13rem] rounded-2xl border border-norma-peach/80 bg-norma-peach/95 px-4 py-3 shadow-norma-md backdrop-blur sm:block md:-left-6">
