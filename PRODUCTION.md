@@ -12,7 +12,7 @@ Checklist for the public Cloudflare deploy. Re-verify before interviewer send.
 | A11y + PII (#30 #32) | Done | Skip link, landmarks, combobox search; emails stripped on `/api/org-chart` |
 | Error / empty / loading on live data | Done | Chart state surfaces; Refresh keeps prior chart on failure |
 | Marketing landing (#33) | Done | [`/welcome`](https://remote-org-chart.shirechiko.workers.dev/welcome) → CTA to `/` |
-| Remote webhook subscription (#44) | Blocked on scopes | App receiver is live; subscribe needs `webhook:write` (current app token is `all:read`). See below. |
+| Remote webhook subscription (#44) | Done | Callback subscribed; `REMOTE_WEBHOOK_SIGNING_KEY` as Wrangler secret; unsigned POST → `401 invalid_signature` |
 
 ## Live smoke commands
 
