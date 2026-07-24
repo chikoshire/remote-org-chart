@@ -39,10 +39,17 @@ if ! curl -sf -o /dev/null "http://127.0.0.1:${PORT}/"; then
   exit 1
 fi
 
-echo "Starting localtunnel → localhost:${PORT} ..."
-npx --yes localtunnel --port "$PORT" &
-TUNNEL_PID=$!
+if command -v cloudflared >/dev/null 2>&1; then
+  echo "Starting cloudflared quick tunnel → localhost:${PORT} ..."
+  cloudflared tunnel --url "http://127.0.0.1:${PORT}" &
+  TUNNEL_PID=$!
+  echo "Open the printed https://*.trycloudflare.com URL in the Cursor browser."
+else
+  echo "cloudflared not found; falling back to localtunnel..."
+  npx --yes localtunnel --port "$PORT" &
+  TUNNEL_PID=$!
+  echo "Open the printed https://*.loca.lt URL (enter the host IP once if asked)."
+fi
 
 echo "Dev + tunnel running. Leave this terminal open."
-echo "Open the printed https://*.loca.lt URL in the Cursor browser."
 wait
