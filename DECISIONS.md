@@ -448,23 +448,23 @@ Remote provides a sandbox OAuth client for this assessment app, or the brief exp
 
 ## 2026-07-24 — Profile avatars + world map org view
 
-**Status:** Accepted  
+**Status:** Accepted (avatars corrected same day)  
 
 **Context:**  
-Remote’s product surfaces people with profile photos. Sandbox employments often omit `profile_picture`. Interviewers also asked for a geographic view of the org alongside Chart and Tree.
+Remote’s product surfaces people with profile photos via `employment.user.profilePicture` on the **employ session/GraphQL API**. The public customer REST employment endpoints (`GET /v1/employments`, `GET /v1/employments/:id`) for this sandbox return `user_id` / `user_status` but **not** `profile_picture` (sampled 176 employments; include/expand rejected).
 
 **Decision:**  
-1. Pass through Remote `profile_picture` when present (https hosts only).  
-2. Otherwise use a stable DiceBear Notionists portrait seeded by employment id (falls back to initials if the image fails).  
-3. Add Org Chart **Map** mode: country pins from employment country codes + cluster detail list.
+1. Pass through Remote photo URLs when the API provides them (`profile_picture` / `profilePicture` / nested `user`, allowlisted HTTPS hosts including `cdn.employ-assets.remote.com`).  
+2. **Do not** invent third-party portraits (no DiceBear). When no photo URL exists, show department-colored initials — the same honest fallback Remote uses without a photo.  
+3. Keep Org Chart **Map** mode for country pins.
 
 **Consequences:**  
-- Avatars feel product-like even without sandbox photos.  
-- Real Remote photos light up automatically when the API returns them.  
+- Avatars match Remote only when the REST payload includes a picture URL.  
+- Sandbox demo people currently render as initials until Remote exposes photos on the customer API (or we gain an authenticated employ-API path).  
 - Map depends on country being set on employments.
 
 **Revisit when:**  
-Remote exposes a first-class employment avatar field on the list endpoint, or we need offline/air-gapped avatar assets.
+Remote documents a customer-API way to read `employment.user.profilePicture`, or interviewers accept a session-based employ API integration.
 
 ---
 
