@@ -10,6 +10,7 @@ export type DirectoryPerson = {
   country?: string | null;
   directReports?: number;
   managerEmploymentId: string | null;
+  managerName?: string | null;
 };
 
 type PeopleDirectoryProps = {
@@ -73,6 +74,9 @@ export function PeopleDirectory({
           </p>
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#9fd5de]">
             {filtered.length} {filtered.length === 1 ? "person" : "people"}
+          </p>
+          <p className="mt-1 text-[11px] text-[#9fd5de]/90">
+            Search and filters live in the side panel.
           </p>
         </div>
         <label className="ml-auto flex items-center gap-2 text-xs text-[#9fd5de]">
@@ -143,6 +147,11 @@ export function PeopleDirectory({
                           .filter(Boolean)
                           .join(" · ") || "—"}
                       </span>
+                      {person.managerName ? (
+                        <span className="mt-1 block truncate text-xs text-norma-ink-muted">
+                          Reports to {person.managerName}
+                        </span>
+                      ) : null}
                       <span className="mt-1 block text-xs text-norma-ink-subtle">
                         {person.directReports ?? 0} direct{" "}
                         {(person.directReports ?? 0) === 1

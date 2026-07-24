@@ -31,17 +31,20 @@ const forest: OrgChartPayloadNode[] = [
     id: "ceo",
     department: "Exec",
     country: "USA",
+    jobTitle: "CEO",
     children: [
       person({
         id: "eng",
         department: "Engineering",
         country: "GBR",
+        jobTitle: "Engineering Manager",
         managerEmploymentId: "ceo",
         children: [
           person({
             id: "ic",
             department: "Engineering",
             country: "GBR",
+            jobTitle: "Software Engineer",
             managerEmploymentId: "eng",
           }),
         ],
@@ -50,6 +53,7 @@ const forest: OrgChartPayloadNode[] = [
         id: "sales",
         department: "Sales",
         country: "USA",
+        jobTitle: "Account Executive",
         managerEmploymentId: "ceo",
       }),
     ],
@@ -58,19 +62,44 @@ const forest: OrgChartPayloadNode[] = [
 
 describe("org filters", () => {
   it("detects active filters", () => {
-    expect(filtersAreActive({ department: null, country: null })).toBe(false);
-    expect(filtersAreActive({ department: "Sales", country: null })).toBe(true);
+    expect(
+      filtersAreActive({ department: null, country: null, jobTitle: null }),
+    ).toBe(false);
+    expect(
+      filtersAreActive({
+        department: "Sales",
+        country: null,
+        jobTitle: null,
+      }),
+    ).toBe(true);
+    expect(
+      filtersAreActive({
+        department: null,
+        country: null,
+        jobTitle: "CEO",
+      }),
+    ).toBe(true);
   });
 
   it("collects sorted options", () => {
     expect(collectFilterOptions(forest)).toEqual({
       departments: ["Engineering", "Exec", "Sales"],
       countries: ["GBR", "USA"],
+      jobTitles: [
+        "Account Executive",
+        "CEO",
+        "Engineering Manager",
+        "Software Engineer",
+      ],
     });
   });
 
   it("keeps matching nodes and ancestors for path continuity", () => {
-    const filters: OrgFilters = { department: "Engineering", country: null };
+    const filters: OrgFilters = {
+      department: "Engineering",
+      country: null,
+      jobTitle: null,
+    };
     const filtered = filterOrgForest(forest, filters);
     expect(filtered).toHaveLength(1);
     expect(filtered[0]!.id).toBe("ceo");
@@ -79,9 +108,22 @@ describe("org filters", () => {
     expect(filtered[0]!.children![0]!.children![0]!.id).toBe("ic");
   });
 
+  it("filters by job title", () => {
+    const filtered = filterOrgForest(forest, {
+      department: null,
+      country: null,
+      jobTitle: "Software Engineer",
+    });
+    expect(filtered[0]!.children![0]!.children![0]!.id).toBe("ic");
+  });
+
   it("returns empty when nothing matches", () => {
     expect(
-      filterOrgForest(forest, { department: "Legal", country: null }),
+      filterOrgForest(forest, {
+        department: "Legal",
+        country: null,
+        jobTitle: null,
+      }),
     ).toEqual([]);
   });
 });

@@ -132,6 +132,17 @@ export function PersonNodeCard({
           {collapsed && collapsedCount > 0 ? ` · ${collapsedCount} hidden` : ""}
         </span>
         <div className="flex items-center gap-1">
+          {variant === "selected" ? (
+            <span
+              className={`rounded-norma-sm px-1.5 py-0.5 text-[10px] font-semibold ${
+                isRoot
+                  ? "bg-[#e85d04] text-[#0b2a32]"
+                  : "bg-norma-accent-soft text-norma-royal"
+              }`}
+            >
+              Profile
+            </span>
+          ) : null}
           {inCycle ? (
             <span className="rounded-norma-sm bg-norma-danger-soft px-1.5 py-0.5 text-[10px] font-medium text-norma-danger">
               Cycle
