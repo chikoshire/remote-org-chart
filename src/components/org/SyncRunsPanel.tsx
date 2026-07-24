@@ -63,109 +63,110 @@ export function SyncRunsPanel({
     void load();
   }, [load, open, refreshToken]);
 
+  if (!open) return null;
+
   return (
-    <div className="pointer-events-auto absolute bottom-14 left-3 z-20 w-[min(100%-1.5rem,18rem)] md:bottom-12">
-      <button
-        type="button"
-        aria-expanded={open}
-        className="rounded-norma-md border border-norma-border bg-norma-surface px-3 py-1.5 text-[11px] font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian"
-        onClick={() => onOpenChange(!open)}
-      >
-        {open ? "Hide sync log" : "Sync log"}
-      </button>
-      {open ? (
-        <div
-          role="region"
-          aria-label="Recent sync runs and webhook events"
-          className="mt-1 max-h-72 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface p-2 shadow-norma-md"
+    <div
+      role="region"
+      aria-label="Recent sync runs and webhook events"
+      className="max-h-72 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface p-2 shadow-norma-sm"
+    >
+      <div className="mb-2 flex items-center justify-between gap-2 px-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+          Sync log
+        </p>
+        <button
+          type="button"
+          className="text-[11px] font-medium text-norma-royal hover:underline"
+          onClick={() => onOpenChange(false)}
         >
-          {status === "loading" ? (
-            <p className="px-1 py-2 text-xs text-norma-ink-muted">Loading…</p>
-          ) : null}
-          {status === "error" ? (
-            <p className="px-1 py-2 text-xs text-norma-danger">
-              Could not load sync history.
-            </p>
-          ) : null}
-
-          <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-            Sync runs
-          </p>
-          {status === "idle" && runs.length === 0 ? (
-            <p className="px-1 py-2 text-xs text-norma-ink-muted">
-              No sync runs yet (local dev has no D1, or none recorded).
-            </p>
-          ) : null}
-          <ul className="space-y-1.5">
-            {runs.map((run) => (
-              <li
-                key={run.id}
-                className="rounded-norma-sm border border-norma-border/70 px-2 py-1.5 text-[11px]"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span
-                    className={
-                      run.ok
-                        ? "font-medium text-norma-prussian"
-                        : "font-medium text-norma-danger"
-                    }
-                  >
-                    {run.ok ? "OK" : "Fail"} · {run.trigger}
-                  </span>
-                  <span className="text-norma-ink-subtle">
-                    {run.employmentCount != null
-                      ? `${run.employmentCount} people`
-                      : "—"}
-                  </span>
-                </div>
-                <p className="mt-0.5 text-norma-ink-muted">
-                  {new Date(run.startedAt).toLocaleString()}
-                </p>
-                {run.errorSummary ? (
-                  <p className="mt-0.5 text-norma-danger">{run.errorSummary}</p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-
-          <p className="mt-3 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-            Webhook events
-          </p>
-          {status === "idle" && events.length === 0 ? (
-            <p className="px-1 py-2 text-xs text-norma-ink-muted">
-              No webhook deliveries yet. Configure{" "}
-              <code className="font-mono">REMOTE_WEBHOOK_SIGNING_KEY</code> and
-              subscribe employment.* events.
-            </p>
-          ) : null}
-          <ul className="space-y-1.5">
-            {events.map((event) => (
-              <li
-                key={event.id}
-                className="rounded-norma-sm border border-norma-border/70 px-2 py-1.5 text-[11px]"
-              >
-                <p className="font-medium text-norma-prussian">
-                  {event.eventType}
-                  {event.duplicate ? " · duplicate" : ""}
-                </p>
-                <p className="mt-0.5 text-norma-ink-muted">
-                  {new Date(event.receivedAt).toLocaleString()}
-                </p>
-                {event.payloadSummary ? (
-                  <p className="mt-0.5 text-norma-ink-subtle">
-                    {event.payloadSummary}
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-
-          <p className="mt-2 border-t border-norma-border/70 px-1 pt-2 text-[10px] text-norma-ink-subtle">
-            Counts / event types only — no emails. Storage: D1 (see
-            DECISIONS.md).
-          </p>
-        </div>
+          Close
+        </button>
+      </div>
+      {status === "loading" ? (
+        <p className="px-1 py-2 text-xs text-norma-ink-muted">Loading…</p>
       ) : null}
+      {status === "error" ? (
+        <p className="px-1 py-2 text-xs text-norma-danger">
+          Could not load sync history.
+        </p>
+      ) : null}
+
+      <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+        Sync runs
+      </p>
+      {status === "idle" && runs.length === 0 ? (
+        <p className="px-1 py-2 text-xs text-norma-ink-muted">
+          No sync runs yet (local dev has no D1, or none recorded).
+        </p>
+      ) : null}
+      <ul className="space-y-1.5">
+        {runs.map((run) => (
+          <li
+            key={run.id}
+            className="rounded-norma-sm border border-norma-border/70 px-2 py-1.5 text-[11px]"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className={
+                  run.ok
+                    ? "font-medium text-norma-prussian"
+                    : "font-medium text-norma-danger"
+                }
+              >
+                {run.ok ? "OK" : "Fail"} · {run.trigger}
+              </span>
+              <span className="text-norma-ink-subtle">
+                {run.employmentCount != null
+                  ? `${run.employmentCount} people`
+                  : "—"}
+              </span>
+            </div>
+            <p className="mt-0.5 text-norma-ink-muted">
+              {new Date(run.startedAt).toLocaleString()}
+            </p>
+            {run.errorSummary ? (
+              <p className="mt-0.5 text-norma-danger">{run.errorSummary}</p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-3 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+        Webhook events
+      </p>
+      {status === "idle" && events.length === 0 ? (
+        <p className="px-1 py-2 text-xs text-norma-ink-muted">
+          No webhook deliveries yet. Configure{" "}
+          <code className="font-mono">REMOTE_WEBHOOK_SIGNING_KEY</code> and
+          subscribe employment.* events.
+        </p>
+      ) : null}
+      <ul className="space-y-1.5">
+        {events.map((event) => (
+          <li
+            key={event.id}
+            className="rounded-norma-sm border border-norma-border/70 px-2 py-1.5 text-[11px]"
+          >
+            <p className="font-medium text-norma-prussian">
+              {event.eventType}
+              {event.duplicate ? " · duplicate" : ""}
+            </p>
+            <p className="mt-0.5 text-norma-ink-muted">
+              {new Date(event.receivedAt).toLocaleString()}
+            </p>
+            {event.payloadSummary ? (
+              <p className="mt-0.5 text-norma-ink-subtle">
+                {event.payloadSummary}
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-2 border-t border-norma-border/70 px-1 pt-2 text-[10px] text-norma-ink-subtle">
+        Counts / event types only — no emails. Storage: D1.
+      </p>
     </div>
   );
 }

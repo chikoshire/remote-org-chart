@@ -29,21 +29,24 @@ test.describe("org chart smoke", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Welcome" }),
-    ).toBeVisible();
-    await expect(
       page.getByRole("link", { name: "Settings" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+        name: "Welcome",
+      }),
+    ).toHaveCount(0);
     await expect(page.locator("#org-chart")).toBeVisible();
     await expect(page.getByRole("button", { name: "Chart" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Directory" })).toBeVisible();
   });
 
-  test("settings route loads preferences", async ({ page }) => {
+  test("settings route loads preferences and integrations", async ({ page }) => {
     await page.goto("/settings");
     await expect(
       page.getByRole("heading", { name: "Settings", exact: true }),
     ).toBeVisible();
+    await expect(page.getByText("Integrations")).toBeVisible();
     await expect(page.getByText("About this data")).toBeVisible();
     await expect(page.getByRole("button", { name: "Save preferences" })).toBeVisible();
   });
