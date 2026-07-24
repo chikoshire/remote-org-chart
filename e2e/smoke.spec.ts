@@ -47,6 +47,11 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
     await page.getByRole("option").filter({ hasText: "Jordan Report" }).click();
     await expect(page.getByText(/path highlighted/i)).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Jordan Report" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Path to root" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Direct reports" })).toBeVisible();
+    await page.getByRole("button", { name: "Close person details" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
   test("shows empty state when API returns no people", async ({ page }) => {
