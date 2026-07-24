@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
+import { CommandBar } from "@/components/shell/CommandBar";
 
 type ProductShellProps = {
   children: ReactNode;
@@ -80,6 +81,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           })}
         </nav>
         <div className="flex shrink-0 items-center gap-1">
+          <CommandBar />
           <button
             type="button"
             onClick={() => void logout()}
