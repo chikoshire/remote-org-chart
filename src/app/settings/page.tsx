@@ -107,8 +107,8 @@ export default function SettingsPage() {
 
             <div className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-norma-surface to-norma-surface-muted/60 px-4 py-4">
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-norma-md bg-white shadow-norma-sm ring-1 ring-norma-border/80">
-                  <RemoteMark className="h-6 w-auto" />
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-norma-md bg-white p-2 shadow-norma-sm ring-1 ring-norma-border/80">
+                  <RemoteMark className="h-7 w-auto" />
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-norma-ink">

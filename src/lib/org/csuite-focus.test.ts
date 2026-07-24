@@ -23,8 +23,12 @@ function node(
 }
 
 describe("cSuiteFocusNodeIds", () => {
-  it("prefers roots then direct reports up to the cap", () => {
+  it("focuses the largest root tree, not every root across the forest", () => {
     const roots = [
+      node({
+        id: "small",
+        children: [node({ id: "a", managerEmploymentId: "small" })],
+      }),
       node({
         id: "ceo",
         children: [

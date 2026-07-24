@@ -754,17 +754,19 @@ function OrgChartInner() {
       return;
     }
     initialFitDone.current = true;
-    const focusIds = new Set(cSuiteFocusNodeIds(forestRoots, 8));
+    const focusIds = new Set(cSuiteFocusNodeIds(forestRoots, 9));
     const focusNodes = nodes
       .filter((n) => focusIds.has(n.id))
       .map((n) => ({ id: n.id }));
     requestAnimationFrame(() => {
-      void fitView({
-        nodes: focusNodes.length > 0 ? focusNodes : undefined,
-        padding: 0.42,
-        maxZoom: 0.92,
-        minZoom: 0.4,
-        duration: reducedMotion ? 0 : 420,
+      requestAnimationFrame(() => {
+        void fitView({
+          nodes: focusNodes.length > 0 ? focusNodes : undefined,
+          padding: 0.3,
+          maxZoom: 1.1,
+          minZoom: 0.55,
+          duration: reducedMotion ? 0 : 420,
+        });
       });
     });
   }, [fitView, forestRoots, nodes, reducedMotion, status]);
