@@ -337,6 +337,28 @@ Interview feedback asks for image export as a headline feature — then re-expos
 
 ---
 
+## 2026-07-24 — Markel chrome: solid nav, editorial washes, Acme mark
+
+**Status:** Accepted  
+
+**Context:**  
+Gradient washes in the top nav read wrong against Markel/Neuro references. Welcome as a primary tab confused the IA (it is bonus GH#33, not core). Chart stage still didn’t fill the viewport; Tools panels floated over React Flow.
+
+**Decision:**  
+- **Nav:** solid charcoal (`#1a1a1a`), no gradient overlay; **Acme** ascending-bars mark + wordmark; primary link = Org only; **Settings** as far-right icon.  
+- **Gradients:** editorial background washes on page canvas only.  
+- **Layout:** `h-dvh` shell so chart fills the viewport; hideable side panel (persisted); Insights / Sync / Webhooks dock **inside** the side panel — never as floating buttons on the stage.  
+- **Settings:** Integrations section documents Remote connection + “Add integration” placeholder for production-shaped IA.  
+- `/welcome` stays as optional marketing URL, not primary nav.
+
+**Consequences:**  
+Interviewers land on `/app` for the brief deliverable; marketing link can stay in README.
+
+**Revisit when:**  
+Design system expands beyond Acme assessment chrome.
+
+---
+
 ## Template for future entries
 
 
