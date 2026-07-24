@@ -36,6 +36,8 @@ import {
   writeStoredDensity,
   type ChartDensity,
 } from "@/lib/org/collapse";
+import { computeOrgInsights } from "@/lib/org/insights";
+import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -200,6 +202,7 @@ function OrgChartInner() {
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const [insightsOpen, setInsightsOpen] = useState(false);
   const [baseNodes, setBaseNodes] = useState<Node<PersonNodeData>[]>([]);
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
@@ -383,6 +386,12 @@ function OrgChartInner() {
       );
     return { person, pathToRoot, reports };
   }, [baseNodes, peopleIndex, selectedId]);
+
+  const insights = useMemo(
+    () =>
+      computeOrgInsights(applyCollapseToForest(forestRoots, collapsedIds)),
+    [collapsedIds, forestRoots],
+  );
 
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
@@ -582,6 +591,13 @@ function OrgChartInner() {
           reports={selectedDetail.reports}
           onClose={() => setSelectedId(null)}
           onSelectPerson={focusPerson}
+        />
+      ) : null}
+      {!selectedDetail ? (
+        <OrgInsightsPanel
+          insights={insights}
+          open={insightsOpen}
+          onOpenChange={setInsightsOpen}
         />
       ) : null}
     </div>
