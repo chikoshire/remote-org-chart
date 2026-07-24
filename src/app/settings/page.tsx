@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProductShell } from "@/components/shell/ProductShell";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
+import { SettingsSubnav } from "@/components/settings/SettingsSubnav";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
   readAppPrefs,
@@ -85,16 +86,19 @@ export default function SettingsPage() {
   return (
     <ProductShell status={<span>Settings</span>}>
       <div className="relative min-h-0 flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-xl px-4 py-8 md:px-6 md:py-10">
+        <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-8 md:py-8">
+          <div className="mb-5">
+            <SettingsSubnav />
+          </div>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
                 Acme
               </p>
               <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian">
-                Settings
+                Preferences
               </h1>
-              <p className="mt-2 max-w-md text-sm text-norma-ink-muted">
+              <p className="mt-2 max-w-xl text-sm text-norma-ink-muted">
                 Manage how Acme connects to Remote and how the org chart looks
                 for you.
               </p>
