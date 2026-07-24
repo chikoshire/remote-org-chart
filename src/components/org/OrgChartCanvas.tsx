@@ -35,6 +35,7 @@ import {
   readStoredDensity,
   type ChartDensity,
 } from "@/lib/org/collapse";
+import { cSuiteFocusNodeIds } from "@/lib/org/csuite-focus";
 import {
   collectFilterOptions,
   EMPTY_ORG_FILTERS,
@@ -232,21 +233,6 @@ function applySelection(
   };
 }
 
-
-function collapseManagersBeyondDepthOne(
-  roots: OrgChartPayloadNode[],
-): Set<string> {
-  const collapsed = new Set<string>();
-  const walk = (node: OrgChartPayloadNode, depth: number) => {
-    const kids = node.children ?? [];
-    if (depth >= 1 && kids.length > 0) collapsed.add(node.id);
-    for (const child of kids) walk(child, depth + 1);
-  };
-  for (const root of roots) {
-    for (const child of root.children ?? []) walk(child, 1);
-  }
-  return collapsed;
-}
 
 function OrgChartInner() {
   const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
@@ -450,7 +436,8 @@ function OrgChartInner() {
       setStatus("ready");
       writeSessionOrgPayload(body);
       if (!isRefresh && !silent) {
-        setCollapsedIds(collapseManagersBeyondDepthOne(body.roots));
+        // Default: full tree expanded; people can collapse branches themselves.
+        setCollapsedIds(new Set());
         initialFitDone.current = false;
       }
       if (isRefresh) setSyncLogToken((n) => n + 1);
@@ -509,7 +496,7 @@ function OrgChartInner() {
       setLastSyncedAt(session.lastSyncedAt ?? null);
       setFromCache(true);
       hasReadyData.current = true;
-      setCollapsedIds(collapseManagersBeyondDepthOne(session.roots));
+      setCollapsedIds(new Set());
       initialFitDone.current = false;
       setStatus("ready");
       void load({ silent: true });
@@ -767,15 +754,20 @@ function OrgChartInner() {
       return;
     }
     initialFitDone.current = true;
+    const focusIds = new Set(cSuiteFocusNodeIds(forestRoots, 8));
+    const focusNodes = nodes
+      .filter((n) => focusIds.has(n.id))
+      .map((n) => ({ id: n.id }));
     requestAnimationFrame(() => {
       void fitView({
-        padding: 0.28,
-        maxZoom: 1.25,
-        minZoom: 0.5,
-        duration: reducedMotion ? 0 : 380,
+        nodes: focusNodes.length > 0 ? focusNodes : undefined,
+        padding: 0.42,
+        maxZoom: 0.92,
+        minZoom: 0.4,
+        duration: reducedMotion ? 0 : 420,
       });
     });
-  }, [fitView, nodes.length, reducedMotion, status]);
+  }, [fitView, forestRoots, nodes, reducedMotion, status]);
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;

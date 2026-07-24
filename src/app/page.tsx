@@ -184,7 +184,7 @@ export default function MarketingHomePage() {
           <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-5 py-20 md:flex-row md:items-end md:justify-between md:px-8 md:py-28">
             <MarketingReveal className="max-w-2xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-norma-border/80 bg-white/70 px-3 py-1.5 shadow-norma-sm backdrop-blur">
-                <RemoteMark className="h-4 w-4" />
+                <RemoteMark className="h-5 w-auto" />
                 <span className="text-xs font-medium text-norma-ink-muted">
                   Powered by Remote
                 </span>

@@ -23,8 +23,18 @@ describe("settings density preview + Remote mark", () => {
     expect(preview).toContain("PersonNodeCard");
     expect(preview).toContain("density={density}");
     expect(mark).toContain("/brand/remote-mark.svg");
+    expect(mark).toContain("Official Remote mark");
     expect(
       existsSync(join(process.cwd(), "public/brand/remote-mark.svg")),
     ).toBe(true);
+    expect(
+      existsSync(join(process.cwd(), "public/brand/remote-logo.svg")),
+    ).toBe(true);
+    const markSvg = readFileSync(
+      join(process.cwd(), "public/brand/remote-mark.svg"),
+      "utf8",
+    );
+    expect(markSvg).toContain("#141415");
+    expect(markSvg).not.toContain("9767FF");
   });
 });
