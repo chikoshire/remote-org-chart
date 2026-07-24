@@ -1411,7 +1411,7 @@ function OrgChartInner() {
               className="h-full w-full bg-transparent"
               aria-label="Interactive organization chart. Scroll to zoom, drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
             >
-              <Background color="#d5e0dd" gap={isMobile ? 18 : 24} size={1.1} />
+              <Background color="#d7e0e3" gap={isMobile ? 18 : 24} size={1.1} />
               <Controls
                 showInteractive={false}
                 position={isMobile ? "bottom-right" : "bottom-left"}

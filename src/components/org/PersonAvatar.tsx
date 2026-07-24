@@ -50,8 +50,7 @@ function InitialsAvatar({
 
 /**
  * Circular profile avatar.
- * Uses Remote profile photo URLs only; otherwise department-colored initials
- * (same pattern Remote shows when no photo is on file).
+ * Uses Remote profile photo URLs only; otherwise muted Prussian-family initials.
  */
 export function PersonAvatar({
   personId: _personId,
