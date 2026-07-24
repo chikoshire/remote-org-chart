@@ -1021,7 +1021,7 @@ function OrgChartInner() {
       className={`flex h-full min-h-0 w-full flex-1 flex-col md:flex-row ${reducedMotion ? "" : "org-chart-enter"}`}
     >
       {sidePanelOpen ? (
-        <aside className="flex w-full shrink-0 flex-col border-b border-norma-border bg-norma-surface md:h-full md:w-80 md:border-b-0 md:border-r">
+        <aside className="flex w-full shrink-0 flex-col border-b border-norma-border bg-norma-surface md:h-full md:w-96 md:border-b-0 md:border-r">
           <div className="flex items-center justify-between gap-2 border-b border-norma-border px-3 py-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               Workspace
