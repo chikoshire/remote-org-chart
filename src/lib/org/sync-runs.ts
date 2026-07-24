@@ -30,6 +30,8 @@ type D1Like = {
   };
 };
 
+export type { D1Like };
+
 /** Strip anything that looks like a bearer/token fragment from error text. */
 export function sanitizeSyncError(message: string | null | undefined): string | null {
   if (!message?.trim()) return null;

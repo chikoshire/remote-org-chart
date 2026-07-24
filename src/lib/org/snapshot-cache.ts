@@ -22,12 +22,17 @@ export type OrgChartCachePayload = {
 
 type KvLike = {
   get(key: string, type: "json"): Promise<OrgChartCachePayload | null>;
+  get(key: string, type: "text"): Promise<string | null>;
   put(
     key: string,
     value: string,
     options?: { expirationTtl?: number },
   ): Promise<void>;
+  delete(key: string): Promise<void>;
 };
+
+/** Bumped when the snapshot is invalidated so SSE clients can refetch. */
+export const ORG_CHART_NOTIFY_KEY = "org-chart:v1:notify";
 
 export function getOrgChartKv(): KvLike | null {
   try {
@@ -65,6 +70,32 @@ export async function writeOrgChartSnapshot(
     await kv.put(ORG_CHART_CACHE_KEY, JSON.stringify(snapshot), {
       expirationTtl: ORG_CHART_CACHE_TTL_SECONDS,
     });
+    await kv.put(ORG_CHART_NOTIFY_KEY, snapshot.lastSyncedAt, {
+      expirationTtl: ORG_CHART_CACHE_TTL_SECONDS,
+    });
   }
   return snapshot;
+}
+
+export async function invalidateOrgChartSnapshot(
+  kv: KvLike | null = getOrgChartKv(),
+): Promise<string | null> {
+  if (!kv) return null;
+  await kv.delete(ORG_CHART_CACHE_KEY);
+  const at = new Date().toISOString();
+  await kv.put(ORG_CHART_NOTIFY_KEY, at, {
+    expirationTtl: ORG_CHART_CACHE_TTL_SECONDS,
+  });
+  return at;
+}
+
+export async function readOrgChartNotifyAt(
+  kv: KvLike | null = getOrgChartKv(),
+): Promise<string | null> {
+  if (!kv) return null;
+  try {
+    return await kv.get(ORG_CHART_NOTIFY_KEY, "text");
+  } catch {
+    return null;
+  }
 }
