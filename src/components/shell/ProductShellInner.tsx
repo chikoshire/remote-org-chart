@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 
 type ProductShellProps = {
@@ -10,8 +10,28 @@ type ProductShellProps = {
   status?: ReactNode;
 };
 
+const PRIMARY_NAV = [
+  { href: "/app/dashboard", label: "Dashboard", match: (p: string) => p === "/app/dashboard" },
+  {
+    href: "/app",
+    label: "Org Chart",
+    match: (p: string) => p === "/app" || p === "/",
+  },
+  { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
+  {
+    href: "/app/departments",
+    label: "Departments",
+    match: (p: string) => p.startsWith("/app/departments"),
+  },
+  {
+    href: "/app/data-health",
+    label: "Data Health",
+    match: (p: string) => p.startsWith("/app/data-health"),
+  },
+] as const;
+
 function navClass(active: boolean) {
-  return `rounded-norma-sm px-3 py-1.5 text-sm font-medium transition ${
+  return `whitespace-nowrap rounded-norma-sm px-2.5 py-1.5 text-sm font-medium transition md:px-3 ${
     active
       ? "bg-norma-accent-soft text-norma-prussian"
       : "text-norma-ink-muted hover:bg-white/70 hover:text-norma-prussian"
@@ -20,44 +40,37 @@ function navClass(active: boolean) {
 
 export function ProductShellInner({ children, status }: ProductShellProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const view = searchParams.get("view");
-  const orgActive =
-    (pathname === "/app" || pathname === "/") && view !== "directory";
-  const peopleActive =
-    (pathname === "/app" || pathname === "/") && view === "directory";
   const settingsActive = pathname === "/settings";
 
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-norma-canvas">
-      <a href="#org-chart" className="skip-link">
-        Skip to organization chart
+      <a href="#main-content" className="skip-link">
+        Skip to main content
       </a>
       <header
         role="banner"
-        className="flex h-12 shrink-0 items-center gap-6 border-b border-norma-border bg-white px-4 text-norma-prussian md:h-14 md:px-6"
+        className="flex h-12 shrink-0 items-center gap-3 border-b border-norma-border bg-white px-3 text-norma-prussian md:h-14 md:gap-6 md:px-6"
       >
-        <Link href="/app" className="flex min-w-0 items-center">
+        <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo withWordmark />
         </Link>
         <nav
-          className="flex min-w-0 flex-1 items-center gap-1"
+          className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto md:gap-1"
           aria-label="Primary"
         >
-          <Link
-            href="/app"
-            className={navClass(orgActive)}
-            aria-current={orgActive ? "page" : undefined}
-          >
-            Org chart
-          </Link>
-          <Link
-            href="/app?view=directory"
-            className={navClass(peopleActive)}
-            aria-current={peopleActive ? "page" : undefined}
-          >
-            People
-          </Link>
+          {PRIMARY_NAV.map((item) => {
+            const active = item.match(pathname);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={navClass(active)}
+                aria-current={active ? "page" : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         <Link
           href="/settings"
