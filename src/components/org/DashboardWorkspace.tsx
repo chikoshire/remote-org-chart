@@ -346,8 +346,8 @@ export function DashboardWorkspace() {
             label="Data completeness"
             value={`${insights.completenessScore}%`}
             hint="Share of people with title, department, and country"
-            href="/settings/data-health"
-            hrefLabel="Fix incomplete profiles"
+            href="/app/people?incomplete=1"
+            hrefLabel="Browse incomplete"
             onNavigate={navigate}
           />
         </div>
@@ -377,8 +377,8 @@ export function DashboardWorkspace() {
             label="Incomplete profiles"
             value={String(insights.incompleteCount)}
             hint="Missing title, department, or country"
-            href="/settings/data-health"
-            hrefLabel="Open incomplete list"
+            href="/app/people?incomplete=1"
+            hrefLabel="Browse incomplete"
             onNavigate={navigate}
           />
         </div>
