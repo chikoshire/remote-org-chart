@@ -54,15 +54,25 @@ function HealthSection({
         ? "bg-amber-100 text-amber-900"
         : "bg-norma-surface-muted text-norma-prussian";
 
+  const toneDot =
+    tone === "danger"
+      ? "bg-norma-danger"
+      : tone === "warn"
+        ? "bg-amber-500"
+        : "bg-norma-spray";
+
   return (
-    <section className="flex h-full flex-col rounded-norma-lg border border-norma-border bg-white p-5 shadow-norma-sm md:p-6">
+    <section className="flex h-full flex-col rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold text-norma-prussian">{title}</h2>
+          <h2 className="flex items-center gap-2 text-base font-semibold text-norma-prussian">
+            <span className={`h-2 w-2 shrink-0 rounded-full ${toneDot}`} aria-hidden />
+            {title}
+          </h2>
           <p className="mt-1 text-sm text-norma-ink-muted">{description}</p>
         </div>
         <span
-          className={`rounded-norma-sm px-2.5 py-1 text-xs font-semibold ${countClass}`}
+          className={`rounded-norma-sm px-2.5 py-1 text-xs font-semibold tabular-nums ${countClass}`}
         >
           {people.length}
         </span>
@@ -76,7 +86,7 @@ function HealthSection({
             const href = `/app${withPersonSearchParam("", person.id)}`;
             return (
               <li key={person.id}>
-                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/40 px-3.5 py-3.5">
+                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-gradient-to-br from-white to-norma-surface-muted/50 px-3.5 py-3.5">
                   <PersonAvatar
                     personId={person.id}
                     fullName={person.fullName}
@@ -89,16 +99,16 @@ function HealthSection({
                       {name}
                     </p>
                     <p className="truncate text-xs text-norma-ink-muted">
-                      {person.jobTitle?.trim() || "Not set"}
+                      {person.jobTitle?.trim() || "Title not set"}
                       {person.department?.trim()
                         ? ` · ${person.department.trim()}`
-                        : " · Dept not set"}
+                        : ""}
                     </p>
                     <Link
                       href={href}
-                      className="mt-1 inline-block text-xs font-semibold text-norma-royal hover:underline"
+                      className="mt-1 inline-block text-xs font-semibold text-[#e85d04] hover:underline"
                     >
-                      Open in chart
+                      Chart
                     </Link>
                   </div>
                 </div>
@@ -220,57 +230,48 @@ export function DataHealthWorkspace() {
 
   return (
     <ProductPageFrame>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="max-w-2xl">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
-              Trust the org data
-            </p>
-            <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
-              Data Health
-            </h1>
-            <p className="mt-3 text-sm leading-relaxed text-norma-ink-muted">
-              Spot cycles, missing managers, and incomplete profiles so teams can
-              trust the org chart. Jump into the chart to fix each person in
-              Remote.
-            </p>
-          </div>
+        <div>
+          <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+            Data Health
+          </h1>
+          <p className="mt-1 text-sm text-norma-ink-muted">
+            Cycles, missing managers, and thin profiles · synced {syncedLabel}
+          </p>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-gradient-to-br from-white to-[#fff4ec] px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               People
             </p>
-            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
+            <p className="mt-2 font-[family-name:var(--font-norma-display)] text-3xl font-semibold tabular-nums text-norma-prussian">
               {report.headcount}
             </p>
           </div>
-          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-norma-surface/95 px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-              Leadership roots
+              Roots
             </p>
-            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
+            <p className="mt-2 font-[family-name:var(--font-norma-display)] text-3xl font-semibold tabular-nums text-norma-prussian">
               {report.rootCount}
             </p>
             {report.multiRoot ? (
-              <p className="mt-1 text-xs text-amber-900">
-                More than one top of tree
-              </p>
+              <p className="mt-1 text-xs text-amber-900">Multiple tops of tree</p>
             ) : null}
           </div>
-          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-norma-surface/95 px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-              Issues flagged
+              Issues
             </p>
-            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
+            <p className="mt-2 font-[family-name:var(--font-norma-display)] text-3xl font-semibold tabular-nums text-norma-prussian">
               {report.inCycle.length +
                 report.managerMissing.length +
                 report.incompleteFields.length}
             </p>
           </div>
-          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-norma-surface/95 px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
-              Last sync
+              Sync
             </p>
             <p className="mt-2 text-sm font-semibold leading-snug text-norma-prussian">
               {syncedLabel}
@@ -278,31 +279,31 @@ export function DataHealthWorkspace() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2">
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <HealthSection
             title="Reporting cycles"
-            description="These people sit on a looped reporting chain."
+            description="Looped reporting chains"
             people={report.inCycle}
             empty="No reporting cycles detected."
             tone="danger"
           />
           <HealthSection
             title="Manager missing"
-            description="Manager id is set in Remote but that person is not in the active set."
+            description="Manager id set but person not in the active set"
             people={report.managerMissing}
             empty="Every manager link resolves."
             tone="warn"
           />
           <HealthSection
             title="No manager on file"
-            description="People at the top of a reporting line (including intentional leaders)."
+            description="Top of a reporting line (including intentional leaders)"
             people={report.noManagerOnFile}
             empty="No top-of-tree people found."
             tone="neutral"
           />
           <HealthSection
             title="Incomplete profiles"
-            description="Missing job title, department, or country."
+            description="Missing title, department, or country"
             people={report.incompleteFields}
             empty="Every profile has title, department, and country."
             tone="neutral"
