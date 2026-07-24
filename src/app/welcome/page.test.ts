@@ -17,8 +17,13 @@ describe("marketing + welcome", () => {
   });
 
   it("marketing home is brand-forward with Log in", () => {
+    const hero = readFileSync(
+      join(process.cwd(), "src/components/marketing/MarketingHero.tsx"),
+      "utf8",
+    );
     expect(marketing).toContain("AcmeLogo");
-    expect(marketing).toContain("See how Acme is organised");
+    expect(marketing).toContain("MarketingHero");
+    expect(hero).toContain("See how Acme is organised");
     expect(marketing).toContain('href="/login"');
     expect(marketing).toContain("Log in");
   });
