@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { RemoteApiError } from "@/lib/remote/client";
-import { fetchEmploymentsForOrgChart } from "@/lib/remote/employments";
+import { getRemoteEnv } from "@/lib/remote/env";
+import {
+  ENRICH_DETAIL_CONCURRENCY,
+  fetchEmploymentsForOrgChart,
+} from "@/lib/remote/employments";
 
 export const runtime = "nodejs";
 
@@ -13,10 +17,15 @@ export async function GET(request: Request) {
   const sample = url.searchParams.get("sample") === "1";
 
   try {
+    const env = getRemoteEnv();
     const records = await fetchEmploymentsForOrgChart({
       statusPolicy: "active_only",
       pageSize: 100,
-      detailConcurrency: 10,
+      detailConcurrency: ENRICH_DETAIL_CONCURRENCY,
+      fanOut: {
+        origin: new URL(request.url).origin,
+        secret: env.REMOTE_API_TOKEN,
+      },
     });
 
     const withManager = records.filter((r) => r.managerEmploymentId).length;
