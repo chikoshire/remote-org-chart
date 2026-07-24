@@ -24,6 +24,8 @@ export function PersonNode({ data, selected, id }: NodeProps) {
         country={person.country ?? null}
         directReports={person.directReports ?? 0}
         inCycle={Boolean(person.inCycle)}
+        managerMissing={Boolean(person.managerMissing)}
+        incompleteFields={Boolean(person.incompleteFields)}
         variant={variant}
         density={person.density}
         collapsed={person.collapsed}

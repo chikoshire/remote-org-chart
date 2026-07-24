@@ -129,6 +129,9 @@ function toDetail(
     directReports: nodeData?.directReports ?? flat?.directReports ?? 0,
     inCycle: nodeData?.inCycle ?? flat?.inCycle ?? false,
     isRoot: !flat?.managerEmploymentId,
+    managerMissing: Boolean(
+      flat?.managerEmploymentId && !byId.has(flat.managerEmploymentId),
+    ),
   };
 }
 
