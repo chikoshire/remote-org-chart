@@ -9,6 +9,7 @@ import {
   ChartLoadingState,
   RetryButton,
 } from "@/components/org/ChartStateSurfaces";
+import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import {
   computeDashboardInsights,
   type DashboardPerson,
@@ -220,21 +221,21 @@ export function DashboardWorkspace() {
       items.push({
         label: "Manager missing",
         count: insights.managerMissingCount,
-        href: "/settings/data-health",
+        href: "/app/data-health",
       });
     }
     if (insights.incompleteCount > 0) {
       items.push({
         label: "Incomplete profiles",
         count: insights.incompleteCount,
-        href: "/settings/data-health",
+        href: "/app/data-health",
       });
     }
     if (insights.cycleMemberCount > 0) {
       items.push({
         label: "Reporting cycle",
         count: insights.cycleMemberCount,
-        href: "/settings/data-health",
+        href: "/app/data-health",
       });
     }
     if (insights.rootCount > 1) {
@@ -270,8 +271,7 @@ export function DashboardWorkspace() {
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto">
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 md:px-6 md:py-10">
+    <ProductPageFrame>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
@@ -287,28 +287,6 @@ export function DashboardWorkspace() {
             <p className="mt-2 text-xs text-norma-ink-subtle">
               Last updated {syncedLabel}
             </p>
-          </div>
-          <div
-            className="flex flex-wrap gap-2"
-            aria-label="Quick links"
-          >
-            {[
-              { href: "/app", label: "Org Chart" },
-              { href: "/app/people", label: "People" },
-              { href: "/settings/data-health", label: "Data Health" },
-            ].map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-royal"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate(link.href);
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
           </div>
         </div>
 
@@ -369,7 +347,7 @@ export function DashboardWorkspace() {
             label="Manager missing"
             value={String(insights.managerMissingCount)}
             hint="Manager id set but not in the active set"
-            href="/settings/data-health"
+            href="/app/data-health"
             hrefLabel="Review Data Health"
             onNavigate={navigate}
           />
@@ -448,11 +426,11 @@ export function DashboardWorkspace() {
                 Needs attention
               </h2>
               <Link
-                href="/settings/data-health"
+                href="/app/data-health"
                 className="text-xs font-semibold text-norma-royal hover:underline"
                 onClick={(event) => {
                   event.preventDefault();
-                  navigate("/settings/data-health");
+                  navigate("/app/data-health");
                 }}
               >
                 Data Health
@@ -485,7 +463,6 @@ export function DashboardWorkspace() {
             )}
           </section>
         </div>
-      </div>
-    </div>
+    </ProductPageFrame>
   );
 }
