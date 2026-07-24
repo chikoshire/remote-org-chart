@@ -183,12 +183,25 @@ export function CommandBar() {
       <button
         type="button"
         onClick={openPalette}
-        className="hidden rounded-norma-sm border border-norma-border bg-norma-surface-muted px-2.5 py-1.5 text-xs font-medium text-norma-ink-muted hover:text-norma-prussian md:inline-flex"
+        className="hidden min-w-[14rem] items-center gap-3 rounded-norma-md border border-norma-border bg-norma-surface-muted px-3 py-2 text-left text-sm text-norma-ink-muted hover:border-norma-royal hover:text-norma-prussian md:inline-flex lg:min-w-[18rem]"
         aria-label="Open command bar"
         title="Search (⌘K)"
       >
-        Search
-        <kbd className="ml-2 font-mono text-[10px] text-norma-ink-subtle">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="h-4 w-4 shrink-0 opacity-70"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <span className="min-w-0 flex-1 truncate">Search people or pages…</span>
+        <kbd className="shrink-0 rounded border border-norma-border bg-norma-surface px-1.5 py-0.5 font-mono text-[10px] text-norma-ink-subtle">
           ⌘K
         </kbd>
       </button>
@@ -203,7 +216,7 @@ export function CommandBar() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="w-full max-w-lg overflow-hidden rounded-norma-lg border border-norma-border bg-norma-surface shadow-norma-md"
+            className="w-full max-w-2xl overflow-hidden rounded-norma-lg border border-norma-border bg-norma-surface shadow-norma-md"
           >
             <h2 id={titleId} className="sr-only">
               Command bar
