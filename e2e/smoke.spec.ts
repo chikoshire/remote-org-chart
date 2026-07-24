@@ -17,9 +17,12 @@ async function mockOrgChart(page: Page, body: unknown, status = 200) {
 }
 
 async function loginAsDemo(page: Page) {
+  const email = process.env.DEMO_APP_EMAIL ?? "demo@acme.example";
+  const password =
+    process.env.DEMO_APP_PASSWORD ?? "local-dev-only-set-DEMO_APP_PASSWORD";
   await page.goto("/login");
-  await page.getByLabel("Email").fill("demo@acme.example");
-  await page.getByLabel("Password").fill("<scrubbed-old-demo-password>");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Log in" }).click();
   await expect(page).toHaveURL(/\/app/);
 }

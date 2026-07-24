@@ -1004,6 +1004,30 @@ Interview feedback prefers denser chrome, or Remote brand cues need a stronger p
 
 ---
 
+## 2026-07-25 — Demo credentials scrub + rotate + pre-commit gate
+
+**Status:** Accepted  
+
+**Context:**  
+Demo password had lived in README / handoff / e2e scripts / `session.ts` defaults while the repo was briefly public. HEAD scrub alone is not enough for history; production Wrangler also had no `DEMO_APP_*` secrets and fell back to source defaults.
+
+**Decision:**  
+1. Keep the GitHub repo **private**. No history rewrite unless explicitly requested.  
+2. Remove the published password from source; local/CI use a non-production fallback string; interviewer password lives only in Wrangler secrets + private Downloads handoff + `.env.local`.  
+3. E2E / browser smoke read `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` from env.  
+4. Add `scripts/check-secrets.sh` (pre-commit via `prepare` + CI) to block the previously published demo password and long `ra_test_` / `ra_live_` tokens from re-entering the tree.  
+5. Rotate `DEMO_APP_PASSWORD` and set `APP_SESSION_SECRET` on Wrangler.
+
+**Consequences:**  
+- Live login uses the rotated secret after deploy.  
+- Contributors must run with `.env.local` or accept the local-dev fallback (not the interviewer password).  
+- History may still contain the old password until a consented rewrite; private + rotate mitigates.
+
+**Revisit when:**  
+Making the repo public, or interviewers report login failure after rotate.
+
+---
+
 ## Template for future entries
 
 

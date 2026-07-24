@@ -38,6 +38,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local secrets / one-off notes (never commit)
+.local/
+
 # vercel
 .vercel
 
@@ -56,3 +59,5 @@ cloudflare-env.d.ts
 
 # local Cursor hook state
 .cursor/
+
+.local/

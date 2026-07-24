@@ -6,6 +6,9 @@ import { chromium } from "playwright";
 import { existsSync } from "node:fs";
 
 const BASE = process.env.SMOKE_BASE_URL ?? "http://localhost:3000";
+const DEMO_EMAIL = process.env.DEMO_APP_EMAIL ?? "demo@acme.example";
+const DEMO_PASSWORD =
+  process.env.DEMO_APP_PASSWORD ?? "local-dev-only-set-DEMO_APP_PASSWORD";
 const CHROME =
   process.env.PLAYWRIGHT_CHROME ??
   "/Users/chikoshire/Library/Caches/ms-playwright/chromium-1228/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing";
@@ -43,8 +46,8 @@ async function main() {
   try {
     // --- Login ---
     await page.goto(`${BASE}/login`);
-    await page.getByLabel(/email/i).fill("demo@acme.example");
-    await page.getByLabel(/password/i).fill("<scrubbed-old-demo-password>");
+    await page.getByLabel(/email/i).fill(DEMO_EMAIL);
+    await page.getByLabel(/password/i).fill(DEMO_PASSWORD);
     await page.getByRole("button", { name: /log in/i }).click();
     await page.waitForURL(/\/app/, { timeout: 25000 });
     await expect("login lands in app", page.url().includes("/app"), page.url());
