@@ -1,11 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { ProductShell } from "@/components/shell/ProductShell";
+import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
-import { SettingsSubnav } from "@/components/settings/SettingsSubnav";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
   readAppPrefs,
@@ -84,12 +83,8 @@ export default function SettingsPage() {
   const liveConnected = connected && healthOk !== false;
 
   return (
-    <ProductShell status={<span>Settings</span>}>
-      <div className="relative min-h-0 flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-4xl px-4 py-6 md:px-8 md:py-8">
-          <div className="mb-5">
-            <SettingsSubnav />
-          </div>
+    <ProductShell status={<span>Preferences</span>}>
+      <ProductPageFrame>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
@@ -98,7 +93,7 @@ export default function SettingsPage() {
               <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian">
                 Preferences
               </h1>
-              <p className="mt-2 max-w-xl text-sm text-norma-ink-muted">
+              <p className="mt-2 max-w-2xl text-sm text-norma-ink-muted">
                 Manage how Acme connects to Remote and how the org chart looks
                 for you.
               </p>
@@ -282,14 +277,7 @@ export default function SettingsPage() {
               {saved ? "Saved" : "Save preferences"}
             </button>
           </section>
-
-          <p className="mt-6 text-center text-xs text-norma-ink-subtle">
-            <Link href="/app" className="text-norma-royal hover:underline">
-              Back to org chart
-            </Link>
-          </p>
-        </div>
-      </div>
+      </ProductPageFrame>
     </ProductShell>
   );
 }

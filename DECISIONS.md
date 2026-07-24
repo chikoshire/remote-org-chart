@@ -494,7 +494,7 @@ Treat Tree as nested **person cards** with department accent rails, department/c
 
 ## 2026-07-24 — Data Health under Settings + wider layout
 
-**Status:** Accepted  
+**Status:** Superseded (2026-07-24 — primary nav restore)  
 
 **Context:**  
 Data Health was a primary nav item with a narrow `max-w-3xl` column that left large empty side margins. Trust tooling fits better with Remote connect / preferences than with day-to-day org browsing.
@@ -508,6 +508,25 @@ Data Health was a primary nav item with a narrow `max-w-3xl` column that left la
 **Consequences:**  
 - Primary IA is Dashboard · Org Chart · People · Departments · Settings.  
 - Dashboard / command bar deep links point at `/settings/data-health`.
+
+---
+
+## 2026-07-24 — Shell layout consistency (full width + one primary nav)
+
+**Status:** Accepted  
+
+**Context:**  
+Settings subnav (Preferences / Data Health) sat above the title on Preferences and in a separate strip on Data Health. Dashboard / Preferences used narrow `max-w-*` columns while Org Chart / People were full bleed. Dashboard also repeated Org Chart · People · Data Health under the page title.
+
+**Decision:**  
+1. Restore **Data Health** to primary nav (`/app/data-health`). Settings gear opens Preferences only.  
+2. Redirect `/settings/data-health` → `/app/data-health`. Remove `SettingsSubnav`.  
+3. Shared `ProductPageFrame` — full-width padding, no content max-width — for Dashboard, Preferences, and Data Health.  
+4. Drop redundant under-title quick links that duplicate primary nav.
+
+**Consequences:**  
+- One stable primary IA: Dashboard · Org Chart · People · Data Health · Settings.  
+- Scrolled product pages share the same edge-to-edge width language as canvas surfaces.
 
 ---
 
