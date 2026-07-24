@@ -48,6 +48,7 @@ import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
 import { WebhookEventsPanel } from "@/components/org/WebhookEventsPanel";
+import { PeopleDirectory } from "@/components/org/PeopleDirectory";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -258,6 +259,7 @@ function OrgChartInner() {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [eventsToken, setEventsToken] = useState(0);
   const [liveUpdates, setLiveUpdates] = useState(false);
+  const [viewMode, setViewMode] = useState<"chart" | "directory">("chart");
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
@@ -792,6 +794,22 @@ function OrgChartInner() {
     [collapsedIds, filteredForest],
   );
 
+  const directoryPeople = useMemo(() => {
+    const list = [...peopleIndex.values()];
+    return list.filter((p) => {
+      if (
+        filters.department &&
+        (p.department?.trim() ?? "") !== filters.department
+      ) {
+        return false;
+      }
+      if (filters.country && (p.country?.trim() ?? "") !== filters.country) {
+        return false;
+      }
+      return true;
+    });
+  }, [filters.country, filters.department, peopleIndex]);
+
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
     if (status === "error") return "Org chart error";
@@ -850,6 +868,36 @@ function OrgChartInner() {
     >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
         <div className="flex flex-wrap items-center justify-end gap-1 self-end">
+          <div
+            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
+            role="group"
+            aria-label="View mode"
+          >
+            <button
+              type="button"
+              aria-pressed={viewMode === "chart"}
+              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                viewMode === "chart"
+                  ? "bg-norma-accent-soft text-norma-royal"
+                  : "text-norma-ink-muted hover:text-norma-prussian"
+              }`}
+              onClick={() => setViewMode("chart")}
+            >
+              Chart
+            </button>
+            <button
+              type="button"
+              aria-pressed={viewMode === "directory"}
+              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                viewMode === "directory"
+                  ? "bg-norma-accent-soft text-norma-royal"
+                  : "text-norma-ink-muted hover:text-norma-prussian"
+              }`}
+              onClick={() => setViewMode("directory")}
+            >
+              Directory
+            </button>
+          </div>
           <button
             type="button"
             disabled={refreshing}
@@ -1059,7 +1107,7 @@ function OrgChartInner() {
           </div>
         ) : null}
       </div>
-      {filterEmpty ? (
+      {filterEmpty && viewMode === "chart" ? (
         <ChartEmptyState
           title="No people match these filters"
           description="Ancestors stay when they connect a match to the root. Reset filters to see the full Acme org again."
@@ -1070,6 +1118,28 @@ function OrgChartInner() {
             />
           }
         />
+      ) : viewMode === "directory" ? (
+        <>
+          <PeopleDirectory
+            people={directoryPeople}
+            selectedId={selectedId}
+            query={query}
+            onSelect={focusPerson}
+            onOpenInChart={(id) => {
+              setViewMode("chart");
+              focusPerson(id);
+            }}
+          />
+          {selectedDetail && !compareMode ? (
+            <PersonDetailDrawer
+              person={selectedDetail.person}
+              pathToRoot={selectedDetail.pathToRoot}
+              reports={selectedDetail.reports}
+              onClose={clearSelection}
+              onSelectPerson={focusPerson}
+            />
+          ) : null}
+        </>
       ) : (
         <>
           <ReactFlow
@@ -1099,7 +1169,7 @@ function OrgChartInner() {
             preventScrolling
             aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
           >
-            <Background color="#d5dce8" gap={isMobile ? 16 : 20} size={1} />
+            <Background color="#d0ddd9" gap={isMobile ? 16 : 20} size={1} />
             <Controls
               showInteractive={false}
               position={isMobile ? "bottom-right" : "bottom-left"}
@@ -1110,8 +1180,8 @@ function OrgChartInner() {
               <MiniMap
                 pannable
                 zoomable
-                nodeColor={() => "#624DE3"}
-                maskColor="rgb(0 35 75 / 0.08)"
+                nodeColor={() => "#e85d04"}
+                maskColor="rgb(11 42 50 / 0.08)"
                 aria-label="Organization chart overview map"
               />
             ) : null}
