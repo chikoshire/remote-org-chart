@@ -1131,12 +1131,12 @@ function OrgChartInner() {
                       focusPerson(suggestions[0].id);
                     }
                   }}
-                  placeholder="Search by name or title… (/)"
+                  placeholder="Filter the chart… (/)"
                   className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
                   autoComplete="off"
                 />
                 <p className="text-[11px] text-norma-ink-subtle">
-                  Select a person to open their profile.
+                  Select a person to open their profile. ⌘K jumps anywhere.
                 </p>
                 {suggestions.length > 0 ? (
                   <ul
