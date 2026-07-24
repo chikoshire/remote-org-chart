@@ -37,3 +37,9 @@ export {
   readOrgChartSnapshot,
   writeOrgChartSnapshot,
 } from "@/lib/org/snapshot-cache";
+export {
+  listSyncRuns,
+  sanitizeSyncError,
+  writeSyncRun,
+} from "@/lib/org/sync-runs";
+export type { SyncRunRecord, SyncTrigger } from "@/lib/org/sync-runs";
