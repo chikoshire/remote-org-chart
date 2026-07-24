@@ -667,7 +667,7 @@ export function DashboardWorkspace() {
           label="Completeness"
           value={`${insights.completenessScore}%`}
           hint="Title · dept · country"
-          href="/app/people?incomplete=1"
+          href="/settings/data-health"
           onNavigate={navigate}
           icon={<IconShield />}
           tone={completenessTone}
