@@ -310,10 +310,10 @@ Tier 3 employment webhooks need HMAC verification, idempotent storage, and snaps
 - Event UI (#29): **Webhook events** panel + `GET /api/webhooks/events`.
 
 **Consequences:**  
-Subscription (`POST /v1/webhook-callbacks`) is a manual ops step — confirm URL + events with the user before creating. Signing key is shown once at subscribe time.
+Subscription (`POST /v1/webhook-callbacks`) needs a **write-scoped** company token (`webhook:write` / `company_admin` / `all:write`). The app’s read-only `REMOTE_API_TOKEN` (`all:read`) correctly 403s. Use a separate short-lived `REMOTE_WEBHOOK_ADMIN_TOKEN` with `./scripts/subscribe-remote-webhook.sh` (GH#44). Signing key is shown once at subscribe time — store as Wrangler `REMOTE_WEBHOOK_SIGNING_KEY`.
 
 **Revisit when:**  
-Sandbox webhook subscription is created for the live Workers URL.
+Write-scoped sandbox token is available and subscription is created for the live Workers URL.
 
 ---
 
