@@ -70,13 +70,13 @@ function HealthSection({
       {people.length === 0 ? (
         <p className="mt-5 text-sm text-norma-ink-subtle">{empty}</p>
       ) : (
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((person) => {
             const name = person.fullName?.trim() || "Unknown person";
             const href = `/app${withPersonSearchParam("", person.id)}`;
             return (
               <li key={person.id}>
-                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/40 px-3 py-3">
+                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/40 px-3.5 py-3.5">
                   <PersonAvatar
                     personId={person.id}
                     fullName={person.fullName}

@@ -513,7 +513,7 @@ Data Health was a primary nav item with a narrow `max-w-3xl` column that left la
 
 ## 2026-07-24 — Shell layout consistency (full width + one primary nav)
 
-**Status:** Accepted  
+**Status:** Superseded (2026-07-24 — Settings-owned Data Health)  
 
 **Context:**  
 Settings subnav (Preferences / Data Health) sat above the title on Preferences and in a separate strip on Data Health. Dashboard / Preferences used narrow `max-w-*` columns while Org Chart / People were full bleed. Dashboard also repeated Org Chart · People · Data Health under the page title.
@@ -527,6 +527,25 @@ Settings subnav (Preferences / Data Health) sat above the title on Preferences a
 **Consequences:**  
 - One stable primary IA: Dashboard · Org Chart · People · Data Health · Settings.  
 - Scrolled product pages share the same edge-to-edge width language as canvas surfaces.
+
+---
+
+## 2026-07-24 — Data Health back under Settings (stable subnav)
+
+**Status:** Accepted  
+
+**Context:**  
+Product intent is Data Health as a Settings trust surface, not a day-to-day primary tab. Moving it into primary nav fixed bouncing subnav placement but broke the intended IA. Person cards at `xl:grid-cols-4` truncated names.
+
+**Decision:**  
+1. Primary nav: Dashboard · Org Chart · People · Settings gear.  
+2. Settings secondary (fixed sticky strip under header via `SettingsChrome`): Preferences · Data Health.  
+3. Canonical `/settings/data-health`; `/app/data-health` redirects.  
+4. Keep full-width `ProductPageFrame`. Cap health person grids at 3 columns with roomier padding.  
+
+**Consequences:**  
+- Subnav no longer changes position between Preferences and Data Health.  
+- Deep links (Dashboard, ⌘K, People) point at `/settings/data-health`.
 
 ---
 

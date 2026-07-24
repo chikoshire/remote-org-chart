@@ -43,7 +43,7 @@ Rule: move parent **Backlog → In Progress → Review** (all children done) bef
 
 Plan doc (Linear): [Org intelligence product plan](https://linear.app/orbit-linear/document/org-intelligence-product-plan-brief-wow-7f66395d0b8d)
 
-Locked IA (authenticated): **Dashboard · Org Chart · People · Data Health · Settings (Preferences)**.  
+Locked IA (authenticated): **Dashboard · Org Chart · People · Settings (Preferences · Data Health)**.  
 Marketing + demo login/logout. Remote Connect = Option B (+ OAuth scaffold off). Theme in Preferences. No em dashes in product copy.
 
 | Seq | GH | Linear | Branch | Priority |

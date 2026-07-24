@@ -1,6 +1,15 @@
-import { redirect } from "next/navigation";
+"use client";
 
-/** Data Health is a primary surface at `/app/data-health`. */
-export default function SettingsDataHealthRedirectPage() {
-  redirect("/app/data-health");
+import { ProductShell } from "@/components/shell/ProductShell";
+import { SettingsChrome } from "@/components/settings/SettingsChrome";
+import { DataHealthWorkspace } from "@/components/org/DataHealthWorkspace";
+
+export default function SettingsDataHealthPage() {
+  return (
+    <ProductShell status={<span>Settings · Data Health</span>}>
+      <SettingsChrome>
+        <DataHealthWorkspace />
+      </SettingsChrome>
+    </ProductShell>
+  );
 }
