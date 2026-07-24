@@ -30,7 +30,7 @@ const variantClass: Record<PersonNodeVariant, string> = {
   default:
     "border-norma-border/80 bg-norma-surface/95 shadow-norma-sm hover:border-norma-ink/20 hover:shadow-norma-md",
   selected:
-    "border-norma-ink bg-norma-peach/50 shadow-norma-md ring-2 ring-norma-ink/15",
+    "border-norma-ink bg-norma-peach/50 shadow-[0_0_0_2px_rgb(18_18_18/0.14),0_8px_24px_rgb(18_18_18/0.08)]",
   path: "border-norma-lavender bg-norma-lavender/70 shadow-norma-sm",
   root: "border-norma-ink/30 bg-norma-mint/60 shadow-norma-md ring-1 ring-norma-ink/10",
 };
@@ -88,7 +88,7 @@ export function PersonNodeCard({
   return (
     <article
       aria-label={accessibleName}
-      className={`relative overflow-hidden rounded-norma-lg border transition-[border-color,box-shadow,background-color,transform] duration-200 ease-out motion-safe:data-[variant=selected]:scale-[1.02] ${
+      className={`selection-fade relative overflow-hidden rounded-norma-lg border ${
         compact ? "w-[190px] px-3 py-3" : "w-[260px] px-4 py-4"
       } ${variantClass[variant]}`}
       data-variant={variant}

@@ -289,9 +289,7 @@ test.describe("org chart smoke", () => {
       .first()
       .click();
     await expect(page.getByRole("dialog", { name: "Jordan Report" })).toBeVisible();
-    await expect(
-      page.locator('[data-morph-person="emp_report"].bloom-enter'),
-    ).toBeVisible();
+    await expect(page.locator('[data-morph-person="emp_report"].bloom-drawer')).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Open full profile" }),
     ).toBeVisible();

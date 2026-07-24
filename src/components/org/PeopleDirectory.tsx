@@ -292,8 +292,8 @@ function PersonCard({
   if (isList) {
     return (
       <article
-        className={`relative flex flex-row items-center gap-3 py-3 ${
-          selected ? "bg-norma-accent-soft/40" : ""
+        className={`selection-fade relative flex flex-row items-center gap-3 py-3 ${
+          selected ? "bg-norma-accent-soft/40" : "bg-transparent"
         }`}
         data-morph-person={person.id}
       >
@@ -371,10 +371,10 @@ function PersonCard({
 
   return (
     <article
-      className={`norma-glass relative flex h-full flex-col overflow-hidden rounded-norma-lg border shadow-norma-sm transition ${
+      className={`selection-fade norma-glass relative flex h-full flex-col overflow-hidden rounded-norma-lg border ${
         selected
-          ? "border-norma-royal ring-2 ring-norma-royal/25"
-          : "border-norma-border/80 hover:border-norma-spray/45 hover:shadow-norma-md"
+          ? "border-norma-ink shadow-[0_0_0_2px_rgb(18_18_18/0.18)]"
+          : "border-norma-border/80 shadow-norma-sm hover:border-norma-spray/45 hover:shadow-norma-md"
       }`}
       data-morph-person={person.id}
     >

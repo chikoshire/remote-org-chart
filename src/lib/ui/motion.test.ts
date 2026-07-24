@@ -22,6 +22,8 @@ describe("morph bloom motion", () => {
       "utf8",
     );
     expect(css).toContain("bloom-enter");
+    expect(css).toContain("bloom-drawer");
+    expect(css).toContain("selection-fade");
     expect(css).toContain("prefers-reduced-motion: reduce");
     expect(docs).toContain("view-transition-name");
     expect(docs).toContain("prefers-reduced-motion");

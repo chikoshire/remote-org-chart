@@ -91,8 +91,8 @@ export function PersonDetailDrawer({
       aria-labelledby={titleId}
       className={
         docked
-          ? "bloom-enter flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
-          : "bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+          ? "bloom-drawer flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
+          : "bloom-drawer absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
       }
       data-morph-person={person.id}
       data-drawer-placement={placement}

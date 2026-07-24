@@ -16,7 +16,9 @@ Shared-element feel for Org Intelligence navigation. Optional wow polish (#70).
 | `personAvatarMorphName(id)` | Stable `view-transition-name` for the avatar |
 | `personNameMorphName(id)` | Stable name for the display name |
 | `personMorphName(id)` | Legacy whole-card name (prefer avatar/name) |
-| `.bloom-enter` | Soft scale/fade on mount |
+| `.bloom-enter` | Soft fade/rise on mount (no scale) |
+| `.bloom-drawer` | Soft fade/slide for detail docks |
+| `.selection-fade` | Gradual border/shadow for selected cards |
 | `captureProfileReturn` / `consumeReturnScrollIfMatching` | Back from profile to chart or people with scroll |
 
 ## Apply
