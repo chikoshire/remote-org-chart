@@ -367,14 +367,15 @@ Design system expands beyond Acme assessment chrome.
 Core Remote brief is already met. Next goal is to impress: treat Acme as an organisational intelligence product (Dashboard, Org Chart, People, Departments, Data Health), with marketing login, honest Remote connect UX, and stronger edge-case visuals. Reference UIs (Org Mapper, pastel trees, light SaaS shells) beat our current chrome consistency.
 
 **Decision:**  
-Ship the serial wow track GH#58–#68 (Linear TUXX-1593–1603). Top nav after auth: Dashboard · Org Chart · People · Departments · Data Health · Settings gear. Marketing + demo app login/logout. Visual system pass on chart + People. Edge-case badges + Data Health. Theme preference in Settings only. No em dashes in product copy. Command bar and tree-list view tracked as stretch wow (#66–#67).
+Ship the serial wow track GH#58–#68 plus morph polish #70 (Linear TUXX-1593–1603, TUXX-1609). Top nav after auth: Dashboard · Org Chart · People · Departments · Data Health · Settings gear. Marketing + demo app login/logout. Visual system pass on chart + People. Edge-case badges + Data Health. Theme preference in Settings only. No em dashes in product copy. Command bar and tree-list view tracked as stretch wow (#66–#67). Shared-element morph + bloom (#70) is the last wow step before/with #68 QA.
 
 **Consequences:**  
 - One parent at a time; dedicated `feat/` / `ui/` / `cross/` branches named on each issue.  
 - Brief React Flow chart remains the Org Chart primary; tree list is optional add-on.  
+- Morph/bloom only where the same entity continues across views; honour `prefers-reduced-motion`.  
 
 **Revisit when:**  
-Interview handoff date forces cutting optional #66–#67.
+Interview handoff date forces cutting optional #66–#67 or #70.
 
 ---
 

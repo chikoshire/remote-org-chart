@@ -48,7 +48,6 @@ import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
 import { WebhookEventsPanel } from "@/components/org/WebhookEventsPanel";
-import { PeopleDirectory } from "@/components/org/PeopleDirectory";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -80,7 +79,8 @@ import {
   readSessionOrgPayload,
   writeSessionOrgPayload,
 } from "@/lib/ui/remote-connection";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   reportingRelation,
   type ReportingRelation,
@@ -282,10 +282,9 @@ function OrgChartInner() {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [eventsToken, setEventsToken] = useState(0);
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
-  const [viewMode, setViewMode] = useState<"chart" | "directory">("chart");
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
   const [remoteConnected, setRemoteConnected] = useState(true);
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const initialFitDone = useRef(false);
   const hasReadyData = useRef(false);
   const pendingDeepLinkId = useRef<string | null>(null);
@@ -499,9 +498,12 @@ function OrgChartInner() {
   }, [load]);
 
   useEffect(() => {
-    const view = searchParams.get("view");
-    setViewMode(view === "directory" ? "directory" : "chart");
-  }, [searchParams]);
+    if (typeof window === "undefined") return;
+    const view = new URLSearchParams(window.location.search).get("view");
+    if (view === "directory") {
+      router.replace("/app/people");
+    }
+  }, [router]);
 
   useEffect(() => {
     if (!liveUpdates || status !== "ready") return;
@@ -735,7 +737,6 @@ function OrgChartInner() {
     if (status !== "ready" || nodes.length === 0 || initialFitDone.current) {
       return;
     }
-    if (viewMode !== "chart") return;
     initialFitDone.current = true;
     requestAnimationFrame(() => {
       void fitView({
@@ -745,7 +746,7 @@ function OrgChartInner() {
         duration: reducedMotion ? 0 : 380,
       });
     });
-  }, [fitView, nodes.length, reducedMotion, status, viewMode]);
+  }, [fitView, nodes.length, reducedMotion, status]);
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;
@@ -879,36 +880,6 @@ function OrgChartInner() {
     [collapsedIds, filteredForest],
   );
 
-  const directoryPeople = useMemo(() => {
-    const list = [...peopleIndex.values()];
-    return list
-      .filter((p) => {
-        if (
-          filters.department &&
-          (p.department?.trim() ?? "") !== filters.department
-        ) {
-          return false;
-        }
-        if (filters.country && (p.country?.trim() ?? "") !== filters.country) {
-          return false;
-        }
-        if (
-          filters.jobTitle &&
-          (p.jobTitle?.trim() ?? "") !== filters.jobTitle
-        ) {
-          return false;
-        }
-        return true;
-      })
-      .map((p) => {
-        const mgrId = p.managerEmploymentId;
-        const managerName = mgrId
-          ? (peopleIndex.get(mgrId)?.fullName?.trim() ?? null)
-          : null;
-        return { ...p, managerName };
-      });
-  }, [filters.country, filters.department, filters.jobTitle, peopleIndex]);
-
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
     if (status === "error") return "Org chart error";
@@ -971,7 +942,7 @@ function OrgChartInner() {
     >
       {statusLabel}
       {filtersAreActive(filters) ? " · filters on" : ""}
-      {viewMode === "chart" && isMobile ? " · pinch to zoom · drag to pan" : ""}
+      {isMobile ? " · pinch to zoom · drag to pan" : ""}
     </p>
   );
 
@@ -1061,42 +1032,12 @@ function OrgChartInner() {
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="flex flex-col gap-3">
-              <div
-                className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
-                role="group"
-                aria-label="View mode"
+              <Link
+                href="/app/people"
+                className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-center text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian"
               >
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "chart"}
-                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
-                    viewMode === "chart"
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
-                  }`}
-                  onClick={() => {
-                    setViewMode("chart");
-                    window.history.replaceState(null, "", "/app");
-                  }}
-                >
-                  Chart
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={viewMode === "directory"}
-                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
-                    viewMode === "directory"
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
-                  }`}
-                  onClick={() => {
-                    setViewMode("directory");
-                    window.history.replaceState(null, "", "/app?view=directory");
-                  }}
-                >
-                  Directory
-                </button>
-              </div>
+                Open People directory
+              </Link>
               <button
                 type="button"
                 disabled={refreshing || !remoteConnected}
@@ -1358,7 +1299,7 @@ function OrgChartInner() {
           </button>
         ) : null}
         <div className="relative min-h-0 flex-1">
-          {filterEmpty && viewMode === "chart" ? (
+          {filterEmpty ? (
             <ChartEmptyState
               title="No people match these filters"
               description="Ancestors stay when they connect a match to the root. Reset filters to see the full Acme org again."
@@ -1368,17 +1309,6 @@ function OrgChartInner() {
                   onClick={() => setFilters(EMPTY_ORG_FILTERS)}
                 />
               }
-            />
-          ) : viewMode === "directory" ? (
-            <PeopleDirectory
-              people={directoryPeople}
-              selectedId={selectedId}
-              query={query}
-              onSelect={focusPerson}
-              onOpenInChart={(id) => {
-                setViewMode("chart");
-                focusPerson(id);
-              }}
             />
           ) : (
             <ReactFlow

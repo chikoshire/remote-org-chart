@@ -22,28 +22,39 @@ test.describe("org chart smoke", () => {
 
     await expect(page).toHaveURL(/\/app/);
     await expect(page.getByRole("banner")).toContainText("Acme");
-    await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-        name: "Org chart",
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-        name: "People",
-      }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Settings" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-        name: "Welcome",
-      }),
-    ).toHaveCount(0);
+    const primary = page.getByRole("navigation", { name: "Primary" });
+    await expect(primary).toBeVisible();
+    for (const name of [
+      "Dashboard",
+      "Org Chart",
+      "People",
+      "Departments",
+      "Data Health",
+    ]) {
+      await expect(primary.getByRole("link", { name })).toBeVisible();
+    }
+    await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
+    await expect(primary.getByRole("link", { name: "Welcome" })).toHaveCount(0);
     await expect(page.locator("#org-chart")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Chart" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Directory" })).toBeVisible();
+  });
+
+  test("IA stub routes render under product shell", async ({ page }) => {
+    for (const { path, heading } of [
+      { path: "/app/dashboard", heading: "Dashboard" },
+      { path: "/app/people", heading: "People" },
+      { path: "/app/departments", heading: "Departments" },
+      { path: "/app/data-health", heading: "Data Health" },
+    ]) {
+      await page.goto(path);
+      await expect(
+        page.getByRole("heading", { name: heading, exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+          name: heading,
+        }),
+      ).toHaveAttribute("aria-current", "page");
+    }
   });
 
   test("settings route loads preferences and integrations", async ({ page }) => {
@@ -91,41 +102,14 @@ test.describe("org chart smoke", () => {
     await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
-  test("directory search and filters with relationship context", async ({
-    page,
-  }) => {
-    await mockOrgChart(page, orgChartReadyFixture);
-    await page.goto("/app");
-
-    await expect(page.getByText(/2 people · 1 teams/)).toBeVisible({
-      timeout: 20_000,
-    });
-
-    await page.getByRole("button", { name: "Directory" }).click();
+  test("people route is primary directory surface", async ({ page }) => {
+    await page.goto("/app/people");
     await expect(
-      page.getByRole("heading", { name: "People directory" }).or(
-        page.getByText("People directory"),
-      ),
+      page.getByRole("heading", { name: "People", exact: true }),
     ).toBeVisible();
-
-    await expect(page.getByText("Reports to Alex Root")).toBeVisible();
-
-    const search = page.getByRole("combobox", {
-      name: /search people/i,
-    });
-    await search.fill("Jordan");
-
-    const directory = page.getByRole("list", { name: "People directory" });
-    await expect(directory.getByText("Jordan Report")).toBeVisible();
-    await expect(directory.getByText("Reports to Alex Root")).toBeVisible();
     await expect(
-      directory.getByRole("button", {
-        name: /Alex Root.*Chief of Staff/i,
-      }),
-    ).toHaveCount(0);
-
-    await directory.getByRole("button", { name: "Open profile" }).click();
-    await expect(page.getByRole("dialog", { name: "Jordan Report" })).toBeVisible();
+      page.getByRole("link", { name: "Open Org Chart" }),
+    ).toBeVisible();
   });
 
   test("shows empty state when API returns no people", async ({ page }) => {
