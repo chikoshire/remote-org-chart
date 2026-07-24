@@ -9,6 +9,7 @@ import {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeMouseHandler,
@@ -35,6 +36,7 @@ import {
   warningsFromMeta,
   type ChartWarning,
 } from "@/lib/org/chart-state";
+import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 type OrgChartResponse = {
   ok: boolean;
   nodeCount: number;
@@ -103,6 +105,8 @@ function applySelection(
 }
 
 function OrgChartInner() {
+  const { fitView } = useReactFlow();
+  const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
     "loading",
   );
@@ -211,6 +215,27 @@ function OrgChartInner() {
 
   const onPaneClick = useCallback(() => setSelectedId(null), []);
 
+  const suggestions = useMemo(
+    () => searchPeople(peopleFromNodes(baseNodes), query),
+    [baseNodes, query],
+  );
+
+  const focusPerson = useCallback(
+    (id: string) => {
+      setSelectedId(id);
+      setQuery("");
+      requestAnimationFrame(() => {
+        const path = pathIdsToRoot(id, managerIndex);
+        void fitView({
+          nodes: [...path].map((nodeId) => ({ id: nodeId })),
+          padding: 0.35,
+          duration: 400,
+        });
+      });
+    },
+    [fitView, managerIndex],
+  );
+
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
     if (status === "error") return "Org chart error";
@@ -253,18 +278,48 @@ function OrgChartInner() {
 
   return (
     <div className="relative h-full w-full">
-      {warnings.length > 0 ? (
-        <div className="absolute left-3 right-3 top-3 z-10 flex flex-col gap-1">
-          {warnings.map((warning) => (
-            <p
-              key={warning.type}
-              className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
-            >
-              {warningCopy(warning)}
-            </p>
-          ))}
-        </div>
-      ) : null}
+      <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
+        <label className="sr-only" htmlFor="org-search">
+          Search people
+        </label>
+        <input
+          id="org-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by name or title…"
+          className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
+          autoComplete="off"
+        />
+        {suggestions.length > 0 ? (
+          <ul className="max-h-56 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-md">
+            {suggestions.map((person) => (
+              <li key={person.id}>
+                <button
+                  type="button"
+                  className="flex w-full flex-col items-start px-3 py-1.5 text-left hover:bg-norma-accent-soft"
+                  onClick={() => focusPerson(person.id)}
+                >
+                  <span className="text-sm font-medium text-norma-prussian">
+                    {person.fullName ?? "Unknown"}
+                  </span>
+                  <span className="text-xs text-norma-ink-muted">
+                    {person.jobTitle ?? "No title"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {warnings.map((warning) => (
+          <p
+            key={warning.type}
+            className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
+          >
+            {warningCopy(warning)}
+          </p>
+        ))}
+      </div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
