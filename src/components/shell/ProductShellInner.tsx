@@ -24,7 +24,7 @@ const PRIMARY_NAV = [
 ] as const;
 
 function navClass(active: boolean) {
-  return `whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition md:px-4 ${
+  return `whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] font-medium transition md:px-5 ${
     active
       ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
       : "text-norma-ink-muted hover:bg-norma-surface-muted/80 hover:text-norma-ink"
@@ -43,13 +43,13 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="norma-glass flex h-14 shrink-0 items-center gap-4 border-b border-norma-border/80 px-4 text-norma-ink md:h-16 md:gap-6 md:px-6"
+        className="norma-glass flex h-16 shrink-0 items-center gap-4 border-b border-norma-border/80 px-4 text-norma-ink md:h-[4.25rem] md:gap-6 md:px-7"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
-          <AcmeLogo withWordmark />
+          <AcmeLogo withWordmark className="origin-left scale-105" />
         </Link>
         <nav
-          className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto md:gap-1"
+          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:gap-1.5"
           aria-label="Primary"
         >
           {PRIMARY_NAV.map((item) => {
@@ -70,7 +70,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           <CommandBar />
           <Link
             href="/settings"
-            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${
+            className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
               settingsActive
                 ? "bg-norma-ink text-norma-ink-inverse"
                 : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
@@ -114,7 +114,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </main>
       <footer
         role="contentinfo"
-        className="norma-glass flex h-7 shrink-0 items-center border-t border-norma-border/80 px-4 text-[11px] text-norma-ink-muted md:px-6"
+        className="norma-glass flex h-8 shrink-0 items-center border-t border-norma-border/80 px-4 text-xs text-norma-ink-muted md:px-7"
       >
         {status ?? <span>Acme · Connected to Remote</span>}
       </footer>

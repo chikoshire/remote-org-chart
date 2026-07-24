@@ -984,6 +984,26 @@ A brand/editorial pass asks for a different voice.
 
 ---
 
+## 2026-07-25 — Marketing + app scale, color, rounded accordion
+
+**Status:** Accepted  
+
+**Context:**  
+Side-by-side with remote.com, Acme marketing read small and cramped: sharp black “How we do it” rows, tight section padding, muted color. The product shell and org nodes felt similarly undersized next to Remote’s breathing room.
+
+**Decision:**  
+Bump marketing type, CTAs, and section padding; give the How-we-do-it accordion rounded pastel panels with icons (not sharp black rectangles); colorize marquee and surface cards with Norma pastels; loosen app chrome (header, page frame, command bar) and enlarge comfortable org-node cards + layout metrics for readability.
+
+**Consequences:**  
+- Marketing feels closer to Remote’s spacing personality while staying cream + pastel, not Remote maroon/blue.  
+- Chart layout uses larger node footprints (`densityMetrics` / card widths).  
+- Global type and radius tokens nudged up slightly for the whole product.
+
+**Revisit when:**  
+Interview feedback prefers denser chrome, or Remote brand cues need a stronger primary accent on marketing.
+
+---
+
 ## Template for future entries
 
 

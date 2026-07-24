@@ -19,7 +19,7 @@ export function ProductPageFrame({
       className={`min-h-0 flex-1 overflow-auto ${className}`.trim()}
       data-product-scroll
     >
-      <div className="w-full px-5 py-8 md:px-8 md:py-10 lg:px-10 xl:px-12">
+      <div className="w-full px-5 py-10 md:px-10 md:py-12 lg:px-12 xl:px-14">
         {children}
       </div>
     </div>

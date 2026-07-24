@@ -89,7 +89,7 @@ export function PersonNodeCard({
     <article
       aria-label={accessibleName}
       className={`selection-fade relative overflow-hidden rounded-norma-lg border ${
-        compact ? "w-[190px] px-3 py-3" : "w-[260px] px-4 py-4"
+        compact ? "w-[200px] px-3.5 py-3.5" : "w-[280px] px-5 py-5"
       } ${variantClass[variant]}`}
       data-variant={variant}
       data-density={density}
@@ -110,7 +110,7 @@ export function PersonNodeCard({
         <div className="min-w-0 flex-1">
           <h3
             className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-ink ${
-              compact ? "text-xs" : "text-[15px] leading-snug"
+              compact ? "text-[13px]" : "text-base leading-snug"
             }`}
             style={
               morphActive && id
@@ -122,29 +122,29 @@ export function PersonNodeCard({
             {name}
           </h3>
           <p
-            className={`mt-0.5 truncate text-norma-ink-muted ${
-              compact ? "text-[10px]" : "text-xs leading-relaxed"
+            className={`mt-1 truncate text-norma-ink-muted ${
+              compact ? "text-[11px]" : "text-sm leading-relaxed"
             }`}
           >
             {titleLabel}
           </p>
           {!compact ? (
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {department?.trim() ? (
-                <span className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink">
+                <span className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-xs font-medium text-norma-ink">
                   {department.trim()}
                 </span>
               ) : (
-                <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink-muted">
+                <span className="rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-xs font-medium text-norma-ink-muted">
                   Dept not set
                 </span>
               )}
               {countryLabel ? (
-                <span className="truncate text-[11px] text-norma-ink-subtle">
+                <span className="truncate text-xs text-norma-ink-subtle">
                   {countryLabel}
                 </span>
               ) : (
-                <span className="truncate text-[11px] text-norma-ink-muted">
+                <span className="truncate text-xs text-norma-ink-muted">
                   Country not set
                 </span>
               )}
@@ -153,15 +153,15 @@ export function PersonNodeCard({
         </div>
       </div>
       <div
-        className={`mt-3 flex items-center justify-between gap-2 border-t border-norma-border/60 ${
-          compact ? "pt-2" : "pt-2.5"
+        className={`mt-3.5 flex items-center justify-between gap-2 border-t border-norma-border/60 ${
+          compact ? "pt-2.5" : "pt-3"
         }`}
       >
         <span
           className={`inline-flex items-center rounded-norma-sm font-semibold text-norma-ink ${
             compact
-              ? "bg-norma-surface-muted px-1.5 py-0.5 text-[10px]"
-              : "bg-norma-surface-muted px-2 py-0.5 text-[11px]"
+              ? "bg-norma-surface-muted px-1.5 py-0.5 text-[11px]"
+              : "bg-norma-surface-muted px-2.5 py-1 text-xs"
           }`}
         >
           {reportsLabel}

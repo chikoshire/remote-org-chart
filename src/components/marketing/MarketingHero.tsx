@@ -18,27 +18,27 @@ export function MarketingHero() {
       />
       <div className="marketing-grain pointer-events-none absolute inset-0 opacity-25" />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-14 md:grid-cols-12 md:gap-8 md:px-8 md:pb-20 md:pt-20">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-16 md:grid-cols-12 md:gap-10 md:px-8 md:pb-28 md:pt-24">
         <div className="marketing-hero-copy md:col-span-5">
           <AcmeLogo
             withWordmark
-            className="origin-left scale-110"
-            markClassName="!h-9 !w-9"
+            className="origin-left scale-[1.15]"
+            markClassName="!h-10 !w-10"
           />
-          <h1 className="marketing-hero-title mt-8 font-[family-name:var(--font-norma-display)] text-[clamp(2.5rem,5.5vw,3.75rem)] leading-[1.05] tracking-tight text-norma-ink">
+          <h1 className="marketing-hero-title mt-10 font-[family-name:var(--font-norma-display)] text-[clamp(2.85rem,6vw,4.25rem)] leading-[1.02] tracking-tight text-norma-ink">
             See how Acme is organised
           </h1>
-          <p className="marketing-hero-copy mt-5 max-w-md text-base leading-relaxed text-norma-ink-muted md:text-lg">
+          <p className="marketing-hero-copy mt-6 max-w-md text-lg leading-relaxed text-norma-ink-muted md:text-xl md:leading-relaxed">
             Reporting lines, people, and data health in one place. Built on
             Remote so the chart stays close to live employment data.
           </p>
-          <div className="marketing-hero-cta mt-9 flex flex-wrap items-center gap-3">
-            <Link href="/login" className="norma-cta min-h-11 px-7 text-sm">
+          <div className="marketing-hero-cta mt-11 flex flex-wrap items-center gap-4">
+            <Link href="/login" className="norma-cta min-h-12 px-8 text-base">
               Log in to the app
             </Link>
             <a
               href="#product"
-              className="inline-flex min-h-11 items-center rounded-full border border-norma-ink/20 bg-white/80 px-6 text-sm font-medium text-norma-ink transition hover:border-norma-ink/40"
+              className="inline-flex min-h-12 items-center rounded-full border border-norma-ink/20 bg-white/80 px-7 text-base font-medium text-norma-ink transition hover:border-norma-ink/40"
             >
               See how it works
             </a>
@@ -47,7 +47,7 @@ export function MarketingHero() {
 
         <div className="marketing-hero-visual relative md:col-span-7">
           <div className="relative">
-            <div className="overflow-hidden rounded-[1.5rem] border border-norma-border/70 bg-white shadow-[0_32px_90px_rgb(18_18_18/0.14)] ring-1 ring-white/80">
+            <div className="overflow-hidden rounded-[1.75rem] border border-norma-border/70 bg-white shadow-[0_32px_90px_rgb(18_18_18/0.14)] ring-1 ring-white/80">
               <Image
                 src="/marketing/hero-org-chart.png"
                 alt="Acme org chart workspace with Chart, Tree, and Map views"
@@ -59,24 +59,24 @@ export function MarketingHero() {
               />
             </div>
 
-            <div className="marketing-float-chip marketing-float-chip-a absolute -left-3 top-[18%] hidden max-w-[11.5rem] rounded-2xl border border-norma-border/80 bg-white/95 px-3 py-2.5 shadow-norma-md backdrop-blur sm:block md:-left-6">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
+            <div className="marketing-float-chip marketing-float-chip-a absolute -left-3 top-[18%] hidden max-w-[13rem] rounded-2xl border border-norma-peach/80 bg-norma-peach/95 px-4 py-3 shadow-norma-md backdrop-blur sm:block md:-left-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
                 Sync
               </p>
-              <p className="mt-0.5 text-[12px] font-semibold text-norma-ink">
+              <p className="mt-1 text-sm font-semibold text-norma-ink">
                 Remote employments
               </p>
-              <p className="text-[10px] text-norma-success">Live · 149 people</p>
+              <p className="text-xs text-norma-success">Live · 149 people</p>
             </div>
 
-            <div className="marketing-float-chip marketing-float-chip-b absolute -right-2 top-[42%] hidden max-w-[11rem] rounded-2xl border border-norma-border/80 bg-white/95 px-3 py-2.5 shadow-norma-md backdrop-blur md:block md:-right-4">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
+            <div className="marketing-float-chip marketing-float-chip-b absolute -right-2 top-[42%] hidden max-w-[12.5rem] rounded-2xl border border-norma-sky/80 bg-norma-sky/95 px-4 py-3 shadow-norma-md backdrop-blur md:block md:-right-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
                 Data health
               </p>
-              <p className="mt-0.5 text-[12px] font-semibold text-norma-ink">
+              <p className="mt-1 text-sm font-semibold text-norma-ink">
                 Completeness
               </p>
-              <p className="text-[10px] text-norma-ink-muted">Title · dept · country</p>
+              <p className="text-xs text-norma-ink-muted">Title · dept · country</p>
             </div>
           </div>
         </div>

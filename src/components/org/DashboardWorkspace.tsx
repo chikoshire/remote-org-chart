@@ -120,7 +120,7 @@ function KpiCard({
     <button
       type="button"
       onClick={() => onNavigate(href)}
-      className={`bloom-enter group flex cursor-pointer flex-col rounded-norma-lg border p-5 text-left shadow-norma-sm transition hover:-translate-y-1 hover:shadow-norma-md ${
+      className={`bloom-enter group flex cursor-pointer flex-col rounded-norma-lg border p-6 text-left shadow-norma-sm transition hover:-translate-y-1 hover:shadow-norma-md ${
         tall ? "min-h-[9.5rem]" : "min-h-[8.25rem]"
       } ${TONE_STYLES[tone]} ${delayClass}`}
     >
@@ -143,7 +143,7 @@ function KpiCard({
       </div>
       <p className="mt-auto pt-4 text-sm font-semibold text-norma-ink">{label}</p>
       {hint ? (
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-norma-ink-muted">
+        <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-norma-ink-muted">
           {hint}
         </p>
       ) : null}
@@ -626,7 +626,7 @@ export function DashboardWorkspace() {
         </button>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard
           label="People"
           value={String(insights.headcount)}
