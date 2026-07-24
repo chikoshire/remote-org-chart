@@ -6,6 +6,72 @@ type SurfaceProps = {
   action?: ReactNode;
 };
 
+function OrgSkeleton() {
+  return (
+    <div
+      aria-hidden
+      className="mx-auto flex w-full max-w-lg flex-col items-center gap-4 px-4"
+    >
+      <div className="h-16 w-44 animate-pulse rounded-norma-lg bg-norma-surface-muted shadow-norma-sm" />
+      <div className="h-px w-24 bg-norma-border" />
+      <div className="flex flex-wrap justify-center gap-3">
+        <div className="h-14 w-36 animate-pulse rounded-norma-lg bg-norma-surface-muted delay-75" />
+        <div className="h-14 w-36 animate-pulse rounded-norma-lg bg-norma-surface-muted delay-100" />
+        <div className="h-14 w-36 animate-pulse rounded-norma-lg bg-norma-surface-muted delay-150" />
+      </div>
+    </div>
+  );
+}
+
+function EmptyIllustration() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 120 88"
+      className="h-16 w-auto text-norma-royal"
+      fill="none"
+    >
+      <rect
+        x="36"
+        y="8"
+        width="48"
+        height="28"
+        rx="8"
+        className="fill-norma-accent-soft stroke-norma-royal/40"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M60 36v12"
+        className="stroke-norma-royal/50"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M32 60h56"
+        className="stroke-norma-royal/35"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="12"
+        y="60"
+        width="36"
+        height="22"
+        rx="6"
+        className="fill-norma-surface-muted stroke-norma-border"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="72"
+        y="60"
+        width="36"
+        height="22"
+        rx="6"
+        className="fill-norma-surface-muted stroke-norma-border"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
 export function ChartLoadingState({
   title = "Loading organization…",
   description = "Getting the latest people and reporting lines from Remote.",
@@ -14,12 +80,9 @@ export function ChartLoadingState({
     <div
       role="status"
       aria-live="polite"
-      className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 bg-[radial-gradient(ellipse_at_center,rgb(232_93_4/0.08),transparent_55%)] px-6 text-center"
+      className="flex h-full min-h-[320px] flex-col items-center justify-center gap-6 bg-[radial-gradient(ellipse_at_center,rgb(232_93_4/0.06),transparent_55%)] px-6 py-10 text-center"
     >
-      <span
-        aria-hidden
-        className="h-10 w-10 animate-spin rounded-full border-2 border-[#0b2a32]/20 border-t-[#e85d04]"
-      />
+      <OrgSkeleton />
       <div className="max-w-md">
         <h2 className="font-[family-name:var(--font-norma-display)] text-lg font-semibold tracking-tight text-norma-prussian">
           {title}
@@ -40,13 +103,11 @@ export function ChartEmptyState({
       role="status"
       className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 px-6 text-center"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-norma-accent-soft text-norma-royal">
-        <span aria-hidden className="text-lg font-semibold">
-          ∅
-        </span>
-      </div>
+      <EmptyIllustration />
       <div className="max-w-md">
-        <h2 className="text-base font-semibold text-norma-prussian">{title}</h2>
+        <h2 className="font-[family-name:var(--font-norma-display)] text-base font-semibold text-norma-prussian">
+          {title}
+        </h2>
         <p className="mt-1 text-sm text-norma-ink-muted">{description}</p>
       </div>
       {action}
