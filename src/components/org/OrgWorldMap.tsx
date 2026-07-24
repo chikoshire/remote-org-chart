@@ -12,6 +12,16 @@ import { geoNaturalEarth1, geoGraticule10, geoPath } from "d3-geo";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import { countryCentroid } from "@/lib/geo/country-centroids";
 import { alphaToNumericId, normalizeNumericId } from "@/lib/geo/iso-numeric";
+import {
+  MAP_HEIGHT,
+  MAP_WIDTH,
+  WORLD_VIEW,
+  clampView,
+  clientToMapPoint,
+  wheelZoomFactor,
+  zoomAtPoint,
+  type MapView,
+} from "@/lib/geo/map-view";
 import { worldCountries, worldLand } from "@/lib/geo/world-features";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import {
@@ -43,44 +53,6 @@ type CountryCluster = {
   lng: number;
   people: MapPerson[];
 };
-
-type MapView = {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-};
-
-const MAP_WIDTH = 960;
-const MAP_HEIGHT = 480;
-const MAX_ZOOM = 8;
-const WORLD_VIEW: MapView = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT };
-
-function clampView(view: MapView): MapView {
-  const w = Math.min(MAP_WIDTH, Math.max(MAP_WIDTH / MAX_ZOOM, view.w));
-  const h = Math.min(MAP_HEIGHT, Math.max(MAP_HEIGHT / MAX_ZOOM, view.h));
-  const x = Math.min(MAP_WIDTH - w, Math.max(0, view.x));
-  const y = Math.min(MAP_HEIGHT - h, Math.max(0, view.y));
-  return { x, y, w, h };
-}
-
-function zoomAtPoint(
-  view: MapView,
-  factor: number,
-  anchorX: number,
-  anchorY: number,
-): MapView {
-  const nextW = view.w / factor;
-  const nextH = view.h / factor;
-  const rx = (anchorX - view.x) / view.w;
-  const ry = (anchorY - view.y) / view.h;
-  return clampView({
-    x: anchorX - nextW * rx,
-    y: anchorY - nextH * ry,
-    w: nextW,
-    h: nextH,
-  });
-}
 
 export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) {
   const [activeCode, setActiveCode] = useState<string | null>(null);
@@ -183,22 +155,6 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
   const zoomLevel = MAP_WIDTH / view.w;
   const screenScale = 1 / zoomLevel;
 
-  const clientToMap = useCallback((clientX: number, clientY: number) => {
-    const svg = svgRef.current;
-    if (!svg) return null;
-    const rect = svg.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return null;
-    const scale = Math.min(rect.width / MAP_WIDTH, rect.height / MAP_HEIGHT);
-    const offsetX = (rect.width - MAP_WIDTH * scale) / 2;
-    const offsetY = (rect.height - MAP_HEIGHT * scale) / 2;
-    const svgX = (clientX - rect.left - offsetX) / scale;
-    const svgY = (clientY - rect.top - offsetY) / scale;
-    return {
-      x: view.x + (svgX / MAP_WIDTH) * view.w,
-      y: view.y + (svgY / MAP_HEIGHT) * view.h,
-    };
-  }, [view]);
-
   const focusCluster = useCallback(
     (cluster: CountryCluster, zoomFactor = 3.2) => {
       const point = projection([cluster.lng, cluster.lat]);
@@ -224,10 +180,17 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
 
   const onWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
     event.preventDefault();
-    const anchor = clientToMap(event.clientX, event.clientY);
-    if (!anchor) return;
-    const factor = event.deltaY < 0 ? 1.18 : 1 / 1.18;
-    setView((prev) => zoomAtPoint(prev, factor, anchor.x, anchor.y));
+    const factor = wheelZoomFactor(event.deltaX, event.deltaY);
+    if (factor == null) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const { clientX, clientY } = event;
+    setView((prev) => {
+      const anchor = clientToMapPoint(prev, clientX, clientY, rect);
+      if (!anchor) return prev;
+      return zoomAtPoint(prev, factor, anchor.x, anchor.y);
+    });
   };
 
   const onPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
