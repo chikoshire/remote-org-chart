@@ -17,6 +17,15 @@ import {
 import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
 import {
+  PERSON_OVERRIDES_CHANGED_EVENT,
+  applyPersonOverrides,
+  missingProfileFields,
+} from "@/lib/org/person-overrides";
+import {
+  captureProfileReturn,
+  consumeReturnScrollIfMatching,
+} from "@/lib/ui/profile-return";
+import {
   readRemoteConnected,
   readSessionOrgPayload,
   writeSessionOrgPayload,
@@ -38,6 +47,7 @@ type HealthSectionProps = {
   people: HealthPerson[];
   empty: string;
   tone?: "danger" | "warn" | "neutral";
+  showMissingHints?: boolean;
 };
 
 function HealthSection({
@@ -46,6 +56,7 @@ function HealthSection({
   people,
   empty,
   tone = "neutral",
+  showMissingHints = false,
 }: HealthSectionProps) {
   const countClass =
     tone === "danger"
@@ -83,7 +94,11 @@ function HealthSection({
         <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((person) => {
             const name = person.fullName?.trim() || "Unknown person";
-            const href = `/app${withPersonSearchParam("", person.id)}`;
+            const chartHref = `/app${withPersonSearchParam("", person.id)}`;
+            const profileHref = `/app/people/${person.id}`;
+            const missing = showMissingHints
+              ? missingProfileFields(person)
+              : [];
             return (
               <li key={person.id}>
                 <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-lavender/40 px-3.5 py-3.5">
@@ -104,12 +119,26 @@ function HealthSection({
                         ? ` · ${person.department.trim()}`
                         : ""}
                     </p>
-                    <Link
-                      href={href}
-                      className="mt-1 inline-block text-xs font-semibold text-norma-ink hover:underline"
-                    >
-                      Chart
-                    </Link>
+                    {missing.length > 0 ? (
+                      <p className="mt-0.5 text-[11px] text-norma-ink-subtle">
+                        Missing {missing.join(", ")}
+                      </p>
+                    ) : null}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <Link
+                        href={profileHref}
+                        onClick={() => captureProfileReturn(person.id)}
+                        className="text-xs font-semibold text-norma-royal hover:underline"
+                      >
+                        Fix in profile
+                      </Link>
+                      <Link
+                        href={chartHref}
+                        className="text-xs font-medium text-norma-ink-muted hover:underline"
+                      >
+                        Chart
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </li>
@@ -130,6 +159,27 @@ export function DataHealthWorkspace() {
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [orphanManagerIds, setOrphanManagerIds] = useState<string[]>([]);
 
+  const commitPeople = useCallback((nodes: HealthPerson[]) => {
+    const merged = applyPersonOverrides(nodes);
+    setPeople(merged);
+    const byId = new Map(merged.map((n) => [n.id, n]));
+    const orphans = [
+      ...new Set(
+        merged
+          .map((n) => n.managerEmploymentId?.trim())
+          .filter(
+            (id): id is string =>
+              typeof id === "string" && id.length > 0 && !byId.has(id),
+          ),
+      ),
+    ];
+    setOrphanManagerIds(orphans);
+  }, []);
+
+  useEffect(() => {
+    consumeReturnScrollIfMatching("/settings/data-health");
+  }, []);
+
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
       setStatus("empty");
@@ -141,7 +191,7 @@ export function DataHealthWorkspace() {
     try {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
       if (session?.ok && session.nodes?.length) {
-        setPeople(session.nodes);
+        commitPeople(session.nodes);
         setLastSyncedAt(session.lastSyncedAt ?? null);
         setStatus("ready");
       }
@@ -160,20 +210,8 @@ export function DataHealthWorkspace() {
         setPeople([]);
         return;
       }
-      setPeople(nodes);
+      commitPeople(nodes);
       setLastSyncedAt(body.lastSyncedAt ?? new Date().toISOString());
-      const byId = new Map(nodes.map((n) => [n.id, n]));
-      const orphans = [
-        ...new Set(
-          nodes
-            .map((n) => n.managerEmploymentId?.trim())
-            .filter(
-              (id): id is string =>
-                typeof id === "string" && id.length > 0 && !byId.has(id),
-            ),
-        ),
-      ];
-      setOrphanManagerIds(orphans);
       writeSessionOrgPayload(body);
       setStatus("ready");
     } catch (err) {
@@ -184,11 +222,23 @@ export function DataHealthWorkspace() {
       setStatus("error");
       setErrorMessage(mapped.message);
     }
-  }, []);
+  }, [commitPeople]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const onOverrides = () => {
+      const session = readSessionOrgPayload() as OrgChartResponse | null;
+      if (session?.ok && session.nodes?.length) {
+        commitPeople(session.nodes);
+      }
+    };
+    window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+    return () =>
+      window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+  }, [commitPeople]);
 
   const report = useMemo(
     () =>
@@ -234,8 +284,11 @@ export function DataHealthWorkspace() {
           <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
             Data Health
           </h1>
-          <p className="mt-1 text-sm text-norma-ink-muted">
-            Cycles, missing managers, and thin profiles · synced {syncedLabel}
+          <p className="mt-1 max-w-2xl text-sm text-norma-ink-muted">
+            Cycles, missing managers, and thin profiles · synced {syncedLabel}.
+            Open <span className="font-medium text-norma-ink">Fix in profile</span>{" "}
+            to fill missing fields on the People page (saved locally on this
+            device — not written back to Remote).
           </p>
         </div>
 
@@ -282,31 +335,32 @@ export function DataHealthWorkspace() {
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <HealthSection
             title="Reporting cycles"
-            description="Looped reporting chains"
+            description="Looped reporting chains — fix by changing a manager on the profile"
             people={report.inCycle}
             empty="No reporting cycles detected."
             tone="danger"
           />
           <HealthSection
             title="Manager missing"
-            description="Manager id set but person not in the active set"
+            description="Manager id set but person not in the active set — assign a manager on the profile"
             people={report.managerMissing}
             empty="Every manager link resolves."
             tone="warn"
           />
           <HealthSection
             title="No manager on file"
-            description="Top of a reporting line (including intentional leaders)"
+            description="Top of a reporting line (including intentional leaders). Assign a manager only if they should report up."
             people={report.noManagerOnFile}
             empty="No top-of-tree people found."
             tone="neutral"
           />
           <HealthSection
             title="Incomplete profiles"
-            description="Missing title, department, or country"
+            description="Missing title, department, or country — edit those fields on the profile"
             people={report.incompleteFields}
             empty="Every profile has title, department, and country."
             tone="neutral"
+            showMissingHints
           />
         </div>
 

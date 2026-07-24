@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { CommandBar } from "@/components/shell/CommandBar";
 
@@ -33,13 +33,6 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
   const pathname = usePathname();
   const settingsActive =
     pathname === "/settings" || pathname.startsWith("/settings/");
-  const router = useRouter();
-
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/");
-    router.refresh();
-  }
 
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-norma-canvas">
@@ -73,13 +66,6 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
         </nav>
         <div className="flex shrink-0 items-center gap-1">
           <CommandBar />
-          <button
-            type="button"
-            onClick={() => void logout()}
-            className="rounded-full px-3 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
-          >
-            Log out
-          </button>
           <Link
             href="/settings"
             className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${

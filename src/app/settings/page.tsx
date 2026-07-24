@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ProductShell } from "@/components/shell/ProductShell";
 import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
@@ -26,12 +27,14 @@ type Health = {
 };
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [density, setDensity] = useState<ChartDensity>("comfortable");
   const [liveDefault, setLiveDefault] = useState(false);
   const [saved, setSaved] = useState(false);
   const [connected, setConnected] = useState(true);
   const [healthOk, setHealthOk] = useState<boolean | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     const prefs = readAppPrefs();
@@ -76,6 +79,17 @@ export default function SettingsPage() {
   const finishConnect = () => {
     writeRemoteConnected(true);
     setConnected(true);
+  };
+
+  const logout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.replace("/");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const liveConnected = connected && healthOk !== false;
@@ -252,6 +266,25 @@ export default function SettingsPage() {
               </div>
 
               <DensityPreview density={density} />
+            </div>
+          </section>
+
+          <section className="mt-5 rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-sm font-semibold text-norma-ink">Session</h2>
+                <p className="mt-0.5 text-xs text-norma-ink-muted">
+                  End this browser session for the Acme demo app
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                disabled={loggingOut}
+                className="rounded-norma-sm border border-norma-border bg-norma-surface px-4 py-2 text-sm font-medium text-norma-ink hover:border-norma-danger hover:text-norma-danger disabled:opacity-60"
+              >
+                {loggingOut ? "Logging out…" : "Log out"}
+              </button>
             </div>
           </section>
         </ProductPageFrame>

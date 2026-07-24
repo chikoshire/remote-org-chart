@@ -12,6 +12,14 @@ import {
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
+import {
+  PERSON_OVERRIDES_CHANGED_EVENT,
+  applyPersonOverrides,
+  clearPersonOverride,
+  hasPersonOverride,
+  missingProfileFields,
+  writePersonOverride,
+} from "@/lib/org/person-overrides";
 import type { PersonProfilePayload } from "@/lib/remote/person-profile";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import {
@@ -29,6 +37,7 @@ import {
   readSessionOrgPayload,
   writeSessionOrgPayload,
 } from "@/lib/ui/remote-connection";
+import { searchPeople } from "@/lib/org/search-people";
 
 type FlatPerson = {
   id: string;
@@ -87,6 +96,13 @@ export function PersonProfileView({ personId }: { personId: string }) {
   const [returnTo, setReturnTo] = useState<ProfileReturnState>(() =>
     defaultProfileReturn(),
   );
+  const [editTitle, setEditTitle] = useState("");
+  const [editDepartment, setEditDepartment] = useState("");
+  const [editCountry, setEditCountry] = useState("");
+  const [managerQuery, setManagerQuery] = useState("");
+  const [editManagerId, setEditManagerId] = useState<string | null>(null);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [hasLocalEdits, setHasLocalEdits] = useState(false);
 
   useEffect(() => {
     const stored = readProfileReturn(personId) ?? readProfileReturn();
@@ -106,7 +122,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
     try {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
       if (session?.ok && session.nodes?.length) {
-        setPeople(session.nodes);
+        setPeople(applyPersonOverrides(session.nodes));
         // Soft start: show org snapshot immediately while Remote profile loads.
         setStatus("ready");
       } else {
@@ -133,7 +149,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
           setPeople([]);
           return;
         }
-        setPeople(nodes);
+        setPeople(applyPersonOverrides(nodes));
         writeSessionOrgPayload(orgBody);
       }
 
@@ -162,8 +178,30 @@ export function PersonProfileView({ personId }: { personId: string }) {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    const onOverrides = () => {
+      const session = readSessionOrgPayload() as OrgChartResponse | null;
+      if (session?.ok && session.nodes?.length) {
+        setPeople(applyPersonOverrides(session.nodes));
+      }
+      setHasLocalEdits(hasPersonOverride(personId));
+    };
+    window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+    return () =>
+      window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+  }, [personId]);
+
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
   const person = byId.get(personId) ?? null;
+
+  useEffect(() => {
+    setHasLocalEdits(hasPersonOverride(personId));
+    setEditTitle(person?.jobTitle?.trim() || "");
+    setEditDepartment(person?.department?.trim() || "");
+    setEditCountry(person?.country?.trim() || "");
+    setEditManagerId(person?.managerEmploymentId ?? null);
+    setManagerQuery("");
+  }, [person, personId]);
 
   const pathToRoot = useMemo(() => {
     const path: FlatPerson[] = [];
@@ -192,12 +230,53 @@ export function PersonProfileView({ personId }: { personId: string }) {
       target === "/app" ||
       target.startsWith("/app?") ||
       target.startsWith("/app#");
+    const goingToHealth = target.includes("/data-health");
     void withViewTransition(() => {
       router.push(target);
     }).then(() => {
-      if (goingToChart) clearProfileReturn();
+      if (goingToChart || goingToHealth) clearProfileReturn();
     });
   }, [returnTo.href, router]);
+
+  const managerSuggestions = useMemo(() => {
+    const hits = searchPeople(
+      people
+        .filter((p) => p.id !== personId)
+        .map((p) => ({
+          id: p.id,
+          fullName: p.fullName,
+          jobTitle: p.jobTitle,
+        })),
+      managerQuery,
+    );
+    return hits.slice(0, 8);
+  }, [managerQuery, people, personId]);
+
+  const saveProfileEdits = useCallback(() => {
+    writePersonOverride(personId, {
+      jobTitle: editTitle.trim() || null,
+      department: editDepartment.trim() || null,
+      country: editCountry.trim() || null,
+      managerEmploymentId: editManagerId,
+    });
+    setHasLocalEdits(true);
+    setSavedFlash(true);
+    window.setTimeout(() => setSavedFlash(false), 1600);
+  }, [editCountry, editDepartment, editManagerId, editTitle, personId]);
+
+  const clearLocalEdits = useCallback(() => {
+    clearPersonOverride(personId);
+    setHasLocalEdits(false);
+    const session = readSessionOrgPayload() as OrgChartResponse | null;
+    if (session?.ok && session.nodes?.length) {
+      const raw = session.nodes.find((n) => n.id === personId);
+      setEditTitle(raw?.jobTitle?.trim() || "");
+      setEditDepartment(raw?.department?.trim() || "");
+      setEditCountry(raw?.country?.trim() || "");
+      setEditManagerId(raw?.managerEmploymentId ?? null);
+      setPeople(applyPersonOverrides(session.nodes));
+    }
+  }, [personId]);
 
   if (status === "loading") return <ChartLoadingState />;
   if (status === "error") {
@@ -329,6 +408,155 @@ export function PersonProfileView({ personId }: { personId: string }) {
                 ) : null}
               </p>
             </div>
+          </div>
+        </section>
+
+        {hasLocalEdits ? (
+          <p
+            role="status"
+            className="bloom-enter rounded-norma-md border border-norma-border bg-norma-highlight-soft/80 px-4 py-2.5 text-sm text-norma-prussian"
+          >
+            Showing local corrections on this device (not written to Remote).
+          </p>
+        ) : null}
+
+        <section className="bloom-enter bloom-enter-delay-1 norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
+                Fix profile data
+              </h2>
+              <p className="mt-1 text-sm text-norma-ink-muted">
+                Fill gaps flagged in Data Health. Changes stay in this browser.
+              </p>
+            </div>
+            {missingProfileFields({
+              jobTitle: person?.jobTitle,
+              department: person?.department,
+              country: person?.country,
+            }).length > 0 ? (
+              <span className="rounded-norma-sm bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-900">
+                Incomplete
+              </span>
+            ) : null}
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="block text-sm">
+              <span className="text-xs font-medium text-norma-ink-subtle">
+                Job title
+              </span>
+              <input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="mt-1 w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink outline-none focus:border-norma-royal"
+                placeholder="e.g. Product Designer"
+                autoComplete="off"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="text-xs font-medium text-norma-ink-subtle">
+                Department
+              </span>
+              <input
+                value={editDepartment}
+                onChange={(e) => setEditDepartment(e.target.value)}
+                className="mt-1 w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink outline-none focus:border-norma-royal"
+                placeholder="e.g. Engineering"
+                autoComplete="off"
+              />
+            </label>
+            <label className="block text-sm sm:col-span-2">
+              <span className="text-xs font-medium text-norma-ink-subtle">
+                Country
+              </span>
+              <input
+                value={editCountry}
+                onChange={(e) => setEditCountry(e.target.value)}
+                className="mt-1 w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink outline-none focus:border-norma-royal"
+                placeholder="e.g. Portugal or PT"
+                autoComplete="off"
+              />
+            </label>
+          </div>
+
+          <div className="mt-4 border-t border-norma-border/70 pt-4">
+            <p className="text-xs font-medium text-norma-ink-subtle">Manager</p>
+            <p className="mt-0.5 text-xs text-norma-ink-muted">
+              Search someone in the org, or clear to make this person a root.
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <p className="text-sm font-medium text-norma-ink">
+                {editManagerId
+                  ? byId.get(editManagerId)?.fullName?.trim() ||
+                    "Selected manager"
+                  : "No manager (root)"}
+              </p>
+              {editManagerId ? (
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-norma-royal hover:underline"
+                  onClick={() => {
+                    setEditManagerId(null);
+                    setManagerQuery("");
+                  }}
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            <input
+              value={managerQuery}
+              onChange={(e) => setManagerQuery(e.target.value)}
+              className="mt-2 w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink outline-none focus:border-norma-royal"
+              placeholder="Search people to assign as manager…"
+              autoComplete="off"
+            />
+            {managerQuery.trim() && managerSuggestions.length > 0 ? (
+              <ul
+                className="mt-1 max-h-40 overflow-auto rounded-norma-md border border-norma-border bg-norma-surface py-1 shadow-norma-sm"
+                role="listbox"
+              >
+                {managerSuggestions.map((hit) => (
+                  <li key={hit.id}>
+                    <button
+                      type="button"
+                      className="flex w-full flex-col items-start px-3 py-1.5 text-left text-sm hover:bg-norma-accent-soft"
+                      onClick={() => {
+                        setEditManagerId(hit.id);
+                        setManagerQuery("");
+                      }}
+                    >
+                      <span className="font-medium text-norma-prussian">
+                        {hit.fullName ?? "Unknown"}
+                      </span>
+                      <span className="text-xs text-norma-ink-muted">
+                        {hit.jobTitle ?? "No title"}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={saveProfileEdits}
+              className="norma-cta px-4 py-2 text-sm"
+            >
+              {savedFlash ? "Saved locally" : "Save local edits"}
+            </button>
+            {hasLocalEdits ? (
+              <button
+                type="button"
+                onClick={clearLocalEdits}
+                className="rounded-norma-sm border border-norma-border bg-norma-surface px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-ink"
+              >
+                Clear local edits
+              </button>
+            ) : null}
           </div>
         </section>
 

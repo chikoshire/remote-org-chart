@@ -15,7 +15,10 @@ export function ProductPageFrame({
   className = "",
 }: ProductPageFrameProps) {
   return (
-    <div className={`min-h-0 flex-1 overflow-auto ${className}`.trim()}>
+    <div
+      className={`min-h-0 flex-1 overflow-auto ${className}`.trim()}
+      data-product-scroll
+    >
       <div className="w-full px-5 py-8 md:px-8 md:py-10 lg:px-10 xl:px-12">
         {children}
       </div>

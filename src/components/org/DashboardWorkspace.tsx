@@ -16,6 +16,10 @@ import {
   type NamedCount,
 } from "@/lib/org/dashboard-insights";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
+import {
+  PERSON_OVERRIDES_CHANGED_EVENT,
+  applyPersonOverrides,
+} from "@/lib/org/person-overrides";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { withViewTransition } from "@/lib/ui/motion";
 import {
@@ -402,7 +406,7 @@ export function DashboardWorkspace() {
     try {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
       if (session?.ok && session.nodes?.length) {
-        setPeople(session.nodes);
+        setPeople(applyPersonOverrides(session.nodes));
         setLastSyncedAt(session.lastSyncedAt ?? null);
         setStatus("ready");
       }
@@ -423,7 +427,7 @@ export function DashboardWorkspace() {
         setPeople([]);
         return;
       }
-      setPeople(nodes);
+      setPeople(applyPersonOverrides(nodes));
       setLastSyncedAt(body.lastSyncedAt ?? null);
       writeSessionOrgPayload(body);
       setStatus("ready");
@@ -441,6 +445,17 @@ export function DashboardWorkspace() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    const onOverrides = () => {
+      const session = readSessionOrgPayload() as OrgChartResponse | null;
+      if (session?.ok && session.nodes?.length) {
+        setPeople(applyPersonOverrides(session.nodes));
+      }
+    };
+    window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+    return () =>
+      window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+  }, []);
   const insights = useMemo(
     () => computeDashboardInsights(people, { lastSyncedAt }),
     [lastSyncedAt, people],
