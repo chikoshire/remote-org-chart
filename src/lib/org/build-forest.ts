@@ -23,6 +23,7 @@ export function buildOrgForest(records: EmploymentRecord[]): OrgForest {
       status: record.status,
       country: record.country,
       workEmail: record.workEmail,
+      avatarUrl: record.avatarUrl,
       managerEmploymentId: record.managerEmploymentId,
       children: [],
       inCycle: false,
