@@ -6,33 +6,31 @@ Interactive **organisational intelligence** app for **Acme Sandbox Corp**, built
 
 **https://remote-org-chart.shirechiko.workers.dev**
 
+Demo login credentials are shared **separately** with the interview team (private handoff / email) — not stored in this README. Override locally or in Wrangler with `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` / `APP_SESSION_SECRET`. The app session is separate from `REMOTE_API_TOKEN` (server-only).
+
 | Check | Expected |
 |-------|----------|
 | Home `/` | Marketing landing with Log in |
-| Login | Demo: `demo@acme.example` / `acme-org-demo` → `/app` |
-| Product shell | Dashboard · Org Chart · People · Departments · Settings (Data Health inside Settings) |
+| Login | Demo credentials (shared privately) → `/app/dashboard` |
+| Product shell | Dashboard · Org Chart · People · Help · Settings (Data Health inside Settings) |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
 | `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15–25s |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
 
-> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** to force a rebuild.
+> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** on Org Chart, Dashboard, or Data Health to force a rebuild.
 
-### Demo login (interview handoff)
+### Product screenshots
 
-| Field | Value |
-|-------|-------|
-| Email | `demo@acme.example` |
-| Password | `acme-org-demo` |
-
-Override with `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` / `APP_SESSION_SECRET` (Wrangler secrets in production). This **app session** is separate from `REMOTE_API_TOKEN` (server-only).
-
-Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handoff.md).
+| Dashboard | Org Chart | People |
+|-----------|-----------|--------|
+| ![Dashboard](./public/marketing/app-dashboard.png) | ![Org Chart](./public/marketing/app-org-chart.png) | ![People](./public/marketing/app-people.png) |
 
 ### Links for the interview team
 
 - **Live app:** https://remote-org-chart.shirechiko.workers.dev  
 - **Marketing landing:** https://remote-org-chart.shirechiko.workers.dev/  
-- **Source:** https://github.com/chikoshire/remote-org-chart  
+- **Source:** private GitHub repo (collaborator invite only)  
+- **In-app Help:** `/help` (after login) · markdown source in [`docs/help/`](./docs/help/)  
 - **Security notes:** [SECURITY.md](./SECURITY.md)  
 - **Production readiness:** [PRODUCTION.md](./PRODUCTION.md)  
 - **Decision log:** [DECISIONS.md](./DECISIONS.md)
@@ -62,7 +60,8 @@ Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handof
 | `/app/people` | People directory (Grid \| List + department filter) |
 | `/app/departments` | Redirects to Dashboard |
 | `/app/data-health` | Redirects to Settings → Data Health |
-| `/settings` | Preferences (Remote connect + theme) |
+| `/help` | Product how-tos + assistant entry |
+| `/settings` | Preferences (Remote connect + theme + session) |
 | `/settings/data-health` | Trust / edge-case review |
 
 ### Keyboard shortcuts
@@ -107,10 +106,10 @@ Open [http://localhost:3000](http://localhost:3000).
 ```bash
 REMOTE_API_TOKEN=ra_test_…
 REMOTE_API_BASE_URL=https://gateway.remote-sandbox.com
-# Optional app login overrides (defaults documented above)
-# DEMO_APP_EMAIL=demo@acme.example
-# DEMO_APP_PASSWORD=acme-org-demo
-# APP_SESSION_SECRET=…
+# Optional app login overrides (set real values locally / as Wrangler secrets — never commit)
+# DEMO_APP_EMAIL=
+# DEMO_APP_PASSWORD=
+# APP_SESSION_SECRET=
 ```
 
 Token source: sandbox Company settings → Integrations & APIs → Remote API (read-only).  

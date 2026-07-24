@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ChartEmptyState,
@@ -158,6 +158,10 @@ export function DataHealthWorkspace() {
   const [people, setPeople] = useState<HealthPerson[]>([]);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [orphanManagerIds, setOrphanManagerIds] = useState<string[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [remoteConnected, setRemoteConnected] = useState(true);
+  const hasReadyData = useRef(false);
 
   const commitPeople = useCallback((nodes: HealthPerson[]) => {
     const merged = applyPersonOverrides(nodes);
@@ -180,47 +184,77 @@ export function DataHealthWorkspace() {
     consumeReturnScrollIfMatching("/settings/data-health");
   }, []);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (opts?: { refresh?: boolean }) => {
+    const isRefresh = opts?.refresh === true;
+    setRefreshError(null);
     if (!readRemoteConnected()) {
+      setRemoteConnected(false);
       setStatus("empty");
       setPeople([]);
+      hasReadyData.current = false;
       return;
     }
-    setStatus("loading");
-    setErrorMessage(null);
+    setRemoteConnected(true);
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setStatus("loading");
+      setErrorMessage(null);
+    }
     try {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
-      if (session?.ok && session.nodes?.length) {
+      if (!isRefresh && session?.ok && session.nodes?.length) {
         commitPeople(session.nodes);
         setLastSyncedAt(session.lastSyncedAt ?? null);
         setStatus("ready");
+        hasReadyData.current = true;
       }
-      const res = await fetch("/api/org-chart");
+      const res = await fetch(
+        isRefresh ? "/api/org-chart?refresh=1" : "/api/org-chart",
+      );
       const body = (await res.json()) as OrgChartResponse;
       if (!res.ok || !body.ok) {
         const mapped = mapOrgChartHttpError(res.status, body);
-        if (session?.ok && session.nodes?.length) return;
+        if (isRefresh && hasReadyData.current) {
+          setRefreshError(mapped.message);
+          return;
+        }
+        if (!isRefresh && session?.ok && session.nodes?.length) return;
         setStatus("error");
         setErrorMessage(mapped.message);
         return;
       }
       const nodes = body.nodes ?? [];
       if (nodes.length === 0) {
+        if (isRefresh && hasReadyData.current) {
+          setRefreshError(
+            "Remote returned an empty org chart; kept the previous snapshot.",
+          );
+          return;
+        }
         setStatus("empty");
         setPeople([]);
+        hasReadyData.current = false;
         return;
       }
       commitPeople(nodes);
       setLastSyncedAt(body.lastSyncedAt ?? new Date().toISOString());
       writeSessionOrgPayload(body);
+      hasReadyData.current = true;
       setStatus("ready");
     } catch (err) {
       const mapped = mapOrgChartHttpError(0, {
         code: "network",
         message: err instanceof Error ? err.message : "Network error",
       });
+      if (isRefresh && hasReadyData.current) {
+        setRefreshError(mapped.message);
+        return;
+      }
       setStatus("error");
       setErrorMessage(mapped.message);
+    } finally {
+      if (isRefresh) setRefreshing(false);
     }
   }, [commitPeople]);
 
@@ -280,16 +314,32 @@ export function DataHealthWorkspace() {
 
   return (
     <ProductPageFrame>
-        <div>
-          <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
-            Data Health
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm text-norma-ink-muted">
-            Cycles, missing managers, and thin profiles · synced {syncedLabel}.
-            Open <span className="font-medium text-norma-ink">Fix in profile</span>{" "}
-            to fill missing fields on the People page (saved locally on this
-            device — not written back to Remote).
-          </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+              Data Health
+            </h1>
+            <p className="mt-1 max-w-2xl text-sm text-norma-ink-muted">
+              Cycles, missing managers, and thin profiles · synced {syncedLabel}
+              {refreshing ? " · refreshing…" : ""}. Open{" "}
+              <span className="font-medium text-norma-ink">Fix in profile</span>{" "}
+              to fill missing fields on the People page (saved locally on this
+              device — not written back to Remote).
+            </p>
+            {refreshError ? (
+              <p className="mt-2 text-sm text-norma-danger" role="alert">
+                Refresh failed. Kept the previous data. {refreshError}
+              </p>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            disabled={refreshing || !remoteConnected}
+            className="rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
+            onClick={() => void load({ refresh: true })}
+          >
+            {refreshing ? "Refreshing…" : "Refresh from Remote"}
+          </button>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

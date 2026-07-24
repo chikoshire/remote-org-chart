@@ -9,7 +9,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/app/dashboard";
-  const [email, setEmail] = useState("demo@acme.example");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -79,8 +79,8 @@ function LoginForm() {
         {submitting ? "Signing in…" : "Log in"}
       </button>
       <p className="text-xs leading-relaxed text-norma-ink-muted">
-        Interview demo: use the credentials in the README. Remote API tokens
-        stay on the server and never appear in this form.
+        Use the demo credentials shared with your interview invite. Remote API
+        tokens stay on the server and never appear in this form.
       </p>
     </form>
   );

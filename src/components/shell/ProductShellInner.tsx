@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
+import { HelpChatWidget } from "@/components/help/HelpChatWidget";
 import { CommandBar } from "@/components/shell/CommandBar";
 
 type ProductShellProps = {
@@ -19,6 +20,7 @@ const PRIMARY_NAV = [
     match: (p: string) => p === "/app" || p === "/",
   },
   { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
+  { href: "/help", label: "Help", match: (p: string) => p === "/help" || p.startsWith("/help/") },
 ] as const;
 
 function navClass(active: boolean) {
@@ -108,6 +110,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
         <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden">
           {children}
         </div>
+        <HelpChatWidget />
       </main>
       <footer
         role="contentinfo"

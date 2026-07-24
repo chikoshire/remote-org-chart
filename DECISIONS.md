@@ -375,7 +375,7 @@ Ship the serial wow track GH#58–#68 plus morph polish #70 (Linear TUXX-1593–
 - Morph/bloom only where the same entity continues across views; honour `prefers-reduced-motion`.  
 
 **Revisit when:**  
-Interview handoff date forces cutting optional #66–#67 or #70. (Update 2026-07-24: #66–#70 and #68 QA shipped; see `docs/interviewer-handoff.md`.)
+Interview handoff date forces cutting optional #66–#67 or #70. (Update 2026-07-24: #66–#70 and #68 QA shipped; interviewer handoff lives privately outside the repo.)
 
 ---
 
@@ -417,7 +417,7 @@ Interviewers prefer tree as default (unlikely).
 Interviewers need a public story and a gated product without exposing `REMOTE_API_TOKEN`.
 
 **Decision:**  
-`/` is marketing. Demo login (`demo@acme.example` / `acme-org-demo`, overridable via env) sets an httpOnly signed cookie. Middleware gates `/app/*` and `/settings`. Logout clears the cookie and returns to marketing. Remote Bearer remains server-only.
+`/` is marketing. Demo login (credentials via `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD`, with local defaults for boot) sets an httpOnly signed cookie. Middleware gates `/app/*`, `/settings`, and `/help`. Logout clears the cookie and returns to marketing. Remote Bearer remains server-only. Demo passwords are not published in README — shared privately with interviewers.
 
 **Revisit when:**  
 Real identity provider is required beyond demo credentials.
@@ -938,6 +938,28 @@ Rebuild `/` to follow remote.com’s section map: left-copy / right-visual hero,
 
 **Revisit when:**  
 We automate screenshot refresh in CI.
+
+---
+
+## 2026-07-24 — Help KB + Workers AI assistant; secrets scrub
+
+**Status:** Accepted  
+
+**Context:**  
+Interviewers need product how-tos without reading the engineering decision log. Demo passwords were in README / handoff docs while the GitHub repo was public. Dashboard and Data Health showed “synced …” without a Refresh action (only Org Chart had one).
+
+**Decision:**  
+1. Markdown Help under `docs/help/` + authenticated `/help` routes; floating Help assistant calls `POST /api/help/chat` with Workers AI (`AI` binding, Llama 3.1 8B) grounded on KB chunks + org snapshot people search; rate-limited.  
+2. **Refresh from Remote** on Dashboard and Data Health (same `?refresh=1` path as Org Chart).  
+3. Scrub demo credentials from README / `.env.example` / DECISIONS prose; delete `docs/interviewer-handoff.md` from the repo; private handoff lives at `~/Downloads/acme-org-chart-interviewer-handoff.md` for email. Keep GitHub repo **private**; live Workers URL is the demo path.  
+4. Code defaults for demo login remain overridable via Wrangler / `.env.local` — never publish passwords in git-facing docs.
+
+**Consequences:**  
+- Chat uses free Workers AI neuron allowance; offline/local falls back to Help links.  
+- Git history may still contain old password strings — private repo + optional password rotation via env is the practical mitigation.
+
+**Revisit when:**  
+Vectorize RAG is needed, or demo password rotation after broader exposure.
 
 ---
 
