@@ -1227,7 +1227,23 @@ function OrgChartInner() {
                   </p>
                   <p className="mt-1">{compareHint}</p>
                 </div>
-              ) : null}
+              ) : (
+                <div className="rounded-norma-md border border-dashed border-norma-border bg-norma-surface/80 px-3 py-2.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-norma-ink-subtle">
+                    Compare
+                  </p>
+                  <p className="mt-1 text-xs text-norma-ink-muted">
+                    Pick two people on the chart to see reporting distance.
+                  </p>
+                  <button
+                    type="button"
+                    className="mt-2 w-full rounded-norma-sm border border-norma-border bg-norma-surface px-2.5 py-2 text-left text-[11px] font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-royal"
+                    onClick={() => enterCompare()}
+                  >
+                    Start compare
+                  </button>
+                </div>
+              )}
               <details className="rounded-norma-md border border-norma-border bg-norma-surface-muted/50 px-3 py-2">
                 <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
                   Tools
@@ -1251,22 +1267,16 @@ function OrgChartInner() {
                   >
                     {liveUpdates ? "Live updates on" : "Live updates off"}
                   </button>
-                  <button
-                    type="button"
-                    aria-pressed={compareMode}
-                    className={`rounded-norma-sm border px-2 py-1.5 text-left text-[11px] font-medium ${
-                      compareMode
-                        ? "border-norma-royal bg-norma-accent-soft text-norma-royal"
-                        : "border-norma-border bg-norma-surface text-norma-ink-muted hover:text-norma-prussian"
-                    }`}
-                    onClick={() =>
-                      compareMode ? exitCompare() : enterCompare()
-                    }
-                  >
-                    {compareMode
-                      ? "Exit compare mode"
-                      : "Compare reporting distance"}
-                  </button>
+                  {compareMode ? (
+                    <button
+                      type="button"
+                      aria-pressed
+                      className="rounded-norma-sm border border-norma-royal bg-norma-accent-soft px-2 py-1.5 text-left text-[11px] font-medium text-norma-royal"
+                      onClick={() => exitCompare()}
+                    >
+                      Exit compare mode
+                    </button>
+                  ) : null}
                   <div
                     className="flex flex-wrap gap-1"
                     role="group"
