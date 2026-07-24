@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { personDeepLinkHref } from "@/lib/org/deep-links";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import { personMorphName } from "@/lib/ui/motion";
 
 export type PersonDetail = {
   id: string;
@@ -77,7 +78,9 @@ export function PersonDetailDrawer({
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      className="absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+      className="bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+      style={{ viewTransitionName: personMorphName(person.id) }}
+      data-morph-person={person.id}
     >
       <div className="flex items-start gap-3 border-b border-norma-border px-4 py-3">
         <span

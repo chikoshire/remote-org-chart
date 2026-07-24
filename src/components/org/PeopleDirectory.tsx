@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import { personMorphName } from "@/lib/ui/motion";
 
 export type DirectoryPerson = {
   id: string;
@@ -144,6 +145,12 @@ export function PeopleDirectory({
                       ? "border-norma-royal ring-2 ring-norma-royal/25"
                       : "border-norma-border hover:border-[#2a9d8f]/50 hover:shadow-norma-md"
                   }`}
+                  style={
+                    selected
+                      ? undefined
+                      : { viewTransitionName: personMorphName(person.id) }
+                  }
+                  data-morph-person={person.id}
                 >
                   <span
                     aria-hidden

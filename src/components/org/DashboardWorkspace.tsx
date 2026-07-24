@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ChartEmptyState,
   ChartErrorState,
@@ -13,6 +14,7 @@ import {
   type DashboardPerson,
 } from "@/lib/org/dashboard-insights";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
+import { withViewTransition } from "@/lib/ui/motion";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -33,6 +35,7 @@ type InsightCardProps = {
   hint?: string;
   href?: string;
   hrefLabel?: string;
+  onNavigate?: (href: string) => void;
 };
 
 function InsightCard({
@@ -41,9 +44,10 @@ function InsightCard({
   hint,
   href,
   hrefLabel,
+  onNavigate,
 }: InsightCardProps) {
   return (
-    <article className="rounded-norma-lg border border-norma-border bg-norma-surface p-4 shadow-norma-sm">
+    <article className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface p-4 shadow-norma-sm">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
         {label}
       </p>
@@ -57,6 +61,11 @@ function InsightCard({
         <Link
           href={href}
           className="mt-3 inline-block text-xs font-semibold text-norma-royal hover:underline"
+          onClick={(event) => {
+            if (!onNavigate) return;
+            event.preventDefault();
+            onNavigate(href);
+          }}
         >
           {hrefLabel}
         </Link>
@@ -66,12 +75,22 @@ function InsightCard({
 }
 
 export function DashboardWorkspace() {
+  const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
     "loading",
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [people, setPeople] = useState<DashboardPerson[]>([]);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
+
+  const navigate = useCallback(
+    (href: string) => {
+      void withViewTransition(() => {
+        router.push(href);
+      });
+    },
+    [router],
+  );
 
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
@@ -180,6 +199,7 @@ export function DashboardWorkspace() {
             hint="Active employments in Remote"
             href="/app/people"
             hrefLabel="Browse People"
+            onNavigate={navigate}
           />
           <InsightCard
             label="Departments"
@@ -191,6 +211,7 @@ export function DashboardWorkspace() {
             }
             href="/app/departments"
             hrefLabel="Open Departments"
+            onNavigate={navigate}
           />
           <InsightCard
             label="Managers"
@@ -198,6 +219,7 @@ export function DashboardWorkspace() {
             hint={`${insights.individualContributorCount} individual contributors`}
             href="/app"
             hrefLabel="Open Org Chart"
+            onNavigate={navigate}
           />
           <InsightCard
             label="Leadership roots"
@@ -209,6 +231,7 @@ export function DashboardWorkspace() {
             }
             href="/app"
             hrefLabel="View chart"
+            onNavigate={navigate}
           />
           <InsightCard
             label="Manager missing"
@@ -216,6 +239,7 @@ export function DashboardWorkspace() {
             hint="Manager id set but not in the active set"
             href="/app/data-health"
             hrefLabel="Review Data Health"
+            onNavigate={navigate}
           />
           <InsightCard
             label="Data completeness"
@@ -223,6 +247,7 @@ export function DashboardWorkspace() {
             hint="Share of people with title, department, and country"
             href="/app/data-health"
             hrefLabel="Fix incomplete profiles"
+            onNavigate={navigate}
           />
         </div>
 
