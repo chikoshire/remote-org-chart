@@ -485,6 +485,25 @@ Treat Tree as nested **person cards** with department accent rails, department/c
 
 ---
 
+## 2026-07-24 — Data Health under Settings + wider layout
+
+**Status:** Accepted  
+
+**Context:**  
+Data Health was a primary nav item with a narrow `max-w-3xl` column that left large empty side margins. Trust tooling fits better with Remote connect / preferences than with day-to-day org browsing.
+
+**Decision:**  
+1. Move Data Health to **Settings → Data Health** (`/settings/data-health`) with Preferences / Data Health subnav.  
+2. Remove it from primary top nav.  
+3. Keep `/app/data-health` as a redirect for old links.  
+4. Widen the health layout (`max-w-7xl`, 4-up summary, 2-column issue sections, person card grid).
+
+**Consequences:**  
+- Primary IA is Dashboard · Org Chart · People · Departments · Settings.  
+- Dashboard / command bar deep links point at `/settings/data-health`.
+
+---
+
 ## Template for future entries
 
 
