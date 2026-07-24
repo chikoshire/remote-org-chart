@@ -235,6 +235,14 @@
   outline-offset: 2px;
 }
 
+/* Map pins: kill rectangular SVG focus rings; selection uses circular stroke. */
+[data-map-interactive]:focus,
+[data-map-interactive]:focus-visible,
+[data-map-country]:focus,
+[data-map-country]:focus-visible {
+  outline: none !important;
+}
+
 /* Morph + bloom (#70) */
 .bloom-enter {
   animation: bloom-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
