@@ -740,9 +740,9 @@ function OrgChartInner() {
     initialFitDone.current = true;
     requestAnimationFrame(() => {
       void fitView({
-        padding: 0.3,
-        maxZoom: 1.2,
-        minZoom: 0.45,
+        padding: 0.28,
+        maxZoom: 1.25,
+        minZoom: 0.5,
         duration: reducedMotion ? 0 : 380,
       });
     });
@@ -1338,7 +1338,7 @@ function OrgChartInner() {
               className="h-full w-full bg-transparent"
               aria-label="Interactive organization chart. Use arrow keys or drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
             >
-              <Background color="#c5d5d1" gap={isMobile ? 16 : 22} size={1} />
+              <Background color="#d5e0dd" gap={isMobile ? 18 : 24} size={1.1} />
               <Controls
                 showInteractive={false}
                 position={isMobile ? "bottom-right" : "bottom-left"}
