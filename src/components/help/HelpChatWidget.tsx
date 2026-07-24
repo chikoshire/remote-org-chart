@@ -171,12 +171,41 @@ export function HelpChatWidget() {
       ) : null}
       <button
         type="button"
-        className="pointer-events-auto inline-flex h-11 items-center gap-2 rounded-full bg-norma-ink px-4 text-sm font-semibold text-norma-ink-inverse shadow-norma-md hover:opacity-95"
+        className="pointer-events-auto inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-norma-ink text-norma-ink-inverse shadow-norma-md hover:opacity-95"
         onClick={() => (open ? setOpen(false) : openPanel())}
         aria-expanded={open}
         aria-controls={open ? titleId : undefined}
+        aria-label={open ? "Close help assistant" : "Open help assistant"}
+        title={open ? "Close help" : "Help"}
       >
-        {open ? "Hide help" : "Help"}
+        {open ? (
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        ) : (
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="h-6 w-6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 3.3c-.7.5-1.1 1-1.1 1.8" />
+            <path d="M12 17h.01" />
+          </svg>
+        )}
       </button>
     </div>
   );
