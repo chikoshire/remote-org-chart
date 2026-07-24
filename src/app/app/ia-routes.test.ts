@@ -11,15 +11,16 @@ const routes = [
 
 describe("Org Intelligence IA routes", () => {
   for (const segment of routes) {
-    it(`has /app/${segment} page stub`, () => {
-      const path = join(
-        process.cwd(),
-        `src/app/app/${segment}/page.tsx`,
-      );
+    it(`has /app/${segment} page`, () => {
+      const path = join(process.cwd(), `src/app/app/${segment}/page.tsx`);
       expect(existsSync(path)).toBe(true);
       const src = readFileSync(path, "utf8");
       expect(src).toContain("ProductShell");
-      expect(src).toContain("SurfaceStub");
+      if (segment === "people") {
+        expect(src).toContain("PeopleWorkspace");
+      } else {
+        expect(src).toContain("SurfaceStub");
+      }
     });
   }
 });

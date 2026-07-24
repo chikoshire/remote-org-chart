@@ -26,4 +26,10 @@ describe("PersonNodeCard", () => {
     expect(card).toContain('variant === "selected"');
     expect(card).toContain("Profile");
   });
+
+  it("uses department accents and taller comfortable cards", () => {
+    expect(card).toContain("departmentAccent");
+    expect(card).toContain("w-[260px]");
+    expect(card).toContain("reports");
+  });
 });
