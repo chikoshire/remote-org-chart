@@ -221,22 +221,22 @@ Never for agent branding; only if the GitHub noreply address should be replaced 
 
 ## 2026-07-24 — Acme brand + dual view (polish later)
 
-**Status:** Accepted (deferred until after core backlog)
+**Status:** Accepted (shipped GH#43)
 
 **Context:**  
 Norma / Remote product chrome was an early convenience choice, not a brief requirement. The app is an **Acme Sandbox Corp** headless HRIS surface that reads Remote — not a Remote marketing skin. Visual feedback: current chart hits the brief but feels thin; desired brand direction is Markel / Neuro (warm orange, deep teal–navy, soft grain gradients, geometric sans). LinkedIn is UX inspiration for *people discovery*, not a replacement for the org graph.
 
 **Decision:**  
 - Keep the **interactive org graph** as the primary, brief-compliant view.  
-- Later polish: re-theme to **Acme** (Markel/Neuro cues), and add a **toggleable alternate people view** (richer cards / profile-style detail) over the **same** employment data — expand, don’t scrap the graph.  
-- Do **not** block serial backlog (#30 a11y → #31 Playwright → stretch) on this rebrand.  
+- Re-theme CSS variables (class prefix still `norma-*`) to Acme Markel/Neuro: orange `#e85d04`, teal–navy `#0b2a32`, spray teal `#2a9d8f`, grain canvas. Fonts: Outfit + DM Sans.  
+- **Chart | Directory** toggle — directory is LinkedIn-style people cards over the same employment payload; “Show in chart” returns to the graph.  
 - Profile photos / work history only where Remote actually returns them; otherwise initials + available fields.
 
 **Consequences:**  
-Brand tokens and the people-directory toggle land in a dedicated polish pass (likely after #16 / alongside #17–#21). Interviewers still get a working graph before that.
+Welcome + chart chrome share Acme cues. Interviewers get both hierarchy and people-browse without a second data source.
 
 **Revisit when:**  
-Starting the visual polish block, or if Remote exposes avatar/history fields we should surface.
+Remote exposes avatars or richer profile fields worth surfacing in the directory.
 
 ---
 

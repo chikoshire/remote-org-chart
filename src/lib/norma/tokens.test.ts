@@ -7,11 +7,11 @@ const css = readFileSync(
   "utf8",
 );
 
-describe("Norma design tokens", () => {
-  it("defines Remote brand cues", () => {
-    expect(css).toMatch(/--norma-royal:\s*#624de3/i);
-    expect(css).toMatch(/--norma-prussian:\s*#00234b/i);
-    expect(css).toMatch(/--norma-spray:\s*#75e8f0/i);
+describe("Acme design tokens", () => {
+  it("defines Markel/Neuro brand cues", () => {
+    expect(css).toMatch(/--norma-royal:\s*#e85d04/i);
+    expect(css).toMatch(/--norma-prussian:\s*#0b2a32/i);
+    expect(css).toMatch(/--norma-spray:\s*#2a9d8f/i);
   });
 
   it("exposes a Tailwind theme bridge for brand colors", () => {

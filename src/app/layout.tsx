@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Mono, Manrope } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
-const normaSans = Manrope({
+const normaSans = DM_Sans({
   variable: "--font-norma-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-const normaDisplay = Fraunces({
+const normaDisplay = Outfit({
   variable: "--font-norma-display",
   subsets: ["latin"],
   display: "swap",
@@ -22,7 +22,7 @@ const normaMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Remote Org Chart",
+  title: "Acme Org Chart",
   description:
     "Headless HRIS org chart for Acme Sandbox Corp via the Remote sandbox API.",
 };

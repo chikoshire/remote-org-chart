@@ -9,8 +9,8 @@ const shell = readFileSync(
 
 describe("AppShell", () => {
   it("exposes header, main canvas, and status strip", () => {
-    expect(shell).toContain("Remote Org Chart");
-    expect(shell).toContain("Acme Sandbox Corp");
+    expect(shell).toContain("Acme Org Chart");
+    expect(shell).toContain("Sandbox Corp");
     expect(shell).toContain("<main");
     expect(shell).toContain("AppStatus");
     expect(shell).toContain("Skip to organization chart");
