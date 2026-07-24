@@ -16,7 +16,7 @@ import {
   type NamedCount,
 } from "@/lib/org/dashboard-insights";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
-import { departmentAccent } from "@/lib/ui/department-accent";
+import { CHART_BAR_ACCENT } from "@/lib/ui/department-accent";
 import { withViewTransition } from "@/lib/ui/motion";
 import {
   readRemoteConnected,
@@ -55,11 +55,11 @@ function KpiCard({
 }: KpiCardProps) {
   const toneClass =
     tone === "accent"
-      ? "border-[#e85d04]/25 bg-gradient-to-br from-white to-[#fff4ec]"
+      ? "border-[#e85d04]/20 bg-gradient-to-br from-white to-[#faf6f2]"
       : tone === "warn"
-        ? "border-amber-200/80 bg-gradient-to-br from-white to-amber-50/80"
+        ? "border-amber-200/70 bg-gradient-to-br from-white to-amber-50/50"
         : tone === "success"
-          ? "border-norma-spray/30 bg-gradient-to-br from-white to-[#eef8f6]"
+          ? "border-norma-prussian/10 bg-gradient-to-br from-white to-[#f0f4f5]"
           : "border-norma-border bg-norma-surface";
 
   return (
@@ -136,12 +136,10 @@ function CountBars({
   title,
   items,
   empty,
-  accentFor,
 }: {
   title: string;
   items: NamedCount[];
   empty: string;
-  accentFor?: (name: string) => string;
 }) {
   const max = items[0]?.count ?? 1;
   return (
@@ -151,9 +149,10 @@ function CountBars({
         <p className="mt-4 text-sm text-norma-ink-muted">{empty}</p>
       ) : (
         <ul className="mt-4 space-y-3" aria-label={title}>
-          {items.slice(0, 8).map((item) => {
+          {items.slice(0, 8).map((item, index) => {
             const width = Math.max(8, Math.round((item.count / max) * 100));
-            const accent = accentFor?.(item.name) ?? "#e85d04";
+            // Soften lower ranks with opacity — one hue, ranked intensity
+            const opacity = Math.max(0.45, 1 - index * 0.07);
             return (
               <li key={item.name}>
                 <div className="flex items-baseline justify-between gap-2 text-sm">
@@ -169,7 +168,8 @@ function CountBars({
                     className="h-full rounded-full"
                     style={{
                       width: `${width}%`,
-                      backgroundColor: accent,
+                      backgroundColor: CHART_BAR_ACCENT,
+                      opacity,
                     }}
                   />
                 </div>
@@ -410,7 +410,6 @@ export function DashboardWorkspace() {
           title="Headcount by department"
           items={insights.departments}
           empty="No departments on file yet."
-          accentFor={departmentAccent}
         />
         <CountBars
           title="Headcount by country"
