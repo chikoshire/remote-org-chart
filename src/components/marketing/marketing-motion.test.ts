@@ -22,9 +22,21 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(hero).toContain("live employment data");
     expect(page).toContain("Built on Remote. No second employee database.");
     expect(page).not.toContain("HRIS");
+    expect(page).not.toContain("github.com");
+    expect(page).not.toContain("GitHub");
+    expect(page).not.toContain("developer.remote.com");
+    expect(page).not.toContain("View source");
     expect(page).not.toMatch(/\u2014|\u2013/);
     expect(hero).not.toMatch(/\u2014|\u2013/);
     expect(page).not.toContain("MarketingProductMock");
+
+    const header = readFileSync(
+      join(process.cwd(), "src/components/marketing/MarketingHeader.tsx"),
+      "utf8",
+    );
+    expect(header).not.toContain("github.com");
+    expect(header).not.toContain("GitHub");
+    expect(header).toContain('label: "Remote"');
 
     expect(hero).toContain("md:grid-cols-12");
     expect(hero).toContain("/marketing/hero-org-chart.png");
