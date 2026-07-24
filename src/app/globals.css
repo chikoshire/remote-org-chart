@@ -274,3 +274,53 @@
     animation: none !important;
   }
 }
+
+/* Marketing landing (#114) */
+.marketing-hero-copy {
+  animation: marketing-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.marketing-hero-visual {
+  animation: marketing-rise 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+}
+
+.marketing-mock-node {
+  animation: marketing-float 5.5s ease-in-out infinite;
+}
+
+.marketing-mock-node-delay {
+  animation-delay: 0.6s;
+}
+
+.marketing-mock-node-delay-2 {
+  animation-delay: 1.2s;
+}
+
+@keyframes marketing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marketing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-hero-copy,
+  .marketing-hero-visual,
+  .marketing-mock-node {
+    animation: none !important;
+  }
+}
