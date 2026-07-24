@@ -36,10 +36,26 @@ import {
   warningsFromMeta,
   type ChartWarning,
 } from "@/lib/org/chart-state";
+import {
+  PersonDetailDrawer,
+  type PersonDetail,
+} from "@/components/org/PersonDetailDrawer";
 import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
+
+type FlatPerson = {
+  id: string;
+  fullName?: string | null;
+  jobTitle?: string | null;
+  department?: string | null;
+  country?: string | null;
+  managerEmploymentId: string | null;
+  directReports?: number;
+  inCycle?: boolean;
+};
+
 type OrgChartResponse = {
   ok: boolean;
   nodeCount: number;
@@ -47,13 +63,46 @@ type OrgChartResponse = {
   cycleCount: number;
   orphanManagerCount: number;
   roots: OrgChartPayloadNode[];
-  nodes: Array<{
-    id: string;
-    managerEmploymentId: string | null;
-  }>;
+  nodes: FlatPerson[];
   message?: string;
   code?: string;
 };
+
+function toDetail(
+  id: string,
+  byId: Map<string, FlatPerson>,
+  nodeData?: PersonNodeData,
+): PersonDetail {
+  const flat = byId.get(id);
+  return {
+    id,
+    fullName: nodeData?.fullName ?? flat?.fullName ?? null,
+    jobTitle: nodeData?.jobTitle ?? flat?.jobTitle ?? null,
+    department: nodeData?.department ?? flat?.department ?? null,
+    country: nodeData?.country ?? flat?.country ?? null,
+    directReports: nodeData?.directReports ?? flat?.directReports ?? 0,
+    inCycle: nodeData?.inCycle ?? flat?.inCycle ?? false,
+    isRoot: !flat?.managerEmploymentId,
+  };
+}
+
+function pathDetailsToRoot(
+  selectedId: string,
+  byId: Map<string, FlatPerson>,
+  nodesById: Map<string, PersonNodeData>,
+): PersonDetail[] {
+  const ids: string[] = [];
+  let current: string | null = selectedId;
+  const guard = new Set<string>();
+  while (current && !guard.has(current)) {
+    guard.add(current);
+    ids.push(current);
+    current = byId.get(current)?.managerEmploymentId ?? null;
+  }
+  return ids
+    .reverse()
+    .map((id) => toDetail(id, byId, nodesById.get(id)));
+}
 
 const nodeTypes = { person: PersonNode };
 const edgeTypes = { reporting: ReportingEdge };
@@ -130,6 +179,9 @@ function OrgChartInner() {
     orphanManagerCount: 0,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [peopleIndex, setPeopleIndex] = useState(
+    () => new Map<string, FlatPerson>(),
+  );
   const [managerIndex, setManagerIndex] = useState(
     () => new Map<string, { id: string; managerEmploymentId: string | null }>(),
   );
@@ -169,12 +221,14 @@ function OrgChartInner() {
         return;
       }
       const laid = layoutOrgChart(body.roots);
+      const flatPeople = body.nodes ?? [];
       const index = new Map(
-        (body.nodes ?? []).map((n) => [
+        flatPeople.map((n) => [
           n.id,
           { id: n.id, managerEmploymentId: n.managerEmploymentId },
         ]),
       );
+      const people = new Map(flatPeople.map((n) => [n.id, n]));
       const nextMeta = {
         nodeCount: body.nodeCount,
         rootCount: body.rootCount,
@@ -182,6 +236,7 @@ function OrgChartInner() {
         orphanManagerCount: body.orphanManagerCount,
       };
       setManagerIndex(index);
+      setPeopleIndex(people);
       setBaseNodes(laid.nodes);
       setBaseEdges(laid.edges);
       setNodes(laid.nodes);
@@ -245,6 +300,26 @@ function OrgChartInner() {
     },
     [fitView, managerIndex, reducedMotion],
   );
+
+  const selectedDetail = useMemo(() => {
+    if (!selectedId) return null;
+    const node = baseNodes.find((n) => n.id === selectedId);
+    if (!node) return null;
+    const nodesById = new Map(
+      baseNodes.map((n) => [n.id, n.data] as const),
+    );
+    const person = toDetail(selectedId, peopleIndex, node.data);
+    const pathToRoot = pathDetailsToRoot(selectedId, peopleIndex, nodesById);
+    const reports = baseNodes
+      .filter((n) => peopleIndex.get(n.id)?.managerEmploymentId === selectedId)
+      .map((n) => toDetail(n.id, peopleIndex, n.data))
+      .sort((a, b) =>
+        (a.fullName ?? "").localeCompare(b.fullName ?? "", undefined, {
+          sensitivity: "base",
+        }),
+      );
+    return { person, pathToRoot, reports };
+  }, [baseNodes, peopleIndex, selectedId]);
 
   const statusLabel = useMemo(() => {
     if (status === "loading") return "Loading org chart…";
@@ -407,6 +482,15 @@ function OrgChartInner() {
         {statusLabel}
         {isMobile ? " · pinch to zoom · drag to pan" : ""}
       </p>
+      {selectedDetail ? (
+        <PersonDetailDrawer
+          person={selectedDetail.person}
+          pathToRoot={selectedDetail.pathToRoot}
+          reports={selectedDetail.reports}
+          onClose={() => setSelectedId(null)}
+          onSelectPerson={focusPerson}
+        />
+      ) : null}
     </div>
   );
 }
