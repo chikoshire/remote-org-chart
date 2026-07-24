@@ -111,7 +111,7 @@ export function PeopleDirectory({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-transparent">
-      <div className="border-b border-norma-border/80 bg-white/90 px-4 py-4 backdrop-blur-sm md:px-6">
+      <div className="relative z-40 border-b border-norma-border/80 bg-white/90 px-4 py-4 backdrop-blur-sm md:px-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="font-[family-name:var(--font-norma-display)] text-xl font-semibold tracking-tight text-norma-prussian md:text-2xl">
