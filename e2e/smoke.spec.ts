@@ -88,17 +88,18 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
   });
 
-  test("settings route loads preferences and integrations", async ({ page }) => {
+  test("settings connect wizard reconnects without secrets", async ({ page }) => {
     await loginAsDemo(page);
     await page.goto("/settings");
+    await page.getByRole("button", { name: "Disconnect" }).click();
+    await expect(page.getByText("Disconnected")).toBeVisible();
+    await page.getByRole("button", { name: "Connect" }).click();
     await expect(
-      page.getByRole("heading", { name: "Settings", exact: true }),
+      page.getByRole("heading", { name: "Connect Remote" }),
     ).toBeVisible();
-    await expect(page.getByText("Integrations")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Disconnect" }).or(
-      page.getByRole("button", { name: "Connect" }),
-    )).toBeVisible();
-    await expect(page.getByRole("button", { name: "Save preferences" })).toBeVisible();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Connect", exact: true }).click();
+    await expect(page.getByText("Connected", { exact: true }).first()).toBeVisible();
   });
 
   test("renders chart from fixture, opens profile, and has no export buttons", async ({

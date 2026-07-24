@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ProductShell } from "@/components/shell/ProductShell";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
+import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
   readAppPrefs,
@@ -27,6 +28,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [connected, setConnected] = useState(true);
   const [healthOk, setHealthOk] = useState<boolean | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   useEffect(() => {
     const prefs = readAppPrefs();
@@ -63,9 +65,10 @@ export default function SettingsPage() {
     writeRemoteConnected(false);
     clearSessionOrgPayload();
     setConnected(false);
+    setWizardOpen(false);
   };
 
-  const reconnect = () => {
+  const finishConnect = () => {
     writeRemoteConnected(true);
     setConnected(true);
   };
@@ -131,7 +134,7 @@ export default function SettingsPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={reconnect}
+                  onClick={() => setWizardOpen(true)}
                   className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-norma-prussian hover:bg-[#ff7a2f]"
                 >
                   Connect
@@ -139,9 +142,18 @@ export default function SettingsPage() {
               )}
             </div>
             <p className="mt-3 text-xs leading-relaxed text-norma-ink-muted">
-              Disconnect pauses org data in this browser. Connect turns it back
-              on instantly — your company credentials stay secure on the server.
+              Disconnect pauses org data in this browser. Connect walks through
+              a short wizard and turns data back on instantly. Company
+              credentials stay on the server. This is not a Remote OAuth login
+              redirect.
             </p>
+            {wizardOpen && !connected ? (
+              <RemoteConnectWizard
+                healthOk={healthOk}
+                onConnected={finishConnect}
+                onCancel={() => setWizardOpen(false)}
+              />
+            ) : null}
           </section>
 
           <section className="mt-6 space-y-5 rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
