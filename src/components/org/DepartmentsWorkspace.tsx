@@ -23,6 +23,7 @@ import { mapOrgChartHttpError } from "@/lib/org/chart-state";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName, withViewTransition } from "@/lib/ui/motion";
+import { PersonAvatar } from "@/components/org/PersonAvatar";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -46,6 +47,7 @@ function toDetail(
     jobTitle: person.jobTitle,
     department: person.department,
     country: person.country,
+    avatarUrl: person.avatarUrl,
     directReports: person.directReports ?? 0,
     inCycle: person.inCycle,
     isRoot: !person.managerEmploymentId,
@@ -53,12 +55,6 @@ function toDetail(
       person.managerEmploymentId && !byId.has(person.managerEmploymentId),
     ),
   };
-}
-
-function initials(name: string | null | undefined): string {
-  if (!name?.trim()) return "?";
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
 export function DepartmentsWorkspace() {
@@ -301,13 +297,13 @@ export function DepartmentsWorkspace() {
                         className="flex w-full items-start gap-3 px-4 py-4 pl-5 text-left"
                         onClick={() => selectPerson(person.id)}
                       >
-                        <span
-                          aria-hidden
-                          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-                          style={{ backgroundColor: accent }}
-                        >
-                          {initials(person.fullName)}
-                        </span>
+                        <PersonAvatar
+                          personId={person.id}
+                          fullName={person.fullName}
+                          department={person.department}
+                          avatarUrl={person.avatarUrl}
+                          size="md"
+                        />
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-[family-name:var(--font-norma-display)] text-base font-semibold text-norma-prussian">
                             {name}

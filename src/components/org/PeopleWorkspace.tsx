@@ -33,6 +33,7 @@ type FlatPerson = {
   jobTitle: string | null;
   department: string | null;
   country: string | null;
+  avatarUrl?: string | null;
   directReports: number;
   managerEmploymentId: string | null;
   inCycle?: boolean;
@@ -56,6 +57,7 @@ function toDetail(
     jobTitle: person.jobTitle,
     department: person.department,
     country: person.country,
+    avatarUrl: person.avatarUrl,
     directReports: person.directReports,
     inCycle: person.inCycle,
     isRoot: !person.managerEmploymentId,

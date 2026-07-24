@@ -61,12 +61,14 @@ export function layoutOrgChart(
     g.setNode(node.id, { width: metrics.width, height: metrics.height });
     const collapsedCount = node.collapsedCount ?? 0;
     const data: PersonNodeData = {
+      id: node.id,
       fullName: node.fullName,
       jobTitle: node.jobTitle,
       department: node.department,
       country: node.country,
       directReports: node.directReports,
       inCycle: node.inCycle,
+      avatarUrl: node.avatarUrl,
       managerMissing:
         parentId === null && Boolean(node.managerEmploymentId?.trim()),
       incompleteFields:

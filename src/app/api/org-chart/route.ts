@@ -130,6 +130,7 @@ function stripEmails(
     departmentId: n.departmentId,
     status: n.status,
     country: n.country,
+    avatarUrl: n.avatarUrl,
     managerEmploymentId: n.managerEmploymentId,
     inCycle: n.inCycle,
     directReports: n.directReports,
