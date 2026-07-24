@@ -1,31 +1,32 @@
 "use client";
 
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
 import {
   PersonNodeCard,
   type PersonNodeData,
   type PersonNodeVariant,
 } from "@/components/org/PersonNodeCard";
 
-export type PersonFlowNode = Node<PersonNodeData, "person">;
+type PersonData = PersonNodeData & Record<string, unknown>;
 
-export function PersonNode({ data, selected }: NodeProps<PersonFlowNode>) {
+export function PersonNode({ data, selected }: NodeProps) {
+  const person = data as PersonData;
   const variant: PersonNodeVariant =
-    data.variant ?? (selected ? "selected" : "default");
+    person.variant ?? (selected ? "selected" : "default");
 
   return (
     <div className="relative">
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!h-2 !w-2 !border-norma-border !bg-norma-surface"
+      <Handle type="target" position={Position.Top} />
+      <PersonNodeCard
+        fullName={person.fullName ?? null}
+        jobTitle={person.jobTitle ?? null}
+        department={person.department ?? null}
+        country={person.country ?? null}
+        directReports={person.directReports ?? 0}
+        inCycle={Boolean(person.inCycle)}
+        variant={variant}
       />
-      <PersonNodeCard {...data} variant={variant} />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!h-2 !w-2 !border-norma-border !bg-norma-surface"
-      />
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }
