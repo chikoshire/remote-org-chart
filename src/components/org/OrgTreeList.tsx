@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";
-import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 
 type OrgTreeListProps = {
@@ -94,7 +93,6 @@ function PersonCard({
   onToggle: () => void;
   onSelect: () => void;
 }) {
-  const accent = departmentAccent(node.department);
   const name = node.fullName?.trim() || "Unknown person";
   const title = node.jobTitle?.trim() || "Not set";
   const department = node.department?.trim() || null;
@@ -110,17 +108,12 @@ function PersonCard({
         compact ? "w-[196px]" : "w-[236px]"
       } ${
         selected
-          ? "border-norma-royal bg-white shadow-norma-md ring-2 ring-norma-royal/30"
+          ? "border-norma-royal bg-norma-surface shadow-norma-md ring-2 ring-norma-royal/30"
           : isRoot
-            ? "border-norma-border bg-white shadow-norma-md hover:border-norma-spray/55"
-            : "border-norma-border/80 bg-white shadow-norma-sm hover:border-norma-spray/45 hover:shadow-norma-md"
+            ? "border-norma-border bg-norma-surface shadow-norma-md hover:border-norma-spray/55"
+            : "border-norma-border/80 bg-norma-surface shadow-norma-sm hover:border-norma-spray/45 hover:shadow-norma-md"
       }`}
     >
-      <span
-        aria-hidden
-        className={`shrink-0 rounded-l-norma-lg ${isRoot ? "w-1.5" : "w-1"}`}
-        style={{ backgroundColor: accent }}
-      />
       <div
         className={`flex min-w-0 flex-1 flex-col ${compact ? "gap-1.5 p-2.5" : "gap-2 p-3"}`}
       >
@@ -179,12 +172,7 @@ function PersonCard({
         {!compact ? (
           <div className="flex min-w-0 flex-wrap items-center gap-1.5 pl-9">
             {department ? (
-              <span
-                className="inline-flex max-w-full truncate rounded-norma-sm px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian"
-                style={{
-                  backgroundColor: `color-mix(in srgb, ${accent} 18%, white)`,
-                }}
-              >
+              <span className="inline-flex max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-medium text-norma-ink">
                 {department}
               </span>
             ) : null}
@@ -198,11 +186,11 @@ function PersonCard({
 
         {hasChildren ? (
           <div className="flex flex-wrap gap-1.5 pl-9">
-            <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-semibold text-norma-prussian">
+            <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-semibold text-norma-ink">
               {children.length === 1 ? "1 report" : `${children.length} reports`}
             </span>
             {!compact && teamSize > children.length ? (
-              <span className="rounded-norma-sm bg-norma-highlight-soft px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian">
+              <span className="rounded-norma-sm bg-norma-highlight-soft px-1.5 py-0.5 text-[10px] font-medium text-norma-ink">
                 {teamSize} in team
               </span>
             ) : null}

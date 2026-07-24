@@ -9,7 +9,7 @@ type PersonAvatarProps = {
   fullName?: string | null;
   department?: string | null;
   avatarUrl?: string | null;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 };
 
@@ -23,6 +23,7 @@ const sizeClass = {
   sm: "h-9 w-9 text-[11px]",
   md: "h-11 w-11 text-sm",
   lg: "h-14 w-14 text-base",
+  xl: "h-24 w-24 text-2xl md:h-28 md:w-28 md:text-3xl",
 } as const;
 
 function InitialsAvatar({
@@ -33,7 +34,7 @@ function InitialsAvatar({
 }: {
   fullName?: string | null;
   department?: string | null;
-  size: "sm" | "md" | "lg";
+  size: "sm" | "md" | "lg" | "xl";
   className: string;
 }) {
   const accent = departmentAccent(department);
@@ -62,6 +63,7 @@ export function PersonAvatar({
 }: PersonAvatarProps) {
   const [failed, setFailed] = useState(false);
   const src = resolveAvatarSrc({ avatarUrl });
+  const px = size === "xl" ? 112 : size === "lg" ? 56 : size === "sm" ? 36 : 44;
 
   if (!src || failed) {
     return (
@@ -80,8 +82,8 @@ export function PersonAvatar({
       src={src}
       alt=""
       aria-hidden
-      width={size === "lg" ? 56 : size === "sm" ? 36 : 44}
-      height={size === "lg" ? 56 : size === "sm" ? 36 : 44}
+      width={px}
+      height={px}
       className={`inline-block shrink-0 rounded-full bg-norma-surface-muted object-cover shadow-norma-sm ring-1 ring-norma-border/60 ${sizeClass[size]} ${className}`}
       loading="lazy"
       decoding="async"
