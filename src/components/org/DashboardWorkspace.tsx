@@ -22,6 +22,7 @@ import {
 } from "@/lib/org/person-overrides";
 import {
   mapCountryHref,
+  orgChartOpenDepartmentsHref,
   peopleDepartmentHref,
 } from "@/lib/org/deep-links";
 import { departmentAccent } from "@/lib/ui/department-accent";
@@ -646,7 +647,7 @@ export function DashboardWorkspace() {
               ? `Largest · ${insights.largestDepartment.name}`
               : "No departments yet"
           }
-          href="/app/dashboard#departments"
+          href={orgChartOpenDepartmentsHref()}
           onNavigate={navigate}
           icon={<IconBuilding />}
           tone="lavender"

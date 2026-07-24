@@ -64,8 +64,10 @@ import { peopleFromNodes, searchPeople } from "@/lib/org/search-people";
 import { personAccessibleName } from "@/lib/org/person-a11y";
 import {
   COMPARE_QUERY_PARAM,
+  OPEN_QUERY_PARAM,
   expandCollapsedAncestors,
   readCountryFromSearch,
+  readOpenDepartmentsFromSearch,
   readPersonIdFromSearch,
   readViewModeFromSearch,
   resolvePersonDeepLink,
@@ -298,6 +300,7 @@ function OrgChartInner() {
   const [eventsToken, setEventsToken] = useState(0);
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
+  const [openDepartmentMenu, setOpenDepartmentMenu] = useState(false);
   const [remoteConnected, setRemoteConnected] = useState(true);
   const [viewMode, setViewMode] = useState<"chart" | "tree" | "map">("chart");
   const [mapFocusCountry, setMapFocusCountry] = useState<string | null>(null);
@@ -588,6 +591,18 @@ function OrgChartInner() {
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname);
   }, [pathname, router, searchParams, status]);
+
+  useEffect(() => {
+    if (!readOpenDepartmentsFromSearch(`?${searchParams.toString()}`)) return;
+    setSidePanelOpen(true);
+    writeSidePanelOpen(true);
+    setOpenDepartmentMenu(true);
+    setViewMode("chart");
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(OPEN_QUERY_PARAM);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
+  }, [pathname, router, searchParams]);
 
   useEffect(() => {
     if (!liveUpdates || status !== "ready") return;
@@ -1257,6 +1272,7 @@ function OrgChartInner() {
                 jobTitles={filterOptions.jobTitles}
                 onChange={setFilters}
                 onReset={() => setFilters(EMPTY_ORG_FILTERS)}
+                openDepartmentMenu={openDepartmentMenu}
               />
               <div className="flex flex-col gap-1">
                 <label className="sr-only" htmlFor="org-search">
