@@ -17,6 +17,9 @@ describe("CommandBar", () => {
     expect(bar).toContain('role="dialog"');
     expect(bar).toContain("withPersonSearchParam");
     expect(bar).toContain("Go to Data Health");
+    expect(bar).toContain("Search people or pages…");
+    expect(bar).toContain("min-w-[14rem]");
+    expect(bar).toContain("max-w-2xl");
     expect(shell).toContain("CommandBar");
   });
 });
