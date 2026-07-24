@@ -16,4 +16,8 @@ describe("PersonNodeCard", () => {
     expect(card).toContain("norma-royal");
     expect(card).toContain("norma-spray");
   });
+
+  it("exposes an accessible name on the person article", () => {
+    expect(card).toContain("aria-label={accessibleName}");
+  });
 });
