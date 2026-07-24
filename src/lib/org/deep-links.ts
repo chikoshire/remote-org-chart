@@ -71,9 +71,10 @@ export function expandCollapsedAncestors(
   const guard = new Set<string>();
   while (current && !guard.has(current)) {
     guard.add(current);
-    const manager = managerIndex.get(current)?.managerEmploymentId ?? null;
-    if (manager) next.delete(manager);
-    current = manager;
+    const entry = managerIndex.get(current);
+    const managerId: string | null = entry?.managerEmploymentId ?? null;
+    if (managerId) next.delete(managerId);
+    current = managerId;
   }
   return next;
 }
