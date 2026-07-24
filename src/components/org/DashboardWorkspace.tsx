@@ -288,6 +288,18 @@ function DepartmentShare({
   );
 }
 
+/** Mid-tone country dots — richer than soft fills so they read on cream/white. */
+const COUNTRY_DOT_PALETTE = [
+  "#5a9ec8", // sky
+  "#4f9f82", // mint
+  "#d4924a", // peach
+  "#8b7bc4", // lavender
+  "#c97892", // rose
+  "#4a8fb8", // deep sky
+  "#5aab8e", // seafoam
+  "#c9a04a", // gold
+] as const;
+
 /** Proportional dots for countries — distinct from the department donut. */
 function CountryDots({
   items,
@@ -298,16 +310,6 @@ function CountryDots({
 }) {
   const top = items.slice(0, 8);
   const max = top[0]?.count ?? 1;
-  const PALETTE = [
-    "bg-norma-sky",
-    "bg-norma-mint",
-    "bg-norma-peach",
-    "bg-norma-lavender",
-    "bg-norma-rose",
-    "bg-norma-sky/80",
-    "bg-norma-mint/80",
-    "bg-norma-peach/80",
-  ] as const;
 
   return (
     <section className="bloom-enter bloom-enter-delay-5 flex min-h-[22rem] flex-col rounded-norma-lg border border-norma-border/70 bg-gradient-to-br from-white/90 via-norma-mint/30 to-norma-sky/20 p-6 shadow-norma-sm">
@@ -321,6 +323,8 @@ function CountryDots({
         <ul className="mt-5 space-y-4" aria-label="Headcount by country">
           {top.map((item, index) => {
             const dots = Math.max(1, Math.round((item.count / max) * 12));
+            const color =
+              COUNTRY_DOT_PALETTE[index % COUNTRY_DOT_PALETTE.length]!;
             return (
               <li key={item.name}>
                 <div className="flex items-baseline justify-between gap-2">
@@ -335,9 +339,11 @@ function CountryDots({
                   {Array.from({ length: dots }).map((_, i) => (
                     <span
                       key={i}
-                      className={`h-2.5 w-2.5 rounded-full ${PALETTE[index % PALETTE.length]}`}
+                      className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
                       style={{
-                        opacity: 0.45 + (i / Math.max(dots - 1, 1)) * 0.55,
+                        backgroundColor: color,
+                        // Density cue without washing out on cream
+                        opacity: 0.78 + (i / Math.max(dots - 1, 1)) * 0.22,
                       }}
                     />
                   ))}
