@@ -92,6 +92,10 @@ import {
 } from "@/lib/org/reporting-distance";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
+import {
+  PERSON_OVERRIDES_CHANGED_EVENT,
+  orgSnapshotWithOverrides,
+} from "@/lib/org/person-overrides";
 import { withViewTransition } from "@/lib/ui/motion";
 
 type FlatPerson = {
@@ -302,6 +306,7 @@ function OrgChartInner() {
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const rawRemoteNodesRef = useRef<FlatPerson[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
     [],
   );
@@ -358,6 +363,31 @@ function OrgChartInner() {
   const setDensityPreference = useCallback((next: ChartDensity) => {
     setDensity(next);
     writeDensityPref(next);
+  }, []);
+
+  const applyOrgPeople = useCallback((flatPeople: FlatPerson[]) => {
+    rawRemoteNodesRef.current = flatPeople;
+    const { nodes: merged, roots } = orgSnapshotWithOverrides(flatPeople);
+    const index = new Map(
+      merged.map((n) => [
+        n.id,
+        { id: n.id, managerEmploymentId: n.managerEmploymentId ?? null },
+      ]),
+    );
+    const people = new Map(merged.map((n) => [n.id, n]));
+    setManagerIndex(index);
+    setPeopleIndex(people);
+    setForestRoots(roots);
+    return {
+      nodeCount: merged.length,
+      rootCount: roots.length,
+      cycleCount: merged.filter((n) => n.inCycle).length,
+      orphanManagerCount: merged.filter(
+        (n) =>
+          Boolean(n.managerEmploymentId?.trim()) &&
+          !people.has(n.managerEmploymentId!.trim()),
+      ).length,
+    };
   }, []);
 
   const load = useCallback(async (opts?: { refresh?: boolean; silent?: boolean }) => {
@@ -424,22 +454,16 @@ function OrgChartInner() {
         return;
       }
       const flatPeople = body.nodes ?? [];
-      const index = new Map(
-        flatPeople.map((n) => [
-          n.id,
-          { id: n.id, managerEmploymentId: n.managerEmploymentId },
-        ]),
-      );
-      const people = new Map(flatPeople.map((n) => [n.id, n]));
+      const counts = applyOrgPeople(flatPeople);
       const nextMeta = {
-        nodeCount: body.nodeCount,
-        rootCount: body.rootCount,
-        cycleCount: body.cycleCount,
-        orphanManagerCount: body.orphanManagerCount,
+        nodeCount: counts.nodeCount,
+        rootCount: counts.rootCount,
+        cycleCount: counts.cycleCount,
+        orphanManagerCount: Math.max(
+          body.orphanManagerCount ?? 0,
+          counts.orphanManagerCount,
+        ),
       };
-      setManagerIndex(index);
-      setPeopleIndex(people);
-      setForestRoots(body.roots);
       setMeta(nextMeta);
       setWarnings(warningsFromMeta(nextMeta));
       setLastSyncedAt(body.lastSyncedAt ?? new Date().toISOString());
@@ -468,7 +492,7 @@ function OrgChartInner() {
     } finally {
       if (isRefresh) setRefreshing(false);
     }
-  }, []);
+  }, [applyOrgPeople]);
 
   useEffect(() => {
     const connected = readRemoteConnected();
@@ -487,22 +511,16 @@ function OrgChartInner() {
       (session.nodeCount ?? 0) > 0
     ) {
       const flatPeople = session.nodes ?? [];
-      const index = new Map(
-        flatPeople.map((n) => [
-          n.id,
-          { id: n.id, managerEmploymentId: n.managerEmploymentId },
-        ]),
-      );
-      const people = new Map(flatPeople.map((n) => [n.id, n]));
+      const counts = applyOrgPeople(flatPeople);
       const nextMeta = {
-        nodeCount: session.nodeCount,
-        rootCount: session.rootCount,
-        cycleCount: session.cycleCount,
-        orphanManagerCount: session.orphanManagerCount,
+        nodeCount: counts.nodeCount,
+        rootCount: counts.rootCount,
+        cycleCount: counts.cycleCount,
+        orphanManagerCount: Math.max(
+          session.orphanManagerCount ?? 0,
+          counts.orphanManagerCount,
+        ),
       };
-      setManagerIndex(index);
-      setPeopleIndex(people);
-      setForestRoots(session.roots);
       setMeta(nextMeta);
       setWarnings(warningsFromMeta(nextMeta));
       setLastSyncedAt(session.lastSyncedAt ?? null);
@@ -515,8 +533,27 @@ function OrgChartInner() {
       return;
     }
     void load();
-  }, [load]);
+  }, [applyOrgPeople, load]);
 
+  useEffect(() => {
+    const onOverrides = () => {
+      if (!rawRemoteNodesRef.current.length) return;
+      const counts = applyOrgPeople(rawRemoteNodesRef.current);
+      setMeta((prev) => ({
+        ...prev,
+        nodeCount: counts.nodeCount,
+        rootCount: counts.rootCount,
+        cycleCount: counts.cycleCount,
+        orphanManagerCount: Math.max(
+          prev.orphanManagerCount,
+          counts.orphanManagerCount,
+        ),
+      }));
+    };
+    window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+    return () =>
+      window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+  }, [applyOrgPeople]);
   useEffect(() => {
     if (typeof window === "undefined") return;
     const view = new URLSearchParams(window.location.search).get("view");

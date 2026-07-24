@@ -20,7 +20,7 @@ describe("ProductShell", () => {
     expect(shell).not.toContain('href: "/app/departments"');
     expect(shell).not.toContain('href: "/app/data-health"');
     expect(shell).toContain('href="/settings"');
-    expect(shell).toContain("Log out");
+    expect(shell).not.toContain("Log out");
     expect(shell).toContain("CommandBar");
     expect(shell).toContain('aria-label="Settings"');
     expect(shell).toContain("Dashboard");

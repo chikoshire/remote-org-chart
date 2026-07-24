@@ -18,6 +18,10 @@ import {
 } from "@/components/org/PersonDetailDrawer";
 import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
+import {
+  PERSON_OVERRIDES_CHANGED_EVENT,
+  applyPersonOverrides,
+} from "@/lib/org/person-overrides";
 import { withViewTransition } from "@/lib/ui/motion";
 import { consumeReturnScrollIfMatching } from "@/lib/ui/profile-return";
 import {
@@ -96,7 +100,7 @@ export function PeopleWorkspace() {
     try {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
       if (session?.ok && session.nodes?.length) {
-        setPeople(session.nodes);
+        setPeople(applyPersonOverrides(session.nodes));
         setStatus("ready");
       }
       const res = await fetch("/api/org-chart");
@@ -116,7 +120,7 @@ export function PeopleWorkspace() {
         setPeople([]);
         return;
       }
-      setPeople(nodes);
+      setPeople(applyPersonOverrides(nodes));
       writeSessionOrgPayload(body);
       setStatus("ready");
     } catch (err) {
@@ -133,6 +137,17 @@ export function PeopleWorkspace() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    const onOverrides = () => {
+      const session = readSessionOrgPayload() as OrgChartResponse | null;
+      if (session?.ok && session.nodes?.length) {
+        setPeople(applyPersonOverrides(session.nodes));
+      }
+    };
+    window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+    return () =>
+      window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
+  }, []);
   const directoryPeople: DirectoryPerson[] = useMemo(() => {
     const byId = new Map(people.map((p) => [p.id, p]));
     return people.map((p) => {

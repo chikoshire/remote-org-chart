@@ -20,9 +20,11 @@ function scrollContainerTop(): number {
 }
 
 function labelForPath(pathname: string): string {
+  if (pathname.includes("/data-health")) return "Data Health";
   if (pathname.includes("/people")) return "People";
   if (pathname === "/app" || pathname.endsWith("/app")) return "Org Chart";
   if (pathname.includes("/dashboard")) return "Dashboard";
+  if (pathname.includes("/settings")) return "Settings";
   return "Back";
 }
 
