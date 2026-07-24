@@ -16,5 +16,6 @@ describe("AppShell", () => {
     expect(shell).toContain("Skip to organization chart");
     expect(shell).toContain('role="banner"');
     expect(shell).toContain('role="contentinfo"');
+    expect(shell).toContain('href="/welcome"');
   });
 });

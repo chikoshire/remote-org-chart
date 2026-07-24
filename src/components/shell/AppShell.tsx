@@ -46,9 +46,17 @@ function AppHeader({ toolbar }: { toolbar?: ReactNode }) {
           </p>
         </div>
       </div>
-      {toolbar ? (
-        <div className="ml-auto flex min-w-0 items-center gap-2">{toolbar}</div>
-      ) : null}
+      <nav className="ml-auto flex min-w-0 items-center gap-3" aria-label="App">
+        <a
+          href="/welcome"
+          className="hidden text-xs font-medium text-norma-ink-muted hover:text-norma-prussian sm:inline"
+        >
+          Welcome
+        </a>
+        {toolbar ? (
+          <div className="flex min-w-0 items-center gap-2">{toolbar}</div>
+        ) : null}
+      </nav>
     </header>
   );
 }
