@@ -7,7 +7,7 @@ import { AcmeLogo } from "@/components/brand/AcmeLogo";
 const NAV = [
   { href: "#product", label: "Product" },
   { href: "#surfaces", label: "Surfaces" },
-  { href: "#source", label: "Source" },
+  { href: "#source", label: "Remote" },
 ] as const;
 
 export function MarketingHeader() {
@@ -44,12 +44,6 @@ export function MarketingHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <a
-            href="https://github.com/chikoshire/remote-org-chart"
-            className="hidden text-sm font-medium text-norma-ink-muted transition hover:text-norma-ink sm:inline"
-          >
-            GitHub
-          </a>
           <Link href="/login" className="norma-cta min-h-10 px-5 text-sm">
             Log in
           </Link>

@@ -185,10 +185,10 @@ export default function MarketingHomePage() {
                   Log in
                 </Link>
                 <a
-                  href="https://github.com/chikoshire/remote-org-chart"
+                  href="#product"
                   className="inline-flex min-h-11 items-center rounded-full border border-norma-border px-6 text-sm font-medium text-norma-ink transition hover:border-norma-ink/30"
                 >
-                  View source
+                  See how it works
                 </a>
               </div>
             </MarketingReveal>
@@ -200,17 +200,11 @@ export default function MarketingHomePage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-norma-ink-muted md:flex-row md:items-center md:justify-between md:px-8">
           <AcmeLogo withWordmark className="opacity-90" />
           <div className="flex flex-wrap gap-6">
-            <a
-              href="https://github.com/chikoshire/remote-org-chart"
-              className="transition hover:text-norma-ink"
-            >
-              GitHub
+            <a href="#product" className="transition hover:text-norma-ink">
+              Product
             </a>
-            <a
-              href="https://developer.remote.com"
-              className="transition hover:text-norma-ink"
-            >
-              Remote developers
+            <a href="#surfaces" className="transition hover:text-norma-ink">
+              Surfaces
             </a>
             <Link href="/login" className="transition hover:text-norma-ink">
               Log in
