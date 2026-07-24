@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CHART_BAR_ACCENT,
   departmentAccent,
+  departmentAccentsForPeople,
 } from "@/lib/ui/department-accent";
 
 describe("departmentAccent", () => {
@@ -27,9 +28,22 @@ describe("departmentAccent", () => {
     }
   });
 
-  it("falls back to black for empty departments", () => {
+  it("falls back to muted grey for empty departments", () => {
     expect(departmentAccent(null)).toBe("#8a8580");
     expect(departmentAccent("")).toBe("#8a8580");
+  });
+
+  it("collects unique department accents for a country mix", () => {
+    const colors = departmentAccentsForPeople([
+      { department: "Engineering" },
+      { department: "Engineering" },
+      { department: "Finance" },
+      { department: null },
+      { department: "  finance " },
+    ]);
+    expect(colors).toHaveLength(2);
+    expect(colors[0]).toBe(departmentAccent("Engineering"));
+    expect(colors[1]).toBe(departmentAccent("Finance"));
   });
 
   it("uses a single quiet chart bar accent", () => {
