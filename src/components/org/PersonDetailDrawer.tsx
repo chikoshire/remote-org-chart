@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { personDeepLinkHref } from "@/lib/org/deep-links";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName } from "@/lib/ui/motion";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
@@ -63,11 +63,7 @@ export function PersonDetailDrawer({
   }, [person.id]);
 
   const copyLink = useCallback(async () => {
-    const href = personDeepLinkHref(
-      window.location.origin,
-      window.location.pathname,
-      person.id,
-    );
+    const href = `${window.location.origin}/app/people/${person.id}`;
     try {
       await navigator.clipboard.writeText(href);
       setCopyState("copied");
@@ -83,8 +79,8 @@ export function PersonDetailDrawer({
       aria-labelledby={titleId}
       className={
         docked
-          ? "bloom-enter flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
-          : "bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+          ? "bloom-enter flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
+          : "bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
       }
       style={{ viewTransitionName: personMorphName(person.id) }}
       data-morph-person={person.id}
@@ -101,7 +97,7 @@ export function PersonDetailDrawer({
         <div className="min-w-0 flex-1">
           <h2
             id={titleId}
-            className="truncate text-base font-semibold text-norma-prussian"
+            className="truncate text-base font-semibold text-norma-ink"
           >
             {name}
           </h2>
@@ -115,7 +111,7 @@ export function PersonDetailDrawer({
               </span>
             ) : null}
             {person.managerMissing ? (
-              <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900">
+              <span className="rounded-norma-sm bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-900 dark:bg-amber-950 dark:text-amber-100">
                 Manager missing
               </span>
             ) : null}
@@ -127,23 +123,31 @@ export function PersonDetailDrawer({
               </span>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={() => void copyLink()}
-            className="mt-1 text-xs font-medium text-norma-royal hover:underline"
-          >
-            {copyState === "copied"
-              ? "Link copied"
-              : copyState === "failed"
-                ? "Copy failed. Select the URL from the address bar."
-                : "Copy link"}
-          </button>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <Link
+              href={`/app/people/${person.id}`}
+              className="text-xs font-semibold text-norma-royal hover:underline"
+            >
+              Open full profile
+            </Link>
+            <button
+              type="button"
+              onClick={() => void copyLink()}
+              className="text-xs font-medium text-norma-ink-muted hover:text-norma-ink hover:underline"
+            >
+              {copyState === "copied"
+                ? "Link copied"
+                : copyState === "failed"
+                  ? "Copy failed"
+                  : "Copy link"}
+            </button>
+          </div>
         </div>
         <button
           ref={closeRef}
           type="button"
           onClick={onClose}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-norma-sm text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-norma-sm text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
           aria-label="Close person details"
         >
           <span aria-hidden className="text-lg leading-none">
@@ -155,26 +159,24 @@ export function PersonDetailDrawer({
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 text-sm">
           <dt className="text-norma-ink-subtle">Department</dt>
-          <dd className="text-norma-prussian">
+          <dd className="text-norma-ink">
             {person.department?.trim() || "Not set"}
           </dd>
           <dt className="text-norma-ink-subtle">Country</dt>
-          <dd className="text-norma-prussian">{countryLabel || "Not set"}</dd>
+          <dd className="text-norma-ink">{countryLabel || "Not set"}</dd>
           <dt className="text-norma-ink-subtle">Reports</dt>
-          <dd className="text-norma-prussian">
-            {person.directReports} direct
-          </dd>
+          <dd className="text-norma-ink">{person.directReports} direct</dd>
           {person.managerMissing ? (
             <>
               <dt className="text-norma-ink-subtle">Manager</dt>
-              <dd className="text-amber-900">
+              <dd className="text-amber-900 dark:text-amber-200">
                 No manager on file (linked id missing from Remote)
               </dd>
             </>
           ) : person.isRoot ? (
             <>
               <dt className="text-norma-ink-subtle">Manager</dt>
-              <dd className="text-norma-prussian">No manager on file</dd>
+              <dd className="text-norma-ink">No manager on file</dd>
             </>
           ) : null}
           {person.inCycle ? (
@@ -212,7 +214,7 @@ export function PersonDetailDrawer({
                     className={`flex w-full items-center gap-2.5 rounded-norma-sm px-2 py-1.5 text-left text-sm ${
                       isSelf
                         ? "bg-norma-accent-soft font-medium text-norma-royal"
-                        : "text-norma-prussian hover:bg-norma-surface-muted"
+                        : "text-norma-ink hover:bg-norma-surface-muted"
                     }`}
                   >
                     <span className="w-4 shrink-0 font-mono text-[10px] text-norma-ink-subtle">
@@ -264,7 +266,7 @@ export function PersonDetailDrawer({
                       size="sm"
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-norma-prussian">
+                      <span className="block truncate text-sm font-medium text-norma-ink">
                         {report.fullName?.trim() || "Unknown"}
                       </span>
                       <span className="block truncate text-xs text-norma-ink-muted">

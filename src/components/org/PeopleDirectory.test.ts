@@ -8,15 +8,18 @@ const directory = readFileSync(
 );
 
 describe("PeopleDirectory visuals", () => {
-  it("uses light chrome and shared card language", () => {
-    expect(directory).toContain("bg-white/90");
-    expect(directory).toContain("departmentAccent");
+  it("uses theme tokens, centered grid cards, and no left color chips", () => {
+    expect(directory).toContain("bg-norma-surface/80");
+    expect(directory).toContain("norma-glass");
     expect(directory).toContain("formatCountryLabel");
     expect(directory).toContain("Reports to");
+    expect(directory).toContain("Full profile");
     expect(directory).toContain('aria-label="Directory layout"');
     expect(directory).toContain('aria-pressed={view === "list"}');
     expect(directory).not.toContain("DepartmentsBrowse");
     expect(directory).not.toContain('"departments"');
+    expect(directory).not.toContain("departmentAccent");
+    expect(directory).not.toContain("inset-y-0 left-0 w-1");
     expect(directory).toContain("isIncompletePerson");
     expect(directory).toContain("Incomplete");
     expect(directory).not.toContain("#1a1a1a");

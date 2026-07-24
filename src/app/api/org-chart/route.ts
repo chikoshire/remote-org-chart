@@ -113,7 +113,7 @@ export async function GET(request: Request) {
       });
     }
     return NextResponse.json(
-      { ok: false, code: "unknown", message: "Org chart build failed" },
+      { ok: false, code: "unknown", message },
       { status: 500 },
     );
   }

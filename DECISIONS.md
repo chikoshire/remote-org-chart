@@ -734,6 +734,29 @@ Department hash pastels painted charts and avatars in unrelated hues (purple, pi
 
 ---
 
+## 2026-07-24 — Full people profiles + prefs that actually apply
+
+**Status:** Accepted  
+
+**Context:**  
+People cards used left color chips and left-aligned avatars (felt AI-slop). Profile detail lived only in a side dock. Settings Dark / Comfortable / Compact looked broken: theme class toggled but CSS tokens stayed light (`html.dark` buried in `@layer`), and density only persisted on Save. Remote employment detail exposes more than the chart merge used.
+
+**Decision:**  
+1. LinkedIn-style People grid cards (centered avatar over a soft header strip, details below); remove left color chips from directory, chart nodes, and tree cards.  
+2. Full profile route `/app/people/[id]` + `/api/people/[id]` with sanitized Remote fields (emails, model/type/status/lifecycle, dates, pronouns, manager) — never salary/bank/emergency contact. Dock remains a quick peek with “Open full profile.”  
+3. Theme/density/live prefs persist on toggle and emit `PREFS_CHANGED_EVENT`; dark tokens live outside `@layer` so they win over `:root`.  
+4. Liquid-glass (`.norma-glass`) + soft gradient blurs on People/profile/shell — Acme palette only.  
+5. Local `next dev` skips Worker fan-out when `WORKER_SELF` is a broken stub (`Failed to parse URL from [object Request]`).
+
+**Consequences:**  
+- Richer interviewer-facing profiles without leaking sensitive contract PII.  
+- Dark mode and density are browser-smoke verified (`scripts/browser-smoke.mjs`, 25/25).
+
+**Revisit when:**  
+Remote adds stable public photo URLs or we need salary-safe compensation bands for a stretch demo.
+
+---
+
 ## Template for future entries
 
 

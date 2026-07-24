@@ -7,6 +7,7 @@ import {
 export const LIVE_STORAGE_KEY = "acme-org-chart:live-default";
 export const SIDE_PANEL_STORAGE_KEY = "acme-org-chart:side-panel-open";
 export const THEME_STORAGE_KEY = "acme-org-chart:theme";
+export const PREFS_CHANGED_EVENT = "acme-org-chart:prefs-changed";
 
 export type AppTheme = "light" | "dark";
 
@@ -16,6 +17,11 @@ export type AppPrefs = {
   sidePanelOpen: boolean;
   theme: AppTheme;
 };
+
+function emitPrefsChanged(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(PREFS_CHANGED_EVENT));
+}
 
 export function readLiveDefault(): boolean {
   if (typeof window === "undefined") return false;
@@ -29,6 +35,7 @@ export function readLiveDefault(): boolean {
 export function writeLiveDefault(enabled: boolean): void {
   try {
     window.localStorage.setItem(LIVE_STORAGE_KEY, enabled ? "1" : "0");
+    emitPrefsChanged();
   } catch {
     // ignore
   }
@@ -48,6 +55,7 @@ export function readSidePanelOpen(): boolean {
 export function writeSidePanelOpen(open: boolean): void {
   try {
     window.localStorage.setItem(SIDE_PANEL_STORAGE_KEY, open ? "1" : "0");
+    emitPrefsChanged();
   } catch {
     // ignore
   }
@@ -67,6 +75,7 @@ export function readThemePref(): AppTheme {
 export function writeThemePref(theme: AppTheme): void {
   try {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    emitPrefsChanged();
   } catch {
     // ignore
   }
@@ -89,4 +98,5 @@ export function readAppPrefs(): AppPrefs {
 
 export function writeDensityPref(density: ChartDensity): void {
   writeStoredDensity(density);
+  emitPrefsChanged();
 }

@@ -24,8 +24,8 @@ const PRIMARY_NAV = [
 function navClass(active: boolean) {
   return `whitespace-nowrap rounded-norma-sm px-2.5 py-1.5 text-sm font-medium transition md:px-3 ${
     active
-      ? "bg-norma-accent-soft text-norma-prussian"
-      : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+      ? "bg-norma-accent-soft text-norma-ink"
+      : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
   }`;
 }
 
@@ -48,7 +48,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="flex h-12 shrink-0 items-center gap-3 border-b border-norma-border bg-norma-surface px-3 text-norma-prussian md:h-14 md:gap-6 md:px-6"
+        className="norma-glass flex h-12 shrink-0 items-center gap-3 border-b border-norma-border px-3 text-norma-ink md:h-14 md:gap-6 md:px-6"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo withWordmark />
@@ -76,7 +76,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           <button
             type="button"
             onClick={() => void logout()}
-            className="rounded-norma-sm px-2.5 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+            className="rounded-norma-sm px-2.5 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
           >
             Log out
           </button>
@@ -84,8 +84,8 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             href="/settings"
             className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-norma-sm transition ${
               settingsActive
-                ? "bg-norma-accent-soft text-norma-prussian"
-                : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+                ? "bg-norma-accent-soft text-norma-ink"
+                : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
             }`}
             aria-label="Settings"
             aria-current={settingsActive ? "page" : undefined}

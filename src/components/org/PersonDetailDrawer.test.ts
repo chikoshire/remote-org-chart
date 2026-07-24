@@ -20,9 +20,10 @@ describe("PersonDetailDrawer", () => {
     expect(drawer).toContain("Escape");
   });
 
-  it("offers a copy-link control for deep links", () => {
+  it("offers a copy-link control for full profile URLs", () => {
     expect(drawer).toContain("Copy link");
-    expect(drawer).toContain("personDeepLinkHref");
+    expect(drawer).toContain("/app/people/");
+    expect(drawer).toContain("Open full profile");
   });
 
   it("supports docked People layout without covering the grid", () => {
