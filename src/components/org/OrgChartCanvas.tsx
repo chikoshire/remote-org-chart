@@ -64,6 +64,12 @@ import {
   resolvePersonDeepLink,
   withPersonSearchParam,
 } from "@/lib/org/deep-links";
+import {
+  chartExportFilename,
+  downloadDataUrl,
+  exportChartDataUrl,
+} from "@/lib/org/export-chart";
+import { navigateReportingRelative } from "@/lib/org/keyboard-nav";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 
@@ -222,8 +228,11 @@ function OrgChartInner() {
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
   const [deepLinkError, setDeepLinkError] = useState<string | null>(null);
   const [urlSyncReady, setUrlSyncReady] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
+  const chartRootRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
     [],
   );
@@ -467,6 +476,103 @@ function OrgChartInner() {
     setDeepLinkError(null);
   }, []);
 
+  const exportChart = useCallback(
+    async (format: "png" | "svg") => {
+      const root = chartRootRef.current;
+      if (!root || exportBusy) return;
+      setExportBusy(true);
+      try {
+        const dataUrl = await exportChartDataUrl(root, format, {
+          reducedMotion,
+          backgroundColor: "#f4f6fb",
+        });
+        downloadDataUrl(dataUrl, chartExportFilename(format));
+      } catch {
+        // Keep UI quiet — status line already shows chart state.
+      } finally {
+        setExportBusy(false);
+      }
+    },
+    [exportBusy, reducedMotion],
+  );
+
+  useEffect(() => {
+    if (status !== "ready") return;
+
+    const isTypingTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tag = target.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      );
+    };
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        if (isTypingTarget(event.target)) return;
+        event.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+        return;
+      }
+
+      if (event.key === "Escape") {
+        if (query) {
+          setQuery("");
+          return;
+        }
+        if (selectedId) {
+          event.preventDefault();
+          clearSelection();
+        }
+        return;
+      }
+
+      if (isTypingTarget(event.target)) return;
+
+      if (
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight"
+      ) {
+        if (!selectedId) return;
+        const orderedIds = [...baseNodes]
+          .sort((a, b) =>
+            (a.data.fullName ?? "").localeCompare(
+              b.data.fullName ?? "",
+              undefined,
+              { sensitivity: "base" },
+            ),
+          )
+          .map((n) => n.id);
+        const next = navigateReportingRelative(
+          selectedId,
+          event.key,
+          managerIndex,
+          orderedIds,
+        );
+        if (!next) return;
+        event.preventDefault();
+        focusPerson(next);
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [
+    baseNodes,
+    clearSelection,
+    focusPerson,
+    managerIndex,
+    query,
+    selectedId,
+    status,
+  ]);
+
   const selectedDetail = useMemo(() => {
     if (!selectedId) return null;
     const node = baseNodes.find((n) => n.id === selectedId);
@@ -537,38 +643,63 @@ function OrgChartInner() {
 
   return (
     <div
+      ref={chartRootRef}
       className={`relative h-full w-full ${reducedMotion ? "" : "org-chart-enter"}`}
     >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
-        <div
-          className="flex items-center gap-1 self-end rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
-          role="group"
-          aria-label="Node density"
-        >
-          <button
-            type="button"
-            aria-pressed={density === "comfortable"}
-            className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-              density === "comfortable"
-                ? "bg-norma-accent-soft text-norma-royal"
-                : "text-norma-ink-muted hover:text-norma-prussian"
-            }`}
-            onClick={() => setDensityPreference("comfortable")}
+        <div className="flex flex-wrap items-center justify-end gap-1 self-end">
+          <div
+            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
+            role="group"
+            aria-label="Export chart"
           >
-            Comfortable
-          </button>
-          <button
-            type="button"
-            aria-pressed={density === "compact"}
-            className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-              density === "compact"
-                ? "bg-norma-accent-soft text-norma-royal"
-                : "text-norma-ink-muted hover:text-norma-prussian"
-            }`}
-            onClick={() => setDensityPreference("compact")}
+            <button
+              type="button"
+              disabled={exportBusy || filterEmpty}
+              className="rounded-norma-sm px-2 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
+              onClick={() => void exportChart("png")}
+            >
+              {exportBusy ? "Exporting…" : "PNG"}
+            </button>
+            <button
+              type="button"
+              disabled={exportBusy || filterEmpty}
+              className="rounded-norma-sm px-2 py-1 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
+              onClick={() => void exportChart("svg")}
+            >
+              SVG
+            </button>
+          </div>
+          <div
+            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
+            role="group"
+            aria-label="Node density"
           >
-            Compact
-          </button>
+            <button
+              type="button"
+              aria-pressed={density === "comfortable"}
+              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                density === "comfortable"
+                  ? "bg-norma-accent-soft text-norma-royal"
+                  : "text-norma-ink-muted hover:text-norma-prussian"
+              }`}
+              onClick={() => setDensityPreference("comfortable")}
+            >
+              Comfortable
+            </button>
+            <button
+              type="button"
+              aria-pressed={density === "compact"}
+              className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+                density === "compact"
+                  ? "bg-norma-accent-soft text-norma-royal"
+                  : "text-norma-ink-muted hover:text-norma-prussian"
+              }`}
+              onClick={() => setDensityPreference("compact")}
+            >
+              Compact
+            </button>
+          </div>
         </div>
         <OrgFiltersBar
           filters={filters}
@@ -581,6 +712,7 @@ function OrgChartInner() {
           Search people by name or title
         </label>
         <input
+          ref={searchInputRef}
           id="org-search"
           type="search"
           role="combobox"
@@ -600,7 +732,7 @@ function OrgChartInner() {
               focusPerson(suggestions[0].id);
             }
           }}
-          placeholder="Search by name or title…"
+          placeholder="Search by name or title… (/)"
           className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
           autoComplete="off"
         />
