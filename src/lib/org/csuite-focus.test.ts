@@ -23,7 +23,7 @@ function node(
 }
 
 describe("cSuiteFocusNodeIds", () => {
-  it("focuses the largest root tree, not every root across the forest", () => {
+  it("focuses only the largest root manager", () => {
     const roots = [
       node({
         id: "small",
@@ -38,7 +38,7 @@ describe("cSuiteFocusNodeIds", () => {
         ],
       }),
     ];
-    expect(cSuiteFocusNodeIds(roots, 3)).toEqual(["ceo", "cto", "cfo"]);
-    expect(cSuiteFocusNodeIds(roots)).toEqual(["ceo", "cto", "cfo", "cpo"]);
+    expect(cSuiteFocusNodeIds(roots)).toEqual(["ceo"]);
+    expect(cSuiteFocusNodeIds(roots, 4)).toEqual(["ceo"]);
   });
 });
