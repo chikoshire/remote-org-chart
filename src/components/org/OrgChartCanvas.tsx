@@ -760,7 +760,7 @@ function OrgChartInner() {
     const tryFitCSuite = () => {
       if (cancelled || initialFitDone.current) return;
       attempts += 1;
-      const focusIds = cSuiteFocusNodeIds(forestRoots, 4);
+      const focusIds = cSuiteFocusNodeIds(forestRoots);
       const measured = getNodes().filter(
         (n) =>
           focusIds.includes(n.id) &&
@@ -776,9 +776,10 @@ function OrgChartInner() {
       initialFitDone.current = true;
       void fitView({
         nodes: measured.length > 0 ? measured : focusIds.map((id) => ({ id })),
-        padding: 0.35,
-        maxZoom: 1.15,
-        minZoom: 0.85,
+        // Generous padding so direct reports under the root stay in frame.
+        padding: 0.55,
+        maxZoom: 1.05,
+        minZoom: 0.75,
         duration: reducedMotion ? 0 : 420,
       });
     };
