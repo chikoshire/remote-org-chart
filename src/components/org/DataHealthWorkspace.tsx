@@ -8,6 +8,7 @@ import {
   ChartLoadingState,
   RetryButton,
 } from "@/components/org/ChartStateSurfaces";
+import { PersonAvatar } from "@/components/org/PersonAvatar";
 import {
   computeDataHealth,
   type HealthPerson,
@@ -53,9 +54,9 @@ function HealthSection({
         : "bg-norma-surface-muted text-norma-prussian";
 
   return (
-    <section className="rounded-norma-lg border border-norma-border bg-white p-5 shadow-norma-sm">
+    <section className="flex h-full flex-col rounded-norma-lg border border-norma-border bg-white p-5 shadow-norma-sm md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0 flex-1">
           <h2 className="text-base font-semibold text-norma-prussian">{title}</h2>
           <p className="mt-1 text-sm text-norma-ink-muted">{description}</p>
         </div>
@@ -66,34 +67,40 @@ function HealthSection({
         </span>
       </div>
       {people.length === 0 ? (
-        <p className="mt-4 text-sm text-norma-ink-subtle">{empty}</p>
+        <p className="mt-5 text-sm text-norma-ink-subtle">{empty}</p>
       ) : (
-        <ul className="mt-4 divide-y divide-norma-border/70">
+        <ul className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {people.map((person) => {
             const name = person.fullName?.trim() || "Unknown person";
             const href = `/app${withPersonSearchParam("", person.id)}`;
             return (
-              <li
-                key={person.id}
-                className="flex flex-wrap items-center justify-between gap-2 py-3"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-norma-prussian">
-                    {name}
-                  </p>
-                  <p className="truncate text-xs text-norma-ink-muted">
-                    {person.jobTitle?.trim() || "Not set"}
-                    {person.department?.trim()
-                      ? ` · ${person.department.trim()}`
-                      : " · Dept not set"}
-                  </p>
+              <li key={person.id}>
+                <div className="flex h-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/40 px-3 py-3">
+                  <PersonAvatar
+                    personId={person.id}
+                    fullName={person.fullName}
+                    department={person.department}
+                    avatarUrl={person.avatarUrl}
+                    size="sm"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-norma-prussian">
+                      {name}
+                    </p>
+                    <p className="truncate text-xs text-norma-ink-muted">
+                      {person.jobTitle?.trim() || "Not set"}
+                      {person.department?.trim()
+                        ? ` · ${person.department.trim()}`
+                        : " · Dept not set"}
+                    </p>
+                    <Link
+                      href={href}
+                      className="mt-1 inline-block text-xs font-semibold text-norma-royal hover:underline"
+                    >
+                      Open in chart
+                    </Link>
+                  </div>
                 </div>
-                <Link
-                  href={href}
-                  className="shrink-0 text-xs font-semibold text-norma-royal hover:underline"
-                >
-                  Open in chart
-                </Link>
               </li>
             );
           })}
@@ -144,7 +151,6 @@ export function DataHealthWorkspace() {
       }
       setPeople(nodes);
       setLastSyncedAt(body.lastSyncedAt ?? new Date().toISOString());
-      // Reconstruct orphan ids from manager-missing people when API only returns counts.
       const byId = new Map(nodes.map((n) => [n.id, n]));
       const orphans = [
         ...new Set(
@@ -213,32 +219,43 @@ export function DataHealthWorkspace() {
 
   return (
     <div className="min-h-0 flex-1 overflow-auto">
-      <div className="mx-auto w-full max-w-3xl px-4 py-8 md:px-6 md:py-10">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
-          Trust the org data
-        </p>
-        <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
-          Data Health
-        </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-norma-ink-muted">
-          Spot cycles, missing managers, and incomplete profiles so teams can
-          trust the org chart. Jump into the chart to fix each person in Remote.
-        </p>
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8 lg:px-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
+              Trust the org data
+            </p>
+            <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+              Data Health
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-norma-ink-muted">
+              Spot cycles, missing managers, and incomplete profiles so teams can
+              trust the org chart. Jump into the chart to fix each person in
+              Remote.
+            </p>
+          </div>
+          <Link
+            href="/app"
+            className="rounded-norma-md border border-norma-border bg-white px-3 py-2 text-xs font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-spray/50"
+          >
+            Open org chart
+          </Link>
+        </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-norma-lg border border-norma-border bg-white px-4 py-3 shadow-norma-sm">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               People
             </p>
-            <p className="mt-1 text-2xl font-semibold text-norma-prussian">
+            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
               {report.headcount}
             </p>
           </div>
-          <div className="rounded-norma-lg border border-norma-border bg-white px-4 py-3 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               Leadership roots
             </p>
-            <p className="mt-1 text-2xl font-semibold text-norma-prussian">
+            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
               {report.rootCount}
             </p>
             {report.multiRoot ? (
@@ -247,17 +264,27 @@ export function DataHealthWorkspace() {
               </p>
             ) : null}
           </div>
-          <div className="rounded-norma-lg border border-norma-border bg-white px-4 py-3 shadow-norma-sm">
+          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+              Issues flagged
+            </p>
+            <p className="mt-2 text-3xl font-semibold text-norma-prussian">
+              {report.inCycle.length +
+                report.managerMissing.length +
+                report.incompleteFields.length}
+            </p>
+          </div>
+          <div className="rounded-norma-lg border border-norma-border bg-white px-5 py-4 shadow-norma-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               Last sync
             </p>
-            <p className="mt-1 text-sm font-medium text-norma-prussian">
+            <p className="mt-2 text-sm font-semibold leading-snug text-norma-prussian">
               {syncedLabel}
             </p>
           </div>
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <HealthSection
             title="Reporting cycles"
             description="These people sit on a looped reporting chain."

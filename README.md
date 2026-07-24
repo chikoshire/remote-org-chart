@@ -10,7 +10,7 @@ Interactive **organisational intelligence** app for **Acme Sandbox Corp**, built
 |-------|----------|
 | Home `/` | Marketing landing with Log in |
 | Login | Demo: `demo@acme.example` / `acme-org-demo` → `/app` |
-| Product shell | Dashboard · Org Chart · People · Departments · Data Health · Settings |
+| Product shell | Dashboard · Org Chart · People · Departments · Settings (Data Health inside Settings) |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
 | `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15–25s |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
@@ -61,7 +61,7 @@ Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handof
 | `/app` | Org Chart (Chart \| Tree) |
 | `/app/people` | People directory |
 | `/app/departments` | Departments + mini people |
-| `/app/data-health` | Trust / edge-case review |
+| `/settings/data-health` | Trust / edge-case review (also redirected from `/app/data-health`) |
 | `/settings` | Remote connect + theme |
 
 ### Keyboard shortcuts
