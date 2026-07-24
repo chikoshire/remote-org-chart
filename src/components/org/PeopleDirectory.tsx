@@ -140,18 +140,21 @@ export function PeopleDirectory({
           </div>
         </div>
         <label className="mt-4 block">
-          <span className="sr-only">Search people</span>
+          <span className="sr-only">Filter this directory</span>
           <input
             type="search"
             role="combobox"
-            aria-label="Search people"
+            aria-label="Filter this directory"
             aria-expanded={false}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name, title, or department…"
+            placeholder="Filter by name, title, or department…"
             className="w-full rounded-norma-md border border-norma-border bg-white px-3.5 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
             autoComplete="off"
           />
+          <span className="mt-1.5 block text-[11px] text-norma-ink-subtle">
+            Filters this list · ⌘K jumps to a person or page
+          </span>
         </label>
       </div>
 
