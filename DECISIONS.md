@@ -910,7 +910,7 @@ Landing on Org Chart fit the entire expanded company into view (tiny nodes). Bra
 
 **Decision:**  
 1. Default `collapsedIds` empty (full chart expanded); tree view also expands all by default.  
-2. Initial `fitView` targets `cSuiteFocusNodeIds` (roots + a handful of direct reports) at ~0.92 max zoom.  
+2. Initial `fitView` targets `cSuiteFocusNodeIds` (largest root only, with padding) after nodes are measured.  
 3. Ship `remote-logo.svg` + extracted black `remote-mark.svg` from Remote’s Contentstack `remote-logo.svg`.
 
 **Consequences:**  
@@ -919,6 +919,25 @@ Landing on Org Chart fit the entire expanded company into view (tiny nodes). Bra
 
 **Revisit when:**  
 We want remembered collapse/zoom per device.
+
+---
+
+## 2026-07-24 — Marketing page mirrors remote.com structure + real screenshots
+
+**Status:** Accepted  
+
+**Context:**  
+Earlier marketing borrowed remote.com *motifs* (marquee, atmosphere) but kept a centered stack and an invented org-chart mock that didn’t match the shipped app.
+
+**Decision:**  
+Rebuild `/` to follow remote.com’s section map: left-copy / right-visual hero, labelled capability marquee, “How we do it” accordion + sticky product panel, screenshot surface cards, closing CTA. Hero and panels use captured screenshots from the live Acme app (`public/marketing/*.png`).
+
+**Consequences:**  
+- Screenshot assets need occasional refresh when UI chrome changes.  
+- `MarketingProductMock` is no longer used on `/`.
+
+**Revisit when:**  
+We automate screenshot refresh in CI.
 
 ---
 
