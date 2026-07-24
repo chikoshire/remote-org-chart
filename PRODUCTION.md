@@ -9,6 +9,7 @@ Checklist for the public Cloudflare deploy. Re-verify before interviewer send.
 | No secrets in client bundle / repo | Done | Token server-only; [SECURITY.md](./SECURITY.md); `.env*` gitignored |
 | README public URL + setup + architecture | Done | [README.md](./README.md) |
 | Playwright smoke | Done | `npm run test:e2e` + `.github/workflows/playwright.yml` (fixture-mocked `/api/org-chart`) |
+| Org Intelligence QA (#68) | Done | Primary-tab tour, theme, edge badges, morph hooks, mobile viewport, handoff doc (2026-07-24) |
 | A11y + PII (#30 #32) | Done | Skip link, landmarks, combobox search; emails stripped on `/api/org-chart` |
 | Error / empty / loading on live data | Done | Chart state surfaces; Refresh keeps prior chart on failure |
 | Marketing landing (#33) | Done | [`/welcome`](https://remote-org-chart.shirechiko.workers.dev/welcome) → CTA to `/` |
