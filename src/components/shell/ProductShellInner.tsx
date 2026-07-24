@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 
 type ProductShellProps = {
@@ -41,6 +41,13 @@ function navClass(active: boolean) {
 export function ProductShellInner({ children, status }: ProductShellProps) {
   const pathname = usePathname();
   const settingsActive = pathname === "/settings";
+  const router = useRouter();
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.replace("/");
+    router.refresh();
+  }
 
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-norma-canvas">
@@ -72,31 +79,40 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             );
           })}
         </nav>
-        <Link
-          href="/settings"
-          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-norma-sm transition ${
-            settingsActive
-              ? "bg-norma-accent-soft text-norma-prussian"
-              : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
-          }`}
-          aria-label="Settings"
-          aria-current={settingsActive ? "page" : undefined}
-          title="Settings"
-        >
-          <svg
-            aria-hidden
-            viewBox="0 0 24 24"
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => void logout()}
+            className="rounded-norma-sm px-2.5 py-1.5 text-sm font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
           >
-            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
-            <path d="M19.4 13a7.7 7.7 0 0 0 .05-2l2.05-1.6-2-3.45-2.45.95a7.6 7.6 0 0 0-1.75-1L15 3h-6l-.3 2.9a7.6 7.6 0 0 0-1.75 1L4.5 5.95l-2 3.45L4.55 11a7.7 7.7 0 0 0 0 2l-2.05 1.6 2 3.45 2.45-.95a7.6 7.6 0 0 0 1.75 1L9 21h6l.3-2.9a7.6 7.6 0 0 0 1.75-1l2.45.95 2-3.45L19.4 13Z" />
-          </svg>
-        </Link>
+            Log out
+          </button>
+          <Link
+            href="/settings"
+            className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-norma-sm transition ${
+              settingsActive
+                ? "bg-norma-accent-soft text-norma-prussian"
+                : "text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+            }`}
+            aria-label="Settings"
+            aria-current={settingsActive ? "page" : undefined}
+            title="Settings"
+          >
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+              <path d="M19.4 13a7.7 7.7 0 0 0 .05-2l2.05-1.6-2-3.45-2.45.95a7.6 7.6 0 0 0-1.75-1L15 3h-6l-.3 2.9a7.6 7.6 0 0 0-1.75 1L4.5 5.95l-2 3.45L4.55 11a7.7 7.7 0 0 0 0 2l-2.05 1.6 2 3.45 2.45-.95a7.6 7.6 0 0 0 1.75 1L9 21h6l.3-2.9a7.6 7.6 0 0 0 1.75-1l2.45.95 2-3.45L19.4 13Z" />
+            </svg>
+          </Link>
+        </div>
       </header>
       <main
         id="main-content"
