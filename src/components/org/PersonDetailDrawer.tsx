@@ -1,9 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatCountryLabel } from "@/lib/ui/format-country";
-import { personMorphName } from "@/lib/ui/motion";
+import {
+  personNameMorphName,
+  withViewTransition,
+} from "@/lib/ui/motion";
+import { captureProfileReturn } from "@/lib/ui/profile-return";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 
 export type PersonDetail = {
@@ -40,6 +44,7 @@ export function PersonDetailDrawer({
   onSelectPerson,
   placement = "overlay",
 }: PersonDetailDrawerProps) {
+  const router = useRouter();
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const name = person.fullName?.trim() || "Unknown person";
@@ -72,6 +77,13 @@ export function PersonDetailDrawer({
     }
   }, [person.id]);
 
+  const openFullProfile = useCallback(() => {
+    captureProfileReturn(person.id);
+    void withViewTransition(() => {
+      router.push(`/app/people/${person.id}`);
+    });
+  }, [person.id, router]);
+
   return (
     <aside
       role="dialog"
@@ -82,7 +94,6 @@ export function PersonDetailDrawer({
           ? "bloom-enter flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
           : "bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface/95 shadow-norma-md backdrop-blur-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
       }
-      style={{ viewTransitionName: personMorphName(person.id) }}
       data-morph-person={person.id}
       data-drawer-placement={placement}
     >
@@ -93,11 +104,14 @@ export function PersonDetailDrawer({
           department={person.department}
           avatarUrl={person.avatarUrl}
           size="lg"
+          morph
         />
         <div className="min-w-0 flex-1">
           <h2
             id={titleId}
             className="truncate text-base font-semibold text-norma-ink"
+            style={{ viewTransitionName: personNameMorphName(person.id) }}
+            data-morph-name={person.id}
           >
             {name}
           </h2>
@@ -124,12 +138,13 @@ export function PersonDetailDrawer({
             ) : null}
           </div>
           <div className="mt-2 flex flex-wrap gap-3">
-            <Link
-              href={`/app/people/${person.id}`}
+            <button
+              type="button"
+              onClick={openFullProfile}
               className="text-xs font-semibold text-norma-royal hover:underline"
             >
               Open full profile
-            </Link>
+            </button>
             <button
               type="button"
               onClick={() => void copyLink()}

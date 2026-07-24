@@ -14,11 +14,11 @@ describe("PeopleDirectory visuals", () => {
     expect(directory).toContain("formatCountryLabel");
     expect(directory).toContain("Reports to");
     expect(directory).toContain("Full profile");
+    expect(directory).toContain("DepartmentColorLegend");
     expect(directory).toContain('aria-label="Directory layout"');
     expect(directory).toContain('aria-pressed={view === "list"}');
     expect(directory).not.toContain("DepartmentsBrowse");
     expect(directory).not.toContain('"departments"');
-    expect(directory).not.toContain("departmentAccent");
     expect(directory).not.toContain("inset-y-0 left-0 w-1");
     expect(directory).toContain("isIncompletePerson");
     expect(directory).toContain("Incomplete");

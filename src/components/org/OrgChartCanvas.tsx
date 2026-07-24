@@ -89,6 +89,8 @@ import {
 } from "@/lib/org/reporting-distance";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
+import { withViewTransition } from "@/lib/ui/motion";
+import { DepartmentColorLegend } from "@/components/org/DepartmentColorLegend";
 
 type FlatPerson = {
   id: string;
@@ -183,7 +185,7 @@ function applySelection(
         const variant: PersonNodeData["variant"] = isRoot(n.id)
           ? "root"
           : "default";
-        const data = { ...n.data, variant };
+        const data = { ...n.data, variant, morphActive: true };
         return {
           ...n,
           selected: false,
@@ -208,7 +210,12 @@ function applySelection(
       if (onPath) variant = isSelected ? "selected" : "path";
       if (isRoot(n.id) && onPath && !isSelected) variant = "path";
       if (isRoot(n.id) && isSelected) variant = "selected";
-      const data = { ...n.data, variant };
+      const data = {
+        ...n.data,
+        variant,
+        // Selected person morph is owned by the detail drawer / profile.
+        morphActive: !isSelected,
+      };
       return {
         ...n,
         selected: isSelected,
@@ -631,26 +638,32 @@ function OrgChartInner() {
     (_event, node) => {
       setDeepLinkError(null);
       if (compareMode) {
-        if (!compareA || compareB) {
-          setCompareA(node.id);
-          setCompareB(null);
+        void withViewTransition(() => {
+          if (!compareA || compareB) {
+            setCompareA(node.id);
+            setCompareB(null);
+            setSelectedId(node.id);
+            return;
+          }
+          if (compareA === node.id) return;
+          setCompareB(node.id);
           setSelectedId(node.id);
-          return;
-        }
-        if (compareA === node.id) return;
-        setCompareB(node.id);
-        setSelectedId(node.id);
+        });
         return;
       }
-      setSelectedId((prev) => (prev === node.id ? null : node.id));
+      void withViewTransition(() => {
+        setSelectedId((prev) => (prev === node.id ? null : node.id));
+      });
     },
     [compareA, compareB, compareMode],
   );
 
   const onPaneClick = useCallback(() => {
     if (compareMode) return;
-    setSelectedId(null);
-    setDeepLinkError(null);
+    void withViewTransition(() => {
+      setSelectedId(null);
+      setDeepLinkError(null);
+    });
   }, [compareMode]);
 
   const exitCompare = useCallback(() => {
@@ -710,19 +723,21 @@ function OrgChartInner() {
   const focusPerson = useCallback(
     (id: string) => {
       setDeepLinkError(null);
-      setCollapsedIds((prev) =>
-        expandCollapsedAncestors(id, managerIndex, prev),
-      );
-      if (compareMode) {
-        if (!compareA || compareB) {
-          setCompareA(id);
-          setCompareB(null);
-        } else if (compareA !== id) {
-          setCompareB(id);
+      void withViewTransition(() => {
+        setCollapsedIds((prev) =>
+          expandCollapsedAncestors(id, managerIndex, prev),
+        );
+        if (compareMode) {
+          if (!compareA || compareB) {
+            setCompareA(id);
+            setCompareB(null);
+          } else if (compareA !== id) {
+            setCompareB(id);
+          }
         }
-      }
-      setSelectedId(id);
-      setQuery("");
+        setSelectedId(id);
+        setQuery("");
+      });
       requestAnimationFrame(() => {
         const path = pathIdsToRoot(id, managerIndex);
         void fitView({
@@ -786,8 +801,10 @@ function OrgChartInner() {
   }, [selectedId, urlSyncReady]);
 
   const clearSelection = useCallback(() => {
-    setSelectedId(null);
-    setDeepLinkError(null);
+    void withViewTransition(() => {
+      setSelectedId(null);
+      setDeepLinkError(null);
+    });
   }, []);
 
   useEffect(() => {
@@ -1106,6 +1123,10 @@ function OrgChartInner() {
                 jobTitles={filterOptions.jobTitles}
                 onChange={setFilters}
                 onReset={() => setFilters(EMPTY_ORG_FILTERS)}
+              />
+              <DepartmentColorLegend
+                departments={filterOptions.departments}
+                className="rounded-norma-md border border-norma-border/60 bg-white/50 px-2.5 py-2"
               />
               <div className="flex flex-col gap-1">
                 <label className="sr-only" htmlFor="org-search">

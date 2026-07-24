@@ -801,6 +801,27 @@ Accessibility review wants even stronger contrast, or interviewers prefer photog
 
 ---
 
+## 2026-07-24 — Morph partners, profile return, department avatar legend
+
+**Status:** Accepted  
+
+**Context:**  
+Full profile always linked “← People” even when opened from the org chart. Shared-element morph (#70) existed on drawer shells but not avatar→profile. Initials already used `departmentAccent`, but there was no key explaining the colours.
+
+**Decision:**  
+1. Capture return href + scroll in `sessionStorage` when opening a profile; back label is Org Chart or People; People restores list scroll; chart restores via `?person=`.  
+2. Morph on **avatar** + **name** across chart node ↔ drawer ↔ profile; wrap selection/navigation in `withViewTransition`. Soft-load profile header from session org snapshot.  
+3. Quiet `DepartmentColorLegend` on chart workspace + People directory; photo avatars get a department-coloured ring.
+
+**Consequences:**  
+- Hard refresh on a profile loses return context (falls back to People).  
+- View Transitions need Chromium; reduced-motion skips morph.
+
+**Revisit when:**  
+Safari/Firefox VT support matures or we add a fallback FLIP morph.
+
+---
+
 ## Template for future entries
 
 

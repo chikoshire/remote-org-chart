@@ -1,6 +1,7 @@
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { isIncompletePerson } from "@/lib/org/data-health";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
+import { personNameMorphName } from "@/lib/ui/motion";
 
 export type PersonNodeVariant = "default" | "selected" | "path" | "root";
 
@@ -21,6 +22,8 @@ export type PersonNodeData = {
   collapsedCount?: number;
   /** Set by canvas — toggles subtree collapse for managers. */
   onToggleCollapse?: () => void;
+  /** Owns shared-element morph when this node is the transition source. */
+  morphActive?: boolean;
 };
 
 const variantClass: Record<PersonNodeVariant, string> = {
@@ -48,6 +51,7 @@ export function PersonNodeCard({
   collapsed = false,
   collapsedCount = 0,
   onToggleCollapse,
+  morphActive = false,
 }: PersonNodeData) {
   const name = fullName?.trim() || "Unknown person";
   const compact = density === "compact";
@@ -101,12 +105,19 @@ export function PersonNodeCard({
           avatarUrl={avatarUrl}
           size={compact ? "sm" : "md"}
           className="mt-0.5"
+          morph={morphActive}
         />
         <div className="min-w-0 flex-1">
           <h3
             className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-ink ${
               compact ? "text-xs" : "text-[15px] leading-snug"
             }`}
+            style={
+              morphActive && id
+                ? { viewTransitionName: personNameMorphName(id) }
+                : undefined
+            }
+            data-morph-name={morphActive && id ? id : undefined}
           >
             {name}
           </h3>
