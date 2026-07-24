@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -32,54 +32,103 @@ type OrgChartResponse = {
   code?: string;
 };
 
-type InsightCardProps = {
+type KpiTone = "default" | "accent" | "warn" | "success";
+
+type KpiCardProps = {
   label: string;
   value: string;
   hint?: string;
-  href?: string;
-  hrefLabel?: string;
-  onNavigate?: (href: string) => void;
-  emphasize?: boolean;
+  href: string;
+  onNavigate: (href: string) => void;
+  icon: ReactNode;
+  tone?: KpiTone;
 };
 
-function InsightCard({
+function KpiCard({
   label,
   value,
   hint,
   href,
-  hrefLabel,
   onNavigate,
-  emphasize,
-}: InsightCardProps) {
+  icon,
+  tone = "default",
+}: KpiCardProps) {
+  const toneClass =
+    tone === "accent"
+      ? "border-[#e85d04]/25 bg-gradient-to-br from-white to-[#fff4ec]"
+      : tone === "warn"
+        ? "border-amber-200/80 bg-gradient-to-br from-white to-amber-50/80"
+        : tone === "success"
+          ? "border-norma-spray/30 bg-gradient-to-br from-white to-[#eef8f6]"
+          : "border-norma-border bg-norma-surface";
+
   return (
-    <article
-      className={`bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface p-4 shadow-norma-sm ${
-        emphasize ? "sm:col-span-2 lg:col-span-1" : ""
-      }`}
+    <button
+      type="button"
+      onClick={() => onNavigate(href)}
+      className={`bloom-enter group flex min-h-[7.5rem] flex-col rounded-norma-lg border p-4 text-left shadow-norma-sm transition hover:-translate-y-0.5 hover:shadow-norma-md ${toneClass}`}
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+      <div className="flex items-start justify-between gap-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-norma-md bg-norma-prussian/5 text-norma-prussian group-hover:bg-[#e85d04]/12 group-hover:text-[#e85d04]">
+          {icon}
+        </span>
+        <span className="font-[family-name:var(--font-norma-display)] text-3xl font-semibold tracking-tight text-norma-prussian tabular-nums">
+          {value}
+        </span>
+      </div>
+      <p className="mt-auto pt-3 text-sm font-semibold text-norma-prussian">
         {label}
       </p>
-      <p className="mt-2 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
-        {value}
-      </p>
       {hint ? (
-        <p className="mt-1 text-xs text-norma-ink-muted">{hint}</p>
+        <p className="mt-0.5 line-clamp-1 text-xs text-norma-ink-muted">{hint}</p>
       ) : null}
-      {href && hrefLabel ? (
-        <Link
-          href={href}
-          className="mt-3 inline-block text-xs font-semibold text-norma-royal hover:underline"
-          onClick={(event) => {
-            if (!onNavigate) return;
-            event.preventDefault();
-            onNavigate(href);
-          }}
-        >
-          {hrefLabel}
-        </Link>
-      ) : null}
-    </article>
+    </button>
+  );
+}
+
+function IconPeople() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function IconBuilding() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
+    </svg>
+  );
+}
+
+function IconNetwork() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="12" cy="5" r="2.5" />
+      <circle cx="6" cy="18" r="2.5" />
+      <circle cx="18" cy="18" r="2.5" />
+      <path strokeLinecap="round" d="M12 7.5v4M12 11.5 6.5 16M12 11.5l5.5 4.5" />
+    </svg>
+  );
+}
+
+function IconShield() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3 4.5 6v5c0 5 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.5 7.5-9.5V6L12 3Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+function IconAlert() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.75">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4M12 17h.01M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z" />
+    </svg>
   );
 }
 
@@ -96,7 +145,7 @@ function CountBars({
 }) {
   const max = items[0]?.count ?? 1;
   return (
-    <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
+    <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
       <h2 className="text-sm font-semibold text-norma-prussian">{title}</h2>
       {items.length === 0 ? (
         <p className="mt-4 text-sm text-norma-ink-muted">{empty}</p>
@@ -104,7 +153,7 @@ function CountBars({
         <ul className="mt-4 space-y-3" aria-label={title}>
           {items.slice(0, 8).map((item) => {
             const width = Math.max(8, Math.round((item.count / max) * 100));
-            const accent = accentFor?.(item.name) ?? "#624DE3";
+            const accent = accentFor?.(item.name) ?? "#e85d04";
             return (
               <li key={item.name}>
                 <div className="flex items-baseline justify-between gap-2 text-sm">
@@ -115,7 +164,7 @@ function CountBars({
                     {item.count}
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-norma-surface-muted">
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-norma-surface-muted">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -216,19 +265,26 @@ export function DashboardWorkspace() {
   }, [insights.lastSyncedAt]);
 
   const attentionItems = useMemo(() => {
-    const items: { label: string; count: number; href: string }[] = [];
+    const items: {
+      label: string;
+      count: number;
+      href: string;
+      tone: "warn" | "danger" | "neutral";
+    }[] = [];
     if (insights.managerMissingCount > 0) {
       items.push({
         label: "Manager missing",
         count: insights.managerMissingCount,
         href: "/settings/data-health",
+        tone: "warn",
       });
     }
     if (insights.incompleteCount > 0) {
       items.push({
         label: "Incomplete profiles",
         count: insights.incompleteCount,
-        href: "/settings/data-health",
+        href: "/app/people?incomplete=1",
+        tone: "neutral",
       });
     }
     if (insights.cycleMemberCount > 0) {
@@ -236,6 +292,7 @@ export function DashboardWorkspace() {
         label: "Reporting cycle",
         count: insights.cycleMemberCount,
         href: "/settings/data-health",
+        tone: "danger",
       });
     }
     if (insights.rootCount > 1) {
@@ -243,6 +300,7 @@ export function DashboardWorkspace() {
         label: "Leadership roots",
         count: insights.rootCount,
         href: "/app",
+        tone: "warn",
       });
     }
     return items;
@@ -270,199 +328,178 @@ export function DashboardWorkspace() {
     );
   }
 
+  const completenessTone: KpiTone =
+    insights.completenessScore >= 90
+      ? "success"
+      : insights.completenessScore >= 70
+        ? "default"
+        : "warn";
+
   return (
     <ProductPageFrame>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
-              Organisational intelligence
-            </p>
-            <h1 className="mt-1 font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
-              Dashboard
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-norma-ink-muted">
-              A live read on how Acme is structured: headcount, teams, managers,
-              and where people data needs attention.
-            </p>
-            <p className="mt-2 text-xs text-norma-ink-subtle">
-              Last updated {syncedLabel}
-            </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-norma-ink-muted">
+            Acme structure at a glance · synced {syncedLabel}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label="People"
+          value={String(insights.headcount)}
+          hint="Active employments"
+          href="/app/people"
+          onNavigate={navigate}
+          icon={<IconPeople />}
+          tone="accent"
+        />
+        <KpiCard
+          label="Departments"
+          value={String(insights.departmentCount)}
+          hint={
+            insights.largestDepartment
+              ? `Largest · ${insights.largestDepartment.name}`
+              : "No departments yet"
+          }
+          href="/app/dashboard#departments"
+          onNavigate={navigate}
+          icon={<IconBuilding />}
+        />
+        <KpiCard
+          label="Managers"
+          value={String(insights.managerCount)}
+          hint={`${insights.individualContributorCount} ICs`}
+          href="/app"
+          onNavigate={navigate}
+          icon={<IconNetwork />}
+        />
+        <KpiCard
+          label="Completeness"
+          value={`${insights.completenessScore}%`}
+          hint="Title · dept · country"
+          href="/app/people?incomplete=1"
+          onNavigate={navigate}
+          icon={<IconShield />}
+          tone={completenessTone}
+        />
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-2" id="departments">
+        <CountBars
+          title="Headcount by department"
+          items={insights.departments}
+          empty="No departments on file yet."
+          accentFor={departmentAccent}
+        />
+        <CountBars
+          title="Headcount by country"
+          items={insights.countries}
+          empty="No countries on file yet."
+        />
+      </div>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-norma-prussian">
+              Largest teams
+            </h2>
+            <Link
+              href="/app"
+              className="text-xs font-semibold text-[#e85d04] hover:underline"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate("/app");
+              }}
+            >
+              Chart
+            </Link>
           </div>
-        </div>
+          {insights.topManagers.length === 0 ? (
+            <p className="mt-4 text-sm text-norma-ink-muted">
+              No managers with direct reports yet.
+            </p>
+          ) : (
+            <ul className="mt-3 divide-y divide-norma-border/70" aria-label="Largest teams">
+              {insights.topManagers.map((manager) => (
+                <li key={manager.id} className="flex items-center gap-3 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-norma-prussian">
+                      {manager.fullName}
+                    </p>
+                    <p className="truncate text-xs text-norma-ink-muted">
+                      {manager.jobTitle || "Not set"}
+                      {manager.department ? ` · ${manager.department}` : ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-norma-sm bg-norma-surface-muted px-2 py-1 text-[11px] font-semibold tabular-nums text-norma-prussian">
+                    {manager.directReports}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <InsightCard
-            label="People"
-            value={String(insights.headcount)}
-            hint="Active employments in Remote"
-            href="/app/people"
-            hrefLabel="Browse People"
-            onNavigate={navigate}
-            emphasize
-          />
-          <InsightCard
-            label="Departments"
-            value={String(insights.departmentCount)}
-            hint={
-              insights.largestDepartment
-                ? `Largest: ${insights.largestDepartment.name} (${insights.largestDepartment.count})`
-                : "No departments on file"
-            }
-            href="/app/dashboard"
-            hrefLabel="See headcount by department"
-            onNavigate={navigate}
-          />
-          <InsightCard
-            label="Managers"
-            value={String(insights.managerCount)}
-            hint={`${insights.individualContributorCount} individual contributors`}
-            href="/app"
-            hrefLabel="Open Org Chart"
-            onNavigate={navigate}
-          />
-          <InsightCard
-            label="Data completeness"
-            value={`${insights.completenessScore}%`}
-            hint="Share of people with title, department, and country"
-            href="/app/people?incomplete=1"
-            hrefLabel="Browse incomplete"
-            onNavigate={navigate}
-          />
-        </div>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InsightCard
-            label="Leadership roots"
-            value={String(insights.rootCount)}
-            hint={
-              insights.rootCount > 1
-                ? "More than one top of tree"
-                : "Single leadership root"
-            }
-            href="/app"
-            hrefLabel="View chart"
-            onNavigate={navigate}
-          />
-          <InsightCard
-            label="Manager missing"
-            value={String(insights.managerMissingCount)}
-            hint="Manager id set but not in the active set"
-            href="/settings/data-health"
-            hrefLabel="Review Data Health"
-            onNavigate={navigate}
-          />
-          <InsightCard
-            label="Incomplete profiles"
-            value={String(insights.incompleteCount)}
-            hint="Missing title, department, or country"
-            href="/app/people?incomplete=1"
-            hrefLabel="Browse incomplete"
-            onNavigate={navigate}
-          />
-        </div>
-
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          <CountBars
-            title="Headcount by department"
-            items={insights.departments}
-            empty="No departments on file yet."
-            accentFor={departmentAccent}
-          />
-          <CountBars
-            title="Headcount by country"
-            items={insights.countries}
-            empty="No countries on file yet."
-          />
-        </div>
-
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-norma-prussian">
-                Largest teams
-              </h2>
-              <Link
-                href="/app"
-                className="text-xs font-semibold text-norma-royal hover:underline"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/app");
-                }}
-              >
-                See in chart
-              </Link>
-            </div>
-            {insights.topManagers.length === 0 ? (
-              <p className="mt-4 text-sm text-norma-ink-muted">
-                No managers with direct reports yet.
-              </p>
-            ) : (
-              <ul className="mt-4 divide-y divide-norma-border/70" aria-label="Largest teams">
-                {insights.topManagers.map((manager) => (
-                  <li key={manager.id} className="flex items-center gap-3 py-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-norma-prussian">
-                        {manager.fullName}
-                      </p>
-                      <p className="truncate text-xs text-norma-ink-muted">
-                        {manager.jobTitle || "Not set"}
-                        {manager.department ? ` · ${manager.department}` : ""}
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-norma-sm bg-norma-surface-muted px-2 py-1 text-[11px] font-semibold text-norma-prussian">
-                      {manager.directReports === 1
-                        ? "1 report"
-                        : `${manager.directReports} reports`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface p-5 shadow-norma-sm">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-norma-prussian">
-                Needs attention
-              </h2>
-              <Link
-                href="/settings/data-health"
-                className="text-xs font-semibold text-norma-royal hover:underline"
-                onClick={(event) => {
-                  event.preventDefault();
-                  navigate("/settings/data-health");
-                }}
-              >
-                Data Health
-              </Link>
-            </div>
-            {attentionItems.length === 0 ? (
-              <p className="mt-4 rounded-norma-md bg-norma-success-soft px-3 py-3 text-sm text-norma-success">
-                No reporting cycles, missing managers, or incomplete profiles
-                flagged right now.
-              </p>
-            ) : (
-              <ul className="mt-4 space-y-2" aria-label="Needs attention">
-                {attentionItems.map((item) => (
-                  <li key={item.label}>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-norma-md border border-norma-border bg-norma-surface-muted/40 px-3 py-3 text-left hover:border-norma-royal"
-                      onClick={() => navigate(item.href)}
+        <section className="bloom-enter rounded-norma-lg border border-norma-border bg-norma-surface/95 p-5 shadow-norma-sm backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-norma-prussian">
+              Needs attention
+            </h2>
+            <Link
+              href="/settings/data-health"
+              className="text-xs font-semibold text-[#e85d04] hover:underline"
+              onClick={(event) => {
+                event.preventDefault();
+                navigate("/settings/data-health");
+              }}
+            >
+              Review
+            </Link>
+          </div>
+          {attentionItems.length === 0 ? (
+            <p className="mt-4 flex items-center gap-2 rounded-norma-md bg-norma-success-soft px-3 py-3 text-sm text-norma-success">
+              <IconShield />
+              All clear — no flags right now.
+            </p>
+          ) : (
+            <ul className="mt-3 space-y-2" aria-label="Needs attention">
+              {attentionItems.map((item) => (
+                <li key={item.label}>
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-3 rounded-norma-md border border-norma-border/80 bg-norma-surface-muted/30 px-3 py-2.5 text-left transition hover:border-[#e85d04]/40 hover:bg-white"
+                    onClick={() => navigate(item.href)}
+                  >
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-norma-md ${
+                        item.tone === "danger"
+                          ? "bg-norma-danger-soft text-norma-danger"
+                          : item.tone === "warn"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-norma-surface-muted text-norma-prussian"
+                      }`}
                     >
-                      <span className="text-sm font-medium text-norma-prussian">
-                        {item.label}
-                      </span>
-                      <span className="tabular-nums text-sm font-semibold text-norma-royal">
-                        {item.count}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
+                      <IconAlert />
+                    </span>
+                    <span className="min-w-0 flex-1 text-sm font-medium text-norma-prussian">
+                      {item.label}
+                    </span>
+                    <span className="tabular-nums text-sm font-semibold text-[#e85d04]">
+                      {item.count}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </ProductPageFrame>
   );
 }

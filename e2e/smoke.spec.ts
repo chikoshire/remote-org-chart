@@ -118,12 +118,9 @@ test.describe("org chart smoke", () => {
     await expect(
       page.getByRole("heading", { name: "Dashboard", exact: true }),
     ).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Organisational intelligence")).toBeVisible();
-    await expect(page.getByText("Data completeness")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Browse People" })).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Review Data Health" }),
-    ).toBeVisible();
+    await expect(page.getByText(/synced/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /^People/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Completeness/ })).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Headcount by department" }),
     ).toBeVisible();
