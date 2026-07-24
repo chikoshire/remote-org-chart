@@ -18,8 +18,10 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 ### Links for the interview team
 
 - **Live app:** https://remote-org-chart.shirechiko.workers.dev  
+- **Welcome / product landing:** https://remote-org-chart.shirechiko.workers.dev/welcome  
 - **Source:** https://github.com/chikoshire/remote-org-chart  
 - **Security notes:** [SECURITY.md](./SECURITY.md)  
+- **Production readiness:** [PRODUCTION.md](./PRODUCTION.md)  
 - **Decision log:** [DECISIONS.md](./DECISIONS.md)
 
 ---
