@@ -600,6 +600,23 @@ For map fills, keep only landmass polygons within ~5200km of the country’s lar
 
 ---
 
+## 2026-07-24 — Dual search roles (⌘K vs filter)
+
+**Status:** Accepted  
+
+**Context:**  
+Global ⌘K and page-level search fields read the same (“search people”), so the IA felt duplicated.
+
+**Decision:**  
+- ⌘K / header = **jump** to a person or page (command palette).  
+- People / Chart fields = **filter** the current surface. Copy and placeholders say so explicitly.
+
+**Consequences:**  
+- One story for interviewers: jump vs filter.  
+- No second search product — just clearer roles.
+
+---
+
 ## Template for future entries
 
 
