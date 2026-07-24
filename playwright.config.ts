@@ -31,6 +31,13 @@ export default defineConfig({
           REMOTE_API_BASE_URL:
             process.env.REMOTE_API_BASE_URL ??
             "https://gateway.remote-sandbox.com",
+          DEMO_APP_EMAIL: process.env.DEMO_APP_EMAIL ?? "demo@acme.example",
+          DEMO_APP_PASSWORD:
+            process.env.DEMO_APP_PASSWORD ??
+            "local-dev-only-set-DEMO_APP_PASSWORD",
+          APP_SESSION_SECRET:
+            process.env.APP_SESSION_SECRET ??
+            "local-dev-only-set-APP_SESSION_SECRET",
         },
       },
 });

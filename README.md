@@ -115,6 +115,8 @@ REMOTE_API_BASE_URL=https://gateway.remote-sandbox.com
 Token source: sandbox Company settings → Integrations & APIs → Remote API (read-only).  
 **Never** commit `.env.local` or paste tokens into issues/PRs.
 
+Secrets gate: `npm run check:secrets` (also installed as a git pre-commit hook via `npm run hooks:install` / `prepare`).
+
 ---
 
 ## Architecture

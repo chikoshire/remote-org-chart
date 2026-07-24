@@ -2,20 +2,29 @@
 export const APP_SESSION_COOKIE = "acme_app_session";
 
 const DEFAULT_DEMO_EMAIL = "demo@acme.example";
-const DEFAULT_DEMO_PASSWORD = "acme-org-demo";
+
+/**
+ * Local / Vitest / Playwright fallback when DEMO_APP_PASSWORD is unset.
+ * Never use this as the interviewer-facing production password — set
+ * DEMO_APP_PASSWORD in .env.local and Wrangler secrets instead.
+ */
+export const LOCAL_DEV_DEMO_PASSWORD = "local-dev-only-set-DEMO_APP_PASSWORD";
+
+const LOCAL_DEV_SESSION_SECRET = "local-dev-only-set-APP_SESSION_SECRET";
 
 export function getDemoCredentials(): { email: string; password: string } {
   return {
     email: (process.env.DEMO_APP_EMAIL ?? DEFAULT_DEMO_EMAIL).trim().toLowerCase(),
-    password: process.env.DEMO_APP_PASSWORD ?? DEFAULT_DEMO_PASSWORD,
+    password:
+      process.env.DEMO_APP_PASSWORD?.trim() || LOCAL_DEV_DEMO_PASSWORD,
   };
 }
 
 function sessionSecret(): string {
   return (
     process.env.APP_SESSION_SECRET?.trim() ||
-    process.env.DEMO_APP_PASSWORD ||
-    DEFAULT_DEMO_PASSWORD
+    process.env.DEMO_APP_PASSWORD?.trim() ||
+    LOCAL_DEV_SESSION_SECRET
   );
 }
 

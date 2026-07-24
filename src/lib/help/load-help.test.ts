@@ -7,6 +7,7 @@ describe("help KB", () => {
     expect(pages.length).toBeGreaterThanOrEqual(7);
     const blob = pages.map((p) => p.markdown).join("\n");
     expect(blob).not.toMatch(/acme-org-demo/);
+    expect(blob).not.toMatch(/DEMO_APP_PASSWORD\s*=\s*\S+/);
     expect(getHelpPage("overview")?.title).toBe("Overview");
   });
 
