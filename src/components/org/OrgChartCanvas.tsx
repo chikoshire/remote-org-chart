@@ -237,7 +237,7 @@ function applySelection(
 function OrgChartInner() {
   const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
   const reducedMotion = usePrefersReducedMotion();
-  const { fitView } = useReactFlow();
+  const { fitView, getNodes } = useReactFlow();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
     "loading",
@@ -753,23 +753,45 @@ function OrgChartInner() {
     if (status !== "ready" || nodes.length === 0 || initialFitDone.current) {
       return;
     }
-    initialFitDone.current = true;
-    const focusIds = new Set(cSuiteFocusNodeIds(forestRoots, 9));
-    const focusNodes = nodes
-      .filter((n) => focusIds.has(n.id))
-      .map((n) => ({ id: n.id }));
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        void fitView({
-          nodes: focusNodes.length > 0 ? focusNodes : undefined,
-          padding: 0.3,
-          maxZoom: 1.1,
-          minZoom: 0.55,
-          duration: reducedMotion ? 0 : 420,
-        });
+
+    let cancelled = false;
+    let attempts = 0;
+
+    const tryFitCSuite = () => {
+      if (cancelled || initialFitDone.current) return;
+      attempts += 1;
+      const focusIds = cSuiteFocusNodeIds(forestRoots, 9);
+      const measured = getNodes().filter(
+        (n) =>
+          focusIds.includes(n.id) &&
+          Boolean(n.measured?.width || n.width || n.measured?.height),
+      );
+
+      // Wait until React Flow has measured the C-suite cards.
+      if (measured.length === 0 && attempts < 24) {
+        window.setTimeout(tryFitCSuite, 50);
+        return;
+      }
+
+      initialFitDone.current = true;
+      void fitView({
+        nodes: measured.length > 0 ? measured : focusIds.map((id) => ({ id })),
+        padding: 0.22,
+        // Floor keeps cards readable even if the focus set is wide.
+        maxZoom: 1.2,
+        minZoom: 0.82,
+        duration: reducedMotion ? 0 : 420,
       });
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(tryFitCSuite);
     });
-  }, [fitView, forestRoots, nodes, reducedMotion, status]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fitView, forestRoots, getNodes, nodes.length, reducedMotion, status]);
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;
