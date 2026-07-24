@@ -29,7 +29,12 @@ import {
   pathIdsToRoot,
   type OrgChartPayloadNode,
 } from "@/lib/org/layout-flow";
-
+import {
+  mapOrgChartHttpError,
+  warningCopy,
+  warningsFromMeta,
+  type ChartWarning,
+} from "@/lib/org/chart-state";
 type OrgChartResponse = {
   ok: boolean;
   nodeCount: number;
@@ -102,10 +107,13 @@ function OrgChartInner() {
     "loading",
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorRetryable, setErrorRetryable] = useState(true);
+  const [warnings, setWarnings] = useState<ChartWarning[]>([]);
   const [meta, setMeta] = useState({
     nodeCount: 0,
     rootCount: 0,
     cycleCount: 0,
+    orphanManagerCount: 0,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [managerIndex, setManagerIndex] = useState(
@@ -123,13 +131,17 @@ function OrgChartInner() {
   const load = useCallback(async () => {
     setStatus("loading");
     setErrorMessage(null);
+    setErrorRetryable(true);
+    setWarnings([]);
     setSelectedId(null);
     try {
       const res = await fetch("/api/org-chart");
       const body = (await res.json()) as OrgChartResponse;
       if (!res.ok || !body.ok) {
+        const mapped = mapOrgChartHttpError(res.status, body);
         setStatus("error");
-        setErrorMessage(body.message ?? body.code ?? `HTTP ${res.status}`);
+        setErrorMessage(mapped.message);
+        setErrorRetryable(mapped.retryable);
         return;
       }
       if (!body.roots?.length || body.nodeCount === 0) {
@@ -138,6 +150,7 @@ function OrgChartInner() {
           nodeCount: body.nodeCount ?? 0,
           rootCount: body.rootCount ?? 0,
           cycleCount: body.cycleCount ?? 0,
+          orphanManagerCount: body.orphanManagerCount ?? 0,
         });
         return;
       }
@@ -148,20 +161,28 @@ function OrgChartInner() {
           { id: n.id, managerEmploymentId: n.managerEmploymentId },
         ]),
       );
+      const nextMeta = {
+        nodeCount: body.nodeCount,
+        rootCount: body.rootCount,
+        cycleCount: body.cycleCount,
+        orphanManagerCount: body.orphanManagerCount,
+      };
       setManagerIndex(index);
       setBaseNodes(laid.nodes);
       setBaseEdges(laid.edges);
       setNodes(laid.nodes);
       setEdges(laid.edges);
-      setMeta({
-        nodeCount: body.nodeCount,
-        rootCount: body.rootCount,
-        cycleCount: body.cycleCount,
-      });
+      setMeta(nextMeta);
+      setWarnings(warningsFromMeta(nextMeta));
       setStatus("ready");
     } catch (err) {
+      const mapped = mapOrgChartHttpError(0, {
+        code: "network",
+        message: err instanceof Error ? err.message : "Network error",
+      });
       setStatus("error");
-      setErrorMessage(err instanceof Error ? err.message : "Network error");
+      setErrorMessage(mapped.message);
+      setErrorRetryable(mapped.retryable);
     }
   }, [setEdges, setNodes]);
 
@@ -221,13 +242,29 @@ function OrgChartInner() {
           errorMessage ??
           "The Remote API request failed. Token stays server-side — retry, or check /api/health/remote."
         }
-        action={<RetryButton onClick={() => void load()} />}
+        action={
+          errorRetryable ? (
+            <RetryButton onClick={() => void load()} />
+          ) : undefined
+        }
       />
     );
   }
 
   return (
     <div className="relative h-full w-full">
+      {warnings.length > 0 ? (
+        <div className="absolute left-3 right-3 top-3 z-10 flex flex-col gap-1">
+          {warnings.map((warning) => (
+            <p
+              key={warning.type}
+              className="rounded-norma-sm border border-norma-border bg-norma-highlight-soft/90 px-3 py-1.5 text-xs text-norma-prussian shadow-norma-sm"
+            >
+              {warningCopy(warning)}
+            </p>
+          ))}
+        </div>
+      ) : null}
       <ReactFlow
         nodes={nodes}
         edges={edges}
