@@ -20,7 +20,7 @@ export function mapOrgChartHttpError(
         kind: "error",
         code,
         message:
-          "Remote API token is missing or invalid on the server. Check .env.local — never put tokens in the browser.",
+          "Acme can’t reach Remote right now. Check your connection in Settings, then try again.",
         retryable: false,
       };
     case "unauthorized":
@@ -29,14 +29,14 @@ export function mapOrgChartHttpError(
         kind: "error",
         code,
         message:
-          "Remote sandbox rejected the token. Confirm the read-only sandbox key still works, then retry.",
+          "Remote couldn’t authorize this connection. Ask an admin to check the Acme–Remote integration.",
         retryable: true,
       };
     case "rate_limited":
       return {
         kind: "error",
         code,
-        message: "Remote rate-limited this request. Wait a moment and retry.",
+        message: "Remote is busy. Wait a moment and try again.",
         retryable: true,
       };
     case "upstream":
@@ -46,7 +46,7 @@ export function mapOrgChartHttpError(
         code,
         message:
           body.message ??
-          "Could not reach gateway.remote-sandbox.com. Retry when the network is stable.",
+          "Couldn’t reach Remote. Check your network and try again.",
         retryable: true,
       };
     default:
@@ -55,7 +55,7 @@ export function mapOrgChartHttpError(
         code,
         message:
           body.message ??
-          `Org chart request failed (${status}). Retry or check /api/health/remote.`,
+          "Something went wrong loading the org chart. Please try again.",
         retryable: status >= 500 || status === 429,
       };
   }

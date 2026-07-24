@@ -24,7 +24,7 @@ const normaMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Acme Org Chart",
   description:
-    "Headless HRIS org chart for Acme Sandbox Corp via the Remote sandbox API.",
+    "Organization chart for Acme via Remote.",
 };
 
 export default function RootLayout({
