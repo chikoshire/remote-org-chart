@@ -394,6 +394,21 @@ Theme toggle (#63) needs dark variants of the same recipe.
 
 ---
 
+## 2026-07-24 — Tree list as optional Org Chart mode
+
+**Status:** Accepted  
+
+**Context:**  
+React Flow already satisfies Clara’s interactive chart brief. A third presentation can impress without replacing the primary.
+
+**Decision:**  
+Ship an optional Chart | Tree toggle on the Org Chart workspace. Tree is an indented expand/collapse list sharing the same selection/profile drawer. React Flow remains the brief primary and default.
+
+**Revisit when:**  
+Interviewers prefer tree as default (unlikely).
+
+---
+
 ## 2026-07-24 — Marketing landing + demo app session
 
 **Status:** Accepted  
