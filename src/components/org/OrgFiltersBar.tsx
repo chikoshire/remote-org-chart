@@ -3,6 +3,10 @@
 import type { OrgFilters } from "@/lib/org/filters";
 import { filtersAreActive } from "@/lib/org/filters";
 import { DepartmentFilterSelect } from "@/components/org/DepartmentFilterSelect";
+import {
+  formatCountryLabel,
+  sortCountryCodesByLabel,
+} from "@/lib/ui/format-country";
 
 type OrgFiltersBarProps = {
   filters: OrgFilters;
@@ -25,6 +29,7 @@ export function OrgFiltersBar({
   openDepartmentMenu = false,
 }: OrgFiltersBarProps) {
   const active = filtersAreActive(filters);
+  const countriesByLabel = sortCountryCodesByLabel(countries);
 
   return (
     <div className="flex flex-col gap-2">
@@ -67,9 +72,9 @@ export function OrgFiltersBar({
           }
         >
           <option value="">All countries</option>
-          {countries.map((country) => (
+          {countriesByLabel.map((country) => (
             <option key={country} value={country}>
-              {country}
+              {formatCountryLabel(country) || country}
             </option>
           ))}
         </select>

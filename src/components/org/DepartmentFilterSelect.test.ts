@@ -24,6 +24,7 @@ describe("DepartmentFilterSelect", () => {
     expect(select).toContain("departmentAccent");
     expect(select).toContain('role="listbox"');
     expect(select).toContain("defaultOpen");
+    expect(filters).toContain("formatCountryLabel");
     expect(filters).toContain("openDepartmentMenu");
     expect(people).toContain("DepartmentFilterSelect");
     expect(people).not.toContain("DepartmentColorLegend");
