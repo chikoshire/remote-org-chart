@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName } from "@/lib/ui/motion";
+import { PersonAvatar } from "@/components/org/PersonAvatar";
 
 export type DirectoryPerson = {
   id: string;
@@ -11,6 +12,7 @@ export type DirectoryPerson = {
   jobTitle?: string | null;
   department?: string | null;
   country?: string | null;
+  avatarUrl?: string | null;
   directReports?: number;
   managerEmploymentId: string | null;
   managerName?: string | null;
@@ -27,12 +29,6 @@ type PeopleDirectoryProps = {
 };
 
 type DirectoryView = "grid" | "list";
-
-function initials(name: string | null | undefined): string {
-  if (!name?.trim()) return "?";
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
 
 function sortKey(person: DirectoryPerson): string {
   return (person.fullName ?? "").trim().toLocaleLowerCase() || person.id;
@@ -254,15 +250,13 @@ function PersonCard({
         onClick={() => onSelect(person.id)}
         aria-pressed={selected}
       >
-        <span
-          aria-hidden
-          className={`inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white shadow-norma-sm ${
-            isList ? "h-10 w-10" : "h-12 w-12"
-          }`}
-          style={{ backgroundColor: accent }}
-        >
-          {initials(person.fullName)}
-        </span>
+        <PersonAvatar
+          personId={person.id}
+          fullName={person.fullName}
+          department={person.department}
+          avatarUrl={person.avatarUrl}
+          size={isList ? "sm" : "md"}
+        />
         <span className="min-w-0 flex-1">
           <span
             className={`block truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-prussian ${

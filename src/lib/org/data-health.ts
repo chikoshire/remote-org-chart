@@ -4,6 +4,7 @@ export type HealthPerson = {
   jobTitle: string | null;
   department: string | null;
   country: string | null;
+  avatarUrl?: string | null;
   managerEmploymentId: string | null;
   inCycle?: boolean;
 };

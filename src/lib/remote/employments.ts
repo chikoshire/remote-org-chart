@@ -9,6 +9,7 @@ import {
   type EmploymentListItem,
   type EmploymentRecord,
 } from "@/lib/remote/employment-schema";
+import { extractProfilePicture } from "@/lib/ui/avatar";
 
 export type EmploymentStatusPolicy = "active_only" | "all";
 
@@ -150,6 +151,10 @@ export async function enrichEmploymentsWithManagers(
       status: detail.status ?? item.status ?? null,
       country: countryToString(detail.country ?? item.country),
       workEmail: detail.work_email ?? item.work_email ?? null,
+      avatarUrl: extractProfilePicture(
+        detail as unknown as Record<string, unknown>,
+        item as unknown as Record<string, unknown>,
+      ),
       managerName: detail.manager ?? null,
       managerEmploymentId: detail.manager_employment_id ?? null,
     });

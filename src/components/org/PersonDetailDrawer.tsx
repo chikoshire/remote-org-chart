@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { personDeepLinkHref } from "@/lib/org/deep-links";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName } from "@/lib/ui/motion";
+import { PersonAvatar } from "@/components/org/PersonAvatar";
 
 export type PersonDetail = {
   id: string;
@@ -11,6 +12,7 @@ export type PersonDetail = {
   jobTitle: string | null;
   department: string | null;
   country: string | null;
+  avatarUrl?: string | null;
   directReports: number;
   inCycle?: boolean;
   isRoot?: boolean;
@@ -24,12 +26,6 @@ export type PersonDetailDrawerProps = {
   onClose: () => void;
   onSelectPerson: (id: string) => void;
 };
-
-function initials(name: string | null): string {
-  if (!name?.trim()) return "?";
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
 
 export function PersonDetailDrawer({
   person,
@@ -83,12 +79,13 @@ export function PersonDetailDrawer({
       data-morph-person={person.id}
     >
       <div className="flex items-start gap-3 border-b border-norma-border px-4 py-3">
-        <span
-          aria-hidden
-          className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-norma-accent-soft text-sm font-semibold text-norma-royal"
-        >
-          {initials(person.fullName)}
-        </span>
+        <PersonAvatar
+          personId={person.id}
+          fullName={person.fullName}
+          department={person.department}
+          avatarUrl={person.avatarUrl}
+          size="lg"
+        />
         <div className="min-w-0 flex-1">
           <h2
             id={titleId}

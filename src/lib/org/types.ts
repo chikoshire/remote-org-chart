@@ -9,6 +9,7 @@ export type OrgNode = {
   status: string | null;
   country: string | null;
   workEmail: string | null;
+  avatarUrl: string | null;
   managerEmploymentId: string | null;
   children: OrgNode[];
   /** True when this node participates in a detected reporting cycle. */

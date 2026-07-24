@@ -31,6 +31,7 @@ describe("PersonNodeCard", () => {
     expect(card).toContain("departmentAccent");
     expect(card).toContain("w-[260px]");
     expect(card).toContain("reports");
+    expect(card).toContain("PersonAvatar");
   });
 
   it("surfaces Cycle, Unlinked, and Incomplete badges", () => {

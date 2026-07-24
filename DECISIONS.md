@@ -446,6 +446,28 @@ Remote provides a sandbox OAuth client for this assessment app, or the brief exp
 
 ---
 
+## 2026-07-24 — Profile avatars + world map org view
+
+**Status:** Accepted  
+
+**Context:**  
+Remote’s product surfaces people with profile photos. Sandbox employments often omit `profile_picture`. Interviewers also asked for a geographic view of the org alongside Chart and Tree.
+
+**Decision:**  
+1. Pass through Remote `profile_picture` when present (https hosts only).  
+2. Otherwise use a stable DiceBear Notionists portrait seeded by employment id (falls back to initials if the image fails).  
+3. Add Org Chart **Map** mode: country pins from employment country codes + cluster detail list.
+
+**Consequences:**  
+- Avatars feel product-like even without sandbox photos.  
+- Real Remote photos light up automatically when the API returns them.  
+- Map depends on country being set on employments.
+
+**Revisit when:**  
+Remote exposes a first-class employment avatar field on the list endpoint, or we need offline/air-gapped avatar assets.
+
+---
+
 ## Template for future entries
 
 
