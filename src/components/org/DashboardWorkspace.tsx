@@ -193,6 +193,22 @@ export function DashboardWorkspace() {
 
   const navigate = useCallback(
     (href: string) => {
+      const hashIndex = href.indexOf("#");
+      if (hashIndex >= 0) {
+        const path = href.slice(0, hashIndex) || "/app/dashboard";
+        const hash = href.slice(hashIndex + 1);
+        const onDashboard =
+          typeof window !== "undefined" &&
+          (window.location.pathname === "/app/dashboard" ||
+            path === "/app/dashboard");
+        if (onDashboard && hash) {
+          const el = document.getElementById(hash);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            return;
+          }
+        }
+      }
       void withViewTransition(() => {
         router.push(href);
       });
@@ -389,7 +405,7 @@ export function DashboardWorkspace() {
         />
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2" id="departments">
+      <div className="mt-5 grid scroll-mt-4 gap-4 lg:grid-cols-2" id="departments">
         <CountBars
           title="Headcount by department"
           items={insights.departments}
