@@ -67,7 +67,7 @@ export function PeopleDirectory({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[linear-gradient(180deg,#eef3f2_0%,#f7faf9_40%,#ffffff_100%)]">
-      <div className="flex flex-wrap items-center gap-3 border-b border-norma-border bg-[#0b2a32] px-4 py-3 text-[#f4f7f5]">
+      <div className="flex flex-wrap items-center gap-3 border-b border-norma-border bg-[#1a1a1a] px-4 py-3 text-[#f4f7f5]">
         <div>
           <p className="font-[family-name:var(--font-norma-display)] text-sm font-semibold tracking-tight">
             People directory
