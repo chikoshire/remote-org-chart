@@ -26,6 +26,8 @@ type PeopleDirectoryProps = {
   onOpenInChart: (id: string) => void;
 };
 
+type DirectoryView = "grid" | "list";
+
 function initials(name: string | null | undefined): string {
   if (!name?.trim()) return "?";
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -46,6 +48,7 @@ export function PeopleDirectory({
 }: PeopleDirectoryProps) {
   const [localQuery, setLocalQuery] = useState("");
   const [deptOnly, setDeptOnly] = useState<string | "all">("all");
+  const [view, setView] = useState<DirectoryView>("grid");
   const query = controlledQuery ?? localQuery;
   const setQuery = onQueryChange ?? setLocalQuery;
 
@@ -88,23 +91,55 @@ export function PeopleDirectory({
               {deptOnly !== "all" ? ` in ${deptOnly}` : ""}
             </p>
           </div>
-          <label className="flex flex-col gap-1 text-xs font-medium text-norma-ink-subtle">
-            Department
-            <select
-              value={deptOnly}
-              onChange={(e) =>
-                setDeptOnly(e.target.value === "all" ? "all" : e.target.value)
-              }
-              className="min-w-[10rem] rounded-norma-md border border-norma-border bg-white px-2.5 py-2 text-sm font-normal text-norma-prussian shadow-norma-sm outline-none focus:border-norma-royal"
+          <div className="flex flex-wrap items-end gap-3">
+            <div
+              className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
+              role="group"
+              aria-label="Directory layout"
             >
-              <option value="all">All departments</option>
-              {departments.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </label>
+              <button
+                type="button"
+                aria-pressed={view === "grid"}
+                className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  view === "grid"
+                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    : "text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setView("grid")}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                aria-pressed={view === "list"}
+                className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  view === "list"
+                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    : "text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setView("list")}
+              >
+                List
+              </button>
+            </div>
+            <label className="flex flex-col gap-1 text-xs font-medium text-norma-ink-subtle">
+              Department
+              <select
+                value={deptOnly}
+                onChange={(e) =>
+                  setDeptOnly(e.target.value === "all" ? "all" : e.target.value)
+                }
+                className="min-w-[10rem] rounded-norma-md border border-norma-border bg-white px-2.5 py-2 text-sm font-normal text-norma-prussian shadow-norma-sm outline-none focus:border-norma-royal"
+              >
+                <option value="all">All departments</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
         <label className="mt-4 block">
           <span className="sr-only">Search people</span>
@@ -126,110 +161,191 @@ export function PeopleDirectory({
         <p className="px-4 py-12 text-center text-sm text-norma-ink-muted">
           No people match this directory filter.
         </p>
-      ) : (
+      ) : view === "grid" ? (
         <ul
           className="grid flex-1 grid-cols-1 gap-4 overflow-auto p-4 sm:grid-cols-2 md:p-6 xl:grid-cols-3"
           aria-label="People directory"
         >
-          {filtered.map((person) => {
-            const name = person.fullName?.trim() || "Unknown person";
-            const selected = person.id === selectedId;
-            const accent = departmentAccent(person.department);
-            const countryLabel = formatCountryLabel(person.country);
-            const reports = person.directReports ?? 0;
-            return (
-              <li key={person.id}>
-                <article
-                  className={`relative flex h-full flex-col overflow-hidden rounded-norma-lg border bg-white shadow-norma-sm transition ${
-                    selected
-                      ? "border-norma-royal ring-2 ring-norma-royal/25"
-                      : "border-norma-border hover:border-[#2a9d8f]/50 hover:shadow-norma-md"
-                  }`}
-                  style={
-                    selected
-                      ? undefined
-                      : { viewTransitionName: personMorphName(person.id) }
-                  }
-                  data-morph-person={person.id}
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-y-0 left-0 w-1.5"
-                    style={{ backgroundColor: accent }}
-                  />
-                  <button
-                    type="button"
-                    className="flex w-full items-start gap-3 px-4 py-4 pl-5 text-left"
-                    onClick={() => onSelect(person.id)}
-                    aria-pressed={selected}
-                  >
-                    <span
-                      aria-hidden
-                      className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white shadow-norma-sm"
-                      style={{ backgroundColor: accent }}
-                    >
-                      {initials(person.fullName)}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-prussian">
-                        {name}
-                      </span>
-                      <span className="mt-0.5 block truncate text-sm text-norma-ink-muted">
-                        {person.jobTitle?.trim() || "No title"}
-                      </span>
-                      <span className="mt-2 flex flex-wrap items-center gap-1.5">
-                        {person.department?.trim() ? (
-                          <span
-                            className="max-w-full truncate rounded-norma-sm px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian"
-                            style={{
-                              backgroundColor: `color-mix(in srgb, ${accent} 16%, white)`,
-                            }}
-                          >
-                            {person.department.trim()}
-                          </span>
-                        ) : null}
-                        {countryLabel ? (
-                          <span className="truncate text-xs text-norma-ink-subtle">
-                            {countryLabel}
-                          </span>
-                        ) : null}
-                      </span>
-                      {person.managerName ? (
-                        <span className="mt-2 block truncate text-xs text-norma-ink-muted">
-                          Reports to {person.managerName}
-                        </span>
-                      ) : (
-                        <span className="mt-2 block truncate text-xs text-norma-ink-subtle">
-                          Top of reporting line
-                        </span>
-                      )}
-                      <span className="mt-2 inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-prussian">
-                        {reports === 1 ? "1 report" : `${reports} reports`}
-                      </span>
-                    </span>
-                  </button>
-                  <div className="mt-auto flex gap-4 border-t border-norma-border/70 px-4 py-3 pl-5">
-                    <button
-                      type="button"
-                      className="text-xs font-semibold text-norma-royal hover:underline"
-                      onClick={() => onSelect(person.id)}
-                    >
-                      Open profile
-                    </button>
-                    <button
-                      type="button"
-                      className="text-xs font-medium text-norma-ink-muted hover:text-norma-prussian hover:underline"
-                      onClick={() => onOpenInChart(person.id)}
-                    >
-                      Show in chart
-                    </button>
-                  </div>
-                </article>
-              </li>
-            );
-          })}
+          {filtered.map((person) => (
+            <li key={person.id}>
+              <PersonCard
+                person={person}
+                selected={person.id === selectedId}
+                layout="grid"
+                onSelect={onSelect}
+                onOpenInChart={onOpenInChart}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <ul
+          className="flex-1 divide-y divide-norma-border/70 overflow-auto"
+          aria-label="People directory"
+        >
+          {filtered.map((person) => (
+            <li key={person.id} className="px-4 md:px-6">
+              <PersonCard
+                person={person}
+                selected={person.id === selectedId}
+                layout="list"
+                onSelect={onSelect}
+                onOpenInChart={onOpenInChart}
+              />
+            </li>
+          ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function PersonCard({
+  person,
+  selected,
+  layout,
+  onSelect,
+  onOpenInChart,
+}: {
+  person: DirectoryPerson;
+  selected: boolean;
+  layout: DirectoryView;
+  onSelect: (id: string) => void;
+  onOpenInChart: (id: string) => void;
+}) {
+  const name = person.fullName?.trim() || "Unknown person";
+  const accent = departmentAccent(person.department);
+  const countryLabel = formatCountryLabel(person.country);
+  const reports = person.directReports ?? 0;
+  const isList = layout === "list";
+
+  return (
+    <article
+      className={`relative flex overflow-hidden transition ${
+        isList
+          ? `flex-row items-center gap-3 border-b-0 py-3 ${
+              selected ? "bg-norma-accent-soft/40" : ""
+            }`
+          : `h-full flex-col rounded-norma-lg border bg-white shadow-norma-sm ${
+              selected
+                ? "border-norma-royal ring-2 ring-norma-royal/25"
+                : "border-norma-border hover:border-[#2a9d8f]/50 hover:shadow-norma-md"
+            }`
+      }`}
+      style={
+        selected
+          ? undefined
+          : { viewTransitionName: personMorphName(person.id) }
+      }
+      data-morph-person={person.id}
+    >
+      {!isList ? (
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-1.5"
+          style={{ backgroundColor: accent }}
+        />
+      ) : null}
+      <button
+        type="button"
+        className={`flex min-w-0 flex-1 items-start gap-3 text-left ${
+          isList ? "py-1" : "w-full px-4 py-4 pl-5"
+        }`}
+        onClick={() => onSelect(person.id)}
+        aria-pressed={selected}
+      >
+        <span
+          aria-hidden
+          className={`inline-flex shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white shadow-norma-sm ${
+            isList ? "h-10 w-10" : "h-12 w-12"
+          }`}
+          style={{ backgroundColor: accent }}
+        >
+          {initials(person.fullName)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span
+            className={`block truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-prussian ${
+              isList ? "text-sm" : "text-base"
+            }`}
+          >
+            {name}
+          </span>
+          <span className="mt-0.5 block truncate text-sm text-norma-ink-muted">
+            {person.jobTitle?.trim() || "No title"}
+          </span>
+          {isList ? (
+            <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-norma-ink-subtle">
+              <span className="truncate">
+                {person.department?.trim() || "Not set"}
+              </span>
+              {countryLabel ? <span className="truncate">{countryLabel}</span> : null}
+              <span className="truncate">
+                {person.managerName
+                  ? `Reports to ${person.managerName}`
+                  : "Top of reporting line"}
+              </span>
+              <span className="font-semibold text-norma-prussian">
+                {reports === 1 ? "1 report" : `${reports} reports`}
+              </span>
+            </span>
+          ) : (
+            <>
+              <span className="mt-2 flex flex-wrap items-center gap-1.5">
+                {person.department?.trim() ? (
+                  <span
+                    className="max-w-full truncate rounded-norma-sm px-1.5 py-0.5 text-[10px] font-medium text-norma-prussian"
+                    style={{
+                      backgroundColor: `color-mix(in srgb, ${accent} 16%, white)`,
+                    }}
+                  >
+                    {person.department.trim()}
+                  </span>
+                ) : null}
+                {countryLabel ? (
+                  <span className="truncate text-xs text-norma-ink-subtle">
+                    {countryLabel}
+                  </span>
+                ) : null}
+              </span>
+              {person.managerName ? (
+                <span className="mt-2 block truncate text-xs text-norma-ink-muted">
+                  Reports to {person.managerName}
+                </span>
+              ) : (
+                <span className="mt-2 block truncate text-xs text-norma-ink-subtle">
+                  Top of reporting line
+                </span>
+              )}
+              <span className="mt-2 inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-prussian">
+                {reports === 1 ? "1 report" : `${reports} reports`}
+              </span>
+            </>
+          )}
+        </span>
+      </button>
+      <div
+        className={`flex shrink-0 gap-3 ${
+          isList
+            ? "items-center"
+            : "mt-auto gap-4 border-t border-norma-border/70 px-4 py-3 pl-5"
+        }`}
+      >
+        <button
+          type="button"
+          className="text-xs font-semibold text-norma-royal hover:underline"
+          onClick={() => onSelect(person.id)}
+        >
+          Open profile
+        </button>
+        <button
+          type="button"
+          className="text-xs font-medium text-norma-ink-muted hover:text-norma-prussian hover:underline"
+          onClick={() => onOpenInChart(person.id)}
+        >
+          Show in chart
+        </button>
+      </div>
+    </article>
   );
 }

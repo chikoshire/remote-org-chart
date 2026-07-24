@@ -124,6 +124,12 @@ test.describe("org chart smoke", () => {
     await expect(
       page.getByRole("link", { name: "Review Data Health" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Headcount by department" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Needs attention" }),
+    ).toBeVisible();
   });
 
   test("departments tab lists headcount and people", async ({ page }) => {
@@ -283,6 +289,16 @@ test.describe("org chart smoke", () => {
     await expect(page.getByRole("dialog", { name: "Jordan Report" })).toBeVisible();
     await expect(
       page.locator('[data-morph-person="emp_report"].bloom-enter'),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Close person details" }).click();
+    await page.getByRole("button", { name: "List" }).click();
+    await expect(page.getByRole("button", { name: "List" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(
+      page.getByRole("list", { name: "People directory" }).getByText("Jordan Report"),
     ).toBeVisible();
   });
 
