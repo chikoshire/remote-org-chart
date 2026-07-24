@@ -37,7 +37,7 @@ Rule: move parent **Backlog → In Progress → Review** (all children done) bef
 
 **Coverage check (2026-07-23):** 34 parents. Tier 0 / UX / stretch / cross + bonus #33–#34. Marketing landing is **not** in Clara’s core brief — tracked as stretch wow.
 
-**Core brief status (2026-07-24):** Tier 0 + UX + stretch #17–#34 closed on `main`. Live chart meets Clara’s must-haves. Active serial work is the **Org Intelligence wow track** below (brief + wow).
+**Core brief status (2026-07-24):** Tier 0 + UX + stretch #17–#34 closed on `main`. Live chart meets Clara’s must-haves. **Org Intelligence wow track** (#58–#70) closed after #68 QA/handoff.
 
 ## Org Intelligence wow track (active serial)
 
