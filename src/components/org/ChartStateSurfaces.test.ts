@@ -14,5 +14,8 @@ describe("ChartStateSurfaces", () => {
     expect(src).toContain("ChartErrorState");
     expect(src).toContain('role="status"');
     expect(src).toContain('role="alert"');
+    expect(src).toContain("animate-pulse");
+    expect(src).toContain("<svg");
+    expect(src).not.toContain("animate-spin");
   });
 });
