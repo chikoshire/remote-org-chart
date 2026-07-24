@@ -9,8 +9,8 @@ const welcome = readFileSync(
 
 describe("welcome landing", () => {
   it("is brand-forward with a CTA into the chart", () => {
-    expect(welcome).toContain("ProductShell");
-    expect(welcome).toContain("Sandbox Corp");
+    expect(welcome).toContain("AcmeLogo");
+    expect(welcome).toContain("People powered");
     expect(welcome).toContain('href="/app"');
     expect(welcome).toContain("Open organization chart");
   });
