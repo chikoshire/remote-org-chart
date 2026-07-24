@@ -15,14 +15,14 @@ Paste-ready notes for Clara / Remote interviewers.
 ## Product map (authenticated)
 
 **Dashboard · Org Chart · People · Settings (gear)**  
-Departments is a view under People (Grid | List | Departments), not a top-level tab.
+Department inventory lives on Dashboard (headcount by department). People uses Grid | List plus a department filter.
 Data Health lives under Settings → Data Health.
 
 | Surface | Why look |
 |---------|----------|
 | Dashboard | Headcount, departments, managers, completeness, deep links |
-| Org Chart | React Flow hierarchy; optional Chart \| Tree list; Cycle / Unlinked / Incomplete badges |
-| People | Grid / List directory, or Departments browse; profile drawer |
+| Org Chart | React Flow hierarchy; Chart \| Tree \| Map; Cycle / Unlinked / Incomplete badges |
+| People | Grid / List directory + department filter; profile drawer |
 | Data Health | Reporting cycles, manager missing, incomplete profiles (Settings) |
 | Settings | Connect / disconnect Remote (no secrets in UI); light / dark theme |
 | ⌘K / Ctrl+K | Command bar: jump to people or primary routes |
@@ -30,9 +30,9 @@ Data Health lives under Settings → Data Health.
 ## What to say in the walkthrough
 
 1. Marketing → demo login → product shell.
-2. Dashboard insights → jump to Data Health or People.
+2. Dashboard insights (incl. departments) → jump to Data Health or People.
 3. Org Chart: search Jordan (fixture locally) or a real sandbox person; path-to-root highlight; no export chrome.
-4. People / Departments: open a profile (soft bloom / morph where supported).
+4. People: open a profile (soft bloom / morph where supported); filter by department.
 5. Settings: theme toggle; Disconnect / Connect wizard (token stays server-side).
 6. Log out → back to marketing.
 

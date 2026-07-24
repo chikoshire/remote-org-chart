@@ -134,26 +134,16 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
   });
 
-  test("people departments view lists headcount and people", async ({ page }) => {
+  test("legacy departments route redirects to dashboard headcount", async ({
+    page,
+  }) => {
     await mockOrgChart(page, orgChartReadyFixture);
     await loginAsDemo(page);
-    await page.goto("/app/people?view=departments");
+    await page.goto("/app/departments");
+    await expect(page).toHaveURL(/\/app\/dashboard/);
     await expect(
-      page.getByRole("heading", { name: "People", exact: true }),
+      page.getByRole("heading", { name: "Headcount by department" }),
     ).toBeVisible({ timeout: 20_000 });
-    await expect(
-      page.getByRole("button", { name: "Departments", exact: true }),
-    ).toHaveAttribute("aria-pressed", "true");
-    await expect(
-      page.getByRole("list", { name: "Departments" }).getByText("Operations"),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Operations", exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("list", { name: "Operations people" }).getByText("Alex Root"),
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Show in chart" }).first()).toBeVisible();
   });
 
   test("data health route lists trust sections", async ({ page }) => {
