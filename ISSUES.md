@@ -58,7 +58,8 @@ Marketing + demo login/logout. Remote Connect = Option B (+ OAuth scaffold off).
 | 8 | #65 | TUXX-1600 | `feat/departments-tab` | High |
 | 9 | #66 | TUXX-1601 | `feat/command-bar` | Medium (wow) |
 | 10 | #67 | TUXX-1603 | `feat/tree-list-view` | Low (optional) |
-| 11 | #68 | TUXX-1602 | `cross/org-intelligence-qa` | High |
+| 11 | #70 | TUXX-1609 | `ui/morph-bloom-transitions` | Medium (final wow) |
+| 12 | #68 | TUXX-1602 | `cross/org-intelligence-qa` | High |
 
 Linear subs (examples): TUXX-1604–1605 under #58; TUXX-1606–1608 under #62. GH parents carry full sub-issue checklists in comments.
 
