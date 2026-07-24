@@ -1,12 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { ProductShell } from "@/components/shell/ProductShell";
-import { DepartmentsWorkspace } from "@/components/org/DepartmentsWorkspace";
-
-export default function DepartmentsPage() {
-  return (
-    <ProductShell status={<span>Departments</span>}>
-      <DepartmentsWorkspace />
-    </ProductShell>
-  );
+/** Departments live under People → Departments view. */
+export default function DepartmentsRedirectPage() {
+  redirect("/app/people?view=departments");
 }

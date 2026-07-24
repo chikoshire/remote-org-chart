@@ -295,7 +295,7 @@ export function DashboardWorkspace() {
             {[
               { href: "/app", label: "Org Chart" },
               { href: "/app/people", label: "People" },
-              { href: "/app/departments", label: "Departments" },
+              { href: "/app/people?view=departments", label: "Departments" },
               { href: "/settings/data-health", label: "Data Health" },
             ].map((link) => (
               <Link
@@ -331,8 +331,8 @@ export function DashboardWorkspace() {
                 ? `Largest: ${insights.largestDepartment.name} (${insights.largestDepartment.count})`
                 : "No departments on file"
             }
-            href="/app/departments"
-            hrefLabel="Open Departments"
+            href="/app/people?view=departments"
+            hrefLabel="Browse by department"
             onNavigate={navigate}
           />
           <InsightCard

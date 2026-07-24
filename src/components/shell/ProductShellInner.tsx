@@ -19,11 +19,6 @@ const PRIMARY_NAV = [
     match: (p: string) => p === "/app" || p === "/",
   },
   { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
-  {
-    href: "/app/departments",
-    label: "Departments",
-    match: (p: string) => p.startsWith("/app/departments"),
-  },
 ] as const;
 
 function navClass(active: boolean) {

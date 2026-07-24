@@ -2,26 +2,26 @@ import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const routes = ["dashboard", "people", "departments"] as const;
-
 describe("Org Intelligence IA routes", () => {
-  for (const segment of routes) {
-    it(`has /app/${segment} page`, () => {
-      const path = join(process.cwd(), `src/app/app/${segment}/page.tsx`);
-      expect(existsSync(path)).toBe(true);
-      const src = readFileSync(path, "utf8");
-      expect(src).toContain("ProductShell");
-      if (segment === "people") {
-        expect(src).toContain("PeopleWorkspace");
-      } else if (segment === "dashboard") {
-        expect(src).toContain("DashboardWorkspace");
-      } else if (segment === "departments") {
-        expect(src).toContain("DepartmentsWorkspace");
-      } else {
-        expect(src).toContain("SurfaceStub");
-      }
-    });
-  }
+  it("has /app/dashboard page", () => {
+    const path = join(process.cwd(), "src/app/app/dashboard/page.tsx");
+    expect(existsSync(path)).toBe(true);
+    expect(readFileSync(path, "utf8")).toContain("DashboardWorkspace");
+  });
+
+  it("has /app/people page with directory views", () => {
+    const path = join(process.cwd(), "src/app/app/people/page.tsx");
+    expect(existsSync(path)).toBe(true);
+    expect(readFileSync(path, "utf8")).toContain("PeopleWorkspace");
+  });
+
+  it("redirects legacy /app/departments into People Departments view", () => {
+    const path = join(process.cwd(), "src/app/app/departments/page.tsx");
+    expect(existsSync(path)).toBe(true);
+    const src = readFileSync(path, "utf8");
+    expect(src).toContain('redirect("/app/people?view=departments")');
+    expect(src).not.toContain("DepartmentsWorkspace");
+  });
 
   it("keeps Data Health under Settings with redirect from old path", () => {
     const settingsHealth = join(

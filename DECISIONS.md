@@ -448,24 +448,31 @@ Remote provides a sandbox OAuth client for this assessment app, or the brief exp
 
 ## 2026-07-24 — Profile avatars + world map org view
 
-**Status:** Accepted (avatars corrected same day)  
+**Status:** Accepted (avatars corrected same day; **photos blocked on customer API as of 2026-07-24 re-probe**)  
 
 **Context:**  
-Remote’s product surfaces people with profile photos via `employment.user.profilePicture` on the **employ session/GraphQL API**. The public customer REST employment endpoints (`GET /v1/employments`, `GET /v1/employments/:id`) for this sandbox return `user_id` / `user_status` but **not** `profile_picture` (sampled 176 employments; include/expand rejected).
+Remote’s product UI (employ.remote-sandbox.com) shows real profile photos. The public customer REST path we use for the assessment does not expose them.
+
+**Exhaustive probe (sandbox `ra_test_` Bearer, gateway.remote-sandbox.com):**  
+- `GET /v1/employments` + `:id` — no `profile_picture` / CDN URL on list or detail (re-sampled; `include`/`expand=user` → 422).  
+- Detail has `user_id` / `user_status` only — no nested `user` object.  
+- `GET …/files` — contracts/expense PDFs only, not photos.  
+- SCIM / people / accounts user paths — 404 for this token.  
+- OpenAPI: `profile_picture` exists on `MinimalUser`, but only wired to bulk-import `inserted_by`, **not** Employment responses. No documented GET returns it for company people.
 
 **Decision:**  
-1. Pass through Remote photo URLs when the API provides them (`profile_picture` / `profilePicture` / nested `user`, allowlisted HTTPS hosts including `cdn.employ-assets.remote.com`).  
-2. **Do not** invent third-party portraits (no DiceBear). When no photo URL exists, show department-colored initials — the same honest fallback Remote uses without a photo.  
-3. Keep Org Chart **Map** mode for country pins — rendered as a real Natural Earth world map (`world-atlas` + `d3-geo`), not decorative blob silhouettes. Highlight countries with people; pins use the same projection.
+1. Pass through Remote photo URLs when the API provides them (`profile_picture` / `profilePicture` / nested `user`, allowlisted HTTPS hosts including `cdn.employ-assets.remote.com`). Grid, list, drawer, chart cards, tree, and map all use the same `PersonAvatar` → initials when `avatarUrl` is null.  
+2. **Do not** invent third-party portraits (no DiceBear / fake faces). Department-colored initials are the honest fallback.  
+3. **Do not** scrape employ.remote-sandbox.com session/GraphQL for photos — undocumented, ToS-fragile, and outside the assessment’s customer-REST brief.  
+4. Keep Org Chart **Map** mode for country pins — Natural Earth (`world-atlas` + `d3-geo`).
 
 **Consequences:**  
-- Avatars match Remote only when the REST payload includes a picture URL.  
-- Sandbox demo people currently render as initials until Remote exposes photos on the customer API (or we gain an authenticated employ-API path).  
-- Map depends on country being set on employments.  
-- Tiny territories missing from countries-110m (e.g. Singapore) still get pins via centroids even without a filled polygon.
+- Side panel and directory both show initials today because `avatarUrl` is always null from REST — not a missing UI wire.  
+- Real photos appear automatically the day Remote adds the field to employment payloads (extraction already shipped).  
+- Partner OAuth on the same gateway does not fix this if the schema still omits the field.
 
 **Revisit when:**  
-Remote documents a customer-API way to read `employment.user.profilePicture`, or interviewers accept a session-based employ API integration.
+Remote documents `profile_picture` on employment (or a customer-readable Users endpoint), or the brief explicitly allows a product-session integration.
 
 ---
 
@@ -537,6 +544,24 @@ Vertical list Tree still felt file-browser-like; users wanted chart-like left→
 **Consequences:**  
 - Tree is horizontally scrollable for wide orgs.  
 - Chart (React Flow) remains the primary interactive layout.
+
+---
+
+## 2026-07-24 — Departments inside People
+
+**Status:** Accepted  
+
+**Context:**  
+Primary nav had both People and Departments, while People already filtered by department. Two pages duplicated the same employment set.
+
+**Decision:**  
+1. Remove Departments from primary nav.  
+2. Add a **Departments** layout toggle on People (Grid | List | Departments).  
+3. Keep `/app/departments` as a redirect to `/app/people?view=departments`.
+
+**Consequences:**  
+- One directory surface; department sidebar only when that view is active.  
+- Dashboard / command bar deep-link the People Departments view.
 
 ---
 

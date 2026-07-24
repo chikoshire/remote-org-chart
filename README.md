@@ -59,8 +59,8 @@ Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handof
 |-------|---------|
 | `/app/dashboard` | Organisational insights |
 | `/app` | Org Chart (Chart \| Tree) |
-| `/app/people` | People directory |
-| `/app/departments` | Departments + mini people |
+| `/app/people` | People directory (Grid \| List \| Departments) |
+| `/app/people?view=departments` | Department browse (legacy `/app/departments` redirects here) |
 | `/settings/data-health` | Trust / edge-case review (also redirected from `/app/data-health`) |
 | `/settings` | Remote connect + theme |
 
