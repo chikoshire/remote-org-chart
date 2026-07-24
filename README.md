@@ -57,10 +57,10 @@ Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handof
 
 | Route | Surface |
 |-------|---------|
-| `/app/dashboard` | Organisational insights |
-| `/app` | Org Chart (Chart \| Tree) |
-| `/app/people` | People directory (Grid \| List \| Departments) |
-| `/app/people?view=departments` | Department browse (legacy `/app/departments` redirects here) |
+| `/app/dashboard` | Organisational insights (incl. headcount by department) |
+| `/app` | Org Chart (Chart \| Tree \| Map) |
+| `/app/people` | People directory (Grid \| List + department filter) |
+| `/app/departments` | Redirects to Dashboard |
 | `/settings/data-health` | Trust / edge-case review (also redirected from `/app/data-health`) |
 | `/settings` | Remote connect + theme |
 

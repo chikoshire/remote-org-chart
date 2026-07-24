@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { DepartmentsBrowse } from "@/components/org/DepartmentsBrowse";
+import { useMemo, useState } from "react";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
-import { computeDepartments } from "@/lib/org/departments";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName } from "@/lib/ui/motion";
@@ -20,7 +18,7 @@ export type DirectoryPerson = {
   managerName?: string | null;
 };
 
-export type DirectoryView = "grid" | "list" | "departments";
+type DirectoryView = "grid" | "list";
 
 type PeopleDirectoryProps = {
   people: DirectoryPerson[];
@@ -28,9 +26,6 @@ type PeopleDirectoryProps = {
   /** Optional controlled query; when omitted, directory owns search. */
   query?: string;
   onQueryChange?: (query: string) => void;
-  /** Initial / controlled layout; defaults to grid. */
-  view?: DirectoryView;
-  onViewChange?: (view: DirectoryView) => void;
   onSelect: (id: string) => void;
   onOpenInChart: (id: string) => void;
 };
@@ -44,28 +39,14 @@ export function PeopleDirectory({
   selectedId,
   query: controlledQuery,
   onQueryChange,
-  view: controlledView,
-  onViewChange,
   onSelect,
   onOpenInChart,
 }: PeopleDirectoryProps) {
   const [localQuery, setLocalQuery] = useState("");
   const [deptOnly, setDeptOnly] = useState<string | "all">("all");
-  const [localView, setLocalView] = useState<DirectoryView>(
-    controlledView ?? "grid",
-  );
+  const [view, setView] = useState<DirectoryView>("grid");
   const query = controlledQuery ?? localQuery;
   const setQuery = onQueryChange ?? setLocalQuery;
-  const view = controlledView ?? localView;
-
-  useEffect(() => {
-    if (controlledView) setLocalView(controlledView);
-  }, [controlledView]);
-
-  function setView(next: DirectoryView) {
-    setLocalView(next);
-    onViewChange?.(next);
-  }
 
   const departments = useMemo(() => {
     const set = new Set<string>();
@@ -74,23 +55,6 @@ export function PeopleDirectory({
     }
     return [...set].sort((a, b) => a.localeCompare(b));
   }, [people]);
-
-  const departmentBuckets = useMemo(
-    () =>
-      computeDepartments(
-        people.map((person) => ({
-          id: person.id,
-          fullName: person.fullName ?? null,
-          jobTitle: person.jobTitle ?? null,
-          department: person.department ?? null,
-          country: person.country ?? null,
-          avatarUrl: person.avatarUrl ?? null,
-          directReports: person.directReports,
-          managerEmploymentId: person.managerEmploymentId,
-        })),
-      ),
-    [people],
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
@@ -118,15 +82,9 @@ export function PeopleDirectory({
               People
             </h1>
             <p className="mt-1 text-sm text-norma-ink-muted">
-              {view === "departments"
-                ? `${departmentBuckets.length} ${
-                    departmentBuckets.length === 1
-                      ? "department"
-                      : "departments"
-                  }`
-                : `${filtered.length} ${
-                    filtered.length === 1 ? "person" : "people"
-                  }${deptOnly !== "all" ? ` in ${deptOnly}` : ""}`}
+              {filtered.length}{" "}
+              {filtered.length === 1 ? "person" : "people"}
+              {deptOnly !== "all" ? ` in ${deptOnly}` : ""}
             </p>
           </div>
           <div className="flex flex-wrap items-end gap-3">
@@ -135,49 +93,50 @@ export function PeopleDirectory({
               role="group"
               aria-label="Directory layout"
             >
-              {(
-                [
-                  ["grid", "Grid"],
-                  ["list", "List"],
-                  ["departments", "Departments"],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-pressed={view === id}
-                  className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
-                    view === id
-                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
-                      : "text-norma-ink-muted hover:text-norma-prussian"
-                  }`}
-                  onClick={() => setView(id)}
-                >
-                  {label}
-                </button>
-              ))}
+              <button
+                type="button"
+                aria-pressed={view === "grid"}
+                className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  view === "grid"
+                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    : "text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setView("grid")}
+              >
+                Grid
+              </button>
+              <button
+                type="button"
+                aria-pressed={view === "list"}
+                className={`rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                  view === "list"
+                    ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                    : "text-norma-ink-muted hover:text-norma-prussian"
+                }`}
+                onClick={() => setView("list")}
+              >
+                List
+              </button>
             </div>
-            {view !== "departments" ? (
-              <label className="flex flex-col gap-1 text-xs font-medium text-norma-ink-subtle">
-                Department
-                <select
-                  value={deptOnly}
-                  onChange={(e) =>
-                    setDeptOnly(
-                      e.target.value === "all" ? "all" : e.target.value,
-                    )
-                  }
-                  className="min-w-[10rem] rounded-norma-md border border-norma-border bg-white px-2.5 py-2 text-sm font-normal text-norma-prussian shadow-norma-sm outline-none focus:border-norma-royal"
-                >
-                  <option value="all">All departments</option>
-                  {departments.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+            <label className="flex flex-col gap-1 text-xs font-medium text-norma-ink-subtle">
+              Department
+              <select
+                value={deptOnly}
+                onChange={(e) =>
+                  setDeptOnly(
+                    e.target.value === "all" ? "all" : e.target.value,
+                  )
+                }
+                className="min-w-[10rem] rounded-norma-md border border-norma-border bg-white px-2.5 py-2 text-sm font-normal text-norma-prussian shadow-norma-sm outline-none focus:border-norma-royal"
+              >
+                <option value="all">All departments</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </div>
         <label className="mt-4 block">
@@ -189,26 +148,14 @@ export function PeopleDirectory({
             aria-expanded={false}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={
-              view === "departments"
-                ? "Search departments or people…"
-                : "Search by name, title, or department…"
-            }
+            placeholder="Search by name, title, or department…"
             className="w-full rounded-norma-md border border-norma-border bg-white px-3.5 py-2.5 text-sm text-norma-ink shadow-norma-sm outline-none focus:border-norma-royal"
             autoComplete="off"
           />
         </label>
       </div>
 
-      {view === "departments" ? (
-        <DepartmentsBrowse
-          people={people}
-          selectedId={selectedId}
-          query={query}
-          onSelect={onSelect}
-          onOpenInChart={onOpenInChart}
-        />
-      ) : filtered.length === 0 ? (
+      {filtered.length === 0 ? (
         <p className="px-4 py-12 text-center text-sm text-norma-ink-muted">
           No people match this directory filter.
         </p>
@@ -260,7 +207,7 @@ function PersonCard({
 }: {
   person: DirectoryPerson;
   selected: boolean;
-  layout: "grid" | "list";
+  layout: DirectoryView;
   onSelect: (id: string) => void;
   onOpenInChart: (id: string) => void;
 }) {
@@ -328,7 +275,9 @@ function PersonCard({
               <span className="truncate">
                 {person.department?.trim() || "Not set"}
               </span>
-              {countryLabel ? <span className="truncate">{countryLabel}</span> : null}
+              {countryLabel ? (
+                <span className="truncate">{countryLabel}</span>
+              ) : null}
               <span className="truncate">
                 {person.managerName
                   ? `Reports to ${person.managerName}`

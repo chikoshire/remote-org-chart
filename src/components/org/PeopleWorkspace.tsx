@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   ChartEmptyState,
   ChartErrorState,
@@ -11,7 +11,6 @@ import {
 import {
   PeopleDirectory,
   type DirectoryPerson,
-  type DirectoryView,
 } from "@/components/org/PeopleDirectory";
 import {
   PersonDetailDrawer,
@@ -46,10 +45,6 @@ type OrgChartResponse = {
   code?: string;
 };
 
-function viewFromSearch(raw: string | null): DirectoryView {
-  return raw === "departments" ? "departments" : "grid";
-}
-
 function toDetail(
   person: FlatPerson,
   byId: Map<string, FlatPerson>,
@@ -72,10 +67,6 @@ function toDetail(
 
 export function PeopleWorkspace() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [view, setView] = useState<DirectoryView>(() =>
-    viewFromSearch(searchParams.get("view")),
-  );
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
     "loading",
   );
@@ -83,35 +74,11 @@ export function PeopleWorkspace() {
   const [people, setPeople] = useState<FlatPerson[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Deep-link / redirect into Departments view only; Grid/List stay local.
-    if (searchParams.get("view") === "departments") {
-      setView("departments");
-    }
-  }, [searchParams]);
-
   const selectPerson = useCallback((id: string | null) => {
     void withViewTransition(() => {
       setSelectedId(id);
     });
   }, []);
-
-  const onViewChange = useCallback(
-    (next: DirectoryView) => {
-      setView(next);
-      const params = new URLSearchParams(searchParams.toString());
-      if (next === "departments") {
-        params.set("view", "departments");
-      } else {
-        params.delete("view");
-      }
-      const qs = params.toString();
-      router.replace(qs ? `/app/people?${qs}` : "/app/people", {
-        scroll: false,
-      });
-    },
-    [router, searchParams],
-  );
 
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
@@ -223,8 +190,6 @@ export function PeopleWorkspace() {
       <PeopleDirectory
         people={directoryPeople}
         selectedId={selectedId}
-        view={view}
-        onViewChange={onViewChange}
         onSelect={selectPerson}
         onOpenInChart={(id) => {
           const search = withPersonSearchParam("", id);
