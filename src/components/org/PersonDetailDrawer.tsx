@@ -197,15 +197,22 @@ export function PersonDetailDrawer({
                     type="button"
                     disabled={isSelf}
                     onClick={() => onSelectPerson(step.id)}
-                    className={`flex w-full items-center gap-2 rounded-norma-sm px-2 py-1.5 text-left text-sm ${
+                    className={`flex w-full items-center gap-2.5 rounded-norma-sm px-2 py-1.5 text-left text-sm ${
                       isSelf
                         ? "bg-norma-accent-soft font-medium text-norma-royal"
                         : "text-norma-prussian hover:bg-norma-surface-muted"
                     }`}
                   >
-                    <span className="font-mono text-[10px] text-norma-ink-subtle">
+                    <span className="w-4 shrink-0 font-mono text-[10px] text-norma-ink-subtle">
                       {index + 1}
                     </span>
+                    <PersonAvatar
+                      personId={step.id}
+                      fullName={step.fullName}
+                      department={step.department}
+                      avatarUrl={step.avatarUrl}
+                      size="sm"
+                    />
                     <span className="min-w-0 truncate">
                       {step.fullName?.trim() || "Unknown"}
                       <span className="block truncate text-xs font-normal text-norma-ink-muted">
@@ -235,13 +242,22 @@ export function PersonDetailDrawer({
                   <button
                     type="button"
                     onClick={() => onSelectPerson(report.id)}
-                    className="flex w-full flex-col rounded-norma-sm px-2 py-1.5 text-left hover:bg-norma-surface-muted"
+                    className="flex w-full items-center gap-2.5 rounded-norma-sm px-2 py-1.5 text-left hover:bg-norma-surface-muted"
                   >
-                    <span className="truncate text-sm font-medium text-norma-prussian">
-                      {report.fullName?.trim() || "Unknown"}
-                    </span>
-                    <span className="truncate text-xs text-norma-ink-muted">
-                      {report.jobTitle?.trim() || "Not set"}
+                    <PersonAvatar
+                      personId={report.id}
+                      fullName={report.fullName}
+                      department={report.department}
+                      avatarUrl={report.avatarUrl}
+                      size="sm"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-norma-prussian">
+                        {report.fullName?.trim() || "Unknown"}
+                      </span>
+                      <span className="block truncate text-xs text-norma-ink-muted">
+                        {report.jobTitle?.trim() || "Not set"}
+                      </span>
                     </span>
                   </button>
                 </li>
