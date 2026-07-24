@@ -19,12 +19,15 @@ export default function Home() {
             Acme Sandbox Corp via Remote — interactive React Flow chart.
           </p>
         </div>
-        <div
+        <section
+          id="org-chart"
+          aria-label="Organization chart"
           className="min-h-[70dvh] flex-1 overflow-hidden rounded-norma-lg border border-norma-border bg-norma-surface shadow-norma-sm md:min-h-[480px]"
           data-slot="chart-canvas"
+          tabIndex={-1}
         >
           <OrgChartCanvas />
-        </div>
+        </section>
       </div>
     </AppShell>
   );

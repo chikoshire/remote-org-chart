@@ -35,9 +35,19 @@ export function PersonNodeCard({
   variant = "default",
 }: PersonNodeData) {
   const name = fullName?.trim() || "Unknown person";
+  const accessibleName = [
+    name,
+    jobTitle?.trim() || "No title",
+    [department, country].filter(Boolean).join(" · ") || null,
+    `${directReports} direct report${directReports === 1 ? "" : "s"}`,
+    inCycle ? "reporting cycle" : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <article
+      aria-label={accessibleName}
       className={`w-[220px] rounded-norma-md border px-3 py-2.5 transition-colors ${variantClass[variant]}`}
       data-variant={variant}
       data-in-cycle={inCycle ? "true" : "false"}

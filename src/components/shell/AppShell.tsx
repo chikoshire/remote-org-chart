@@ -9,8 +9,14 @@ type AppShellProps = {
 export function AppShell({ children, toolbar, status }: AppShellProps) {
   return (
     <div className="flex min-h-full flex-col bg-norma-canvas">
+      <a href="#org-chart" className="skip-link">
+        Skip to organization chart
+      </a>
       <AppHeader toolbar={toolbar} />
-      <main className="relative flex flex-1 flex-col overflow-hidden">
+      <main
+        id="main-content"
+        className="relative flex flex-1 flex-col overflow-hidden"
+      >
         {children}
       </main>
       <AppStatus>{status}</AppStatus>
@@ -20,7 +26,10 @@ export function AppShell({ children, toolbar, status }: AppShellProps) {
 
 function AppHeader({ toolbar }: { toolbar?: ReactNode }) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-norma-border bg-norma-surface px-4 shadow-norma-sm md:px-6">
+    <header
+      role="banner"
+      className="flex h-14 shrink-0 items-center gap-4 border-b border-norma-border bg-norma-surface px-4 shadow-norma-sm md:px-6"
+    >
       <div className="flex min-w-0 items-center gap-3">
         <span
           aria-hidden
@@ -46,10 +55,11 @@ function AppHeader({ toolbar }: { toolbar?: ReactNode }) {
 
 function AppStatus({ children }: { children?: ReactNode }) {
   return (
-    <footer className="flex h-9 shrink-0 items-center border-t border-norma-border bg-norma-surface-muted px-4 text-xs text-norma-ink-muted md:px-6">
-      {children ?? (
-        <span>Sandbox · read-only · Norma chrome</span>
-      )}
+    <footer
+      role="contentinfo"
+      className="flex h-9 shrink-0 items-center border-t border-norma-border bg-norma-surface-muted px-4 text-xs text-norma-ink-muted md:px-6"
+    >
+      {children ?? <span>Sandbox · read-only · Norma chrome</span>}
     </footer>
   );
 }
