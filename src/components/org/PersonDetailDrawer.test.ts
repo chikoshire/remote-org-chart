@@ -20,8 +20,14 @@ describe("PersonDetailDrawer", () => {
     expect(drawer).toContain("Escape");
   });
 
+  it("offers a copy-link control for deep links", () => {
+    expect(drawer).toContain("Copy link");
+    expect(drawer).toContain("personDeepLinkHref");
+  });
+
   it("is wired into the org chart canvas on selection", () => {
     expect(canvas).toContain("PersonDetailDrawer");
     expect(canvas).toContain("selectedDetail");
+    expect(canvas).toContain("readPersonIdFromSearch");
   });
 });
