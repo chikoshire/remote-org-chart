@@ -69,7 +69,7 @@ function HealthSection({
       {people.length === 0 ? (
         <p className="mt-5 text-sm text-norma-ink-subtle">{empty}</p>
       ) : (
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {people.map((person) => {
             const name = person.fullName?.trim() || "Unknown person";
             const href = `/app${withPersonSearchParam("", person.id)}`;
@@ -219,7 +219,7 @@ export function DataHealthWorkspace() {
 
   return (
     <div className="min-h-0 flex-1 overflow-auto">
-      <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8 lg:px-10">
+      <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8 xl:px-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
@@ -284,7 +284,7 @@ export function DataHealthWorkspace() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid gap-4 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2">
           <HealthSection
             title="Reporting cycles"
             description="These people sit on a looped reporting chain."
