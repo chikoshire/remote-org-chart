@@ -230,38 +230,54 @@
   outline: none !important;
 }
 
-/* Morph + bloom (#70) */
+/* Morph + bloom (#70) — gradual; avoid scale on surfaces that also morph. */
 .bloom-enter {
-  animation: bloom-enter 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: bloom-enter 560ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
 
 .bloom-enter-delay-1 {
-  animation-delay: 60ms;
+  animation-delay: 80ms;
 }
 .bloom-enter-delay-2 {
-  animation-delay: 120ms;
+  animation-delay: 140ms;
 }
 .bloom-enter-delay-3 {
-  animation-delay: 180ms;
+  animation-delay: 200ms;
 }
 .bloom-enter-delay-4 {
-  animation-delay: 240ms;
+  animation-delay: 260ms;
 }
 .bloom-enter-delay-5 {
-  animation-delay: 300ms;
+  animation-delay: 320ms;
 }
 .bloom-enter-delay-6 {
-  animation-delay: 360ms;
+  animation-delay: 380ms;
 }
 
 @keyframes bloom-enter {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.97);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
+  }
+}
+
+/* Drawer / dock: fade + soft slide only (no scale — fights shared-element morph). */
+.bloom-drawer {
+  animation: bloom-drawer 520ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+@keyframes bloom-drawer {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -272,24 +288,62 @@
 }
 
 .meter-ring-progress {
-  animation: meter-fill 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: meter-fill 900ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
 
-::view-transition-old(root),
+/*
+ * Root: quiet crossfade so chrome (selection rings, layout) doesn’t hard-cut.
+ * Named morph partners (avatar / name) keep a longer, softer ease.
+ */
+::view-transition-old(root) {
+  animation: vt-root-out 420ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
 ::view-transition-new(root) {
-  animation-duration: 220ms;
+  animation: vt-root-in 480ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
 
-/* Shared-element morphs (avatar / name) keep a slightly longer ease. */
+@keyframes vt-root-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.35;
+  }
+}
+
+@keyframes vt-root-in {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 ::view-transition-group(*) {
-  animation-duration: 360ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+::view-transition-image-pair(*) {
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Selection chrome: fade rings/borders instead of snapping. */
+.selection-fade {
+  transition:
+    border-color 480ms cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 480ms cubic-bezier(0.33, 1, 0.68, 1),
+    background-color 480ms cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bloom-enter,
-  .meter-ring-progress {
+  .bloom-drawer,
+  .meter-ring-progress,
+  .selection-fade {
     animation: none !important;
+    transition: none !important;
   }
 
   ::view-transition-old(root),
