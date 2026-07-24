@@ -31,6 +31,12 @@ import {
   type OrgChartPayloadNode,
 } from "@/lib/org/layout-flow";
 import {
+  applyCollapseToForest,
+  readStoredDensity,
+  writeStoredDensity,
+  type ChartDensity,
+} from "@/lib/org/collapse";
+import {
   mapOrgChartHttpError,
   warningCopy,
   warningsFromMeta,
@@ -113,11 +119,15 @@ function applySelection(
   selectedId: string | null,
   managerIndex: Map<string, { id: string; managerEmploymentId: string | null }>,
 ): { nodes: Node<PersonNodeData>[]; edges: Edge<ReportingEdgeData>[] } {
+  const isRoot = (id: string) =>
+    !managerIndex.get(id)?.managerEmploymentId;
+
   if (!selectedId) {
     return {
       nodes: nodes.map((n) => {
-        const variant: PersonNodeData["variant"] =
-          n.data.variant === "root" ? "root" : "default";
+        const variant: PersonNodeData["variant"] = isRoot(n.id)
+          ? "root"
+          : "default";
         const data = { ...n.data, variant };
         return {
           ...n,
@@ -139,10 +149,10 @@ function applySelection(
       const onPath = path.has(n.id);
       const isSelected = n.id === selectedId;
       let variant: PersonNodeData["variant"] = "default";
-      if (n.data.variant === "root" && !onPath) variant = "root";
+      if (isRoot(n.id) && !onPath) variant = "root";
       if (onPath) variant = isSelected ? "selected" : "path";
-      if (n.data.variant === "root" && onPath && !isSelected) variant = "path";
-      if (n.data.variant === "root" && isSelected) variant = "selected";
+      if (isRoot(n.id) && onPath && !isSelected) variant = "path";
+      if (isRoot(n.id) && isSelected) variant = "selected";
       const data = { ...n.data, variant };
       return {
         ...n,
@@ -185,6 +195,11 @@ function OrgChartInner() {
   const [managerIndex, setManagerIndex] = useState(
     () => new Map<string, { id: string; managerEmploymentId: string | null }>(),
   );
+  const [forestRoots, setForestRoots] = useState<OrgChartPayloadNode[]>([]);
+  const [density, setDensity] = useState<ChartDensity>("comfortable");
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [baseNodes, setBaseNodes] = useState<Node<PersonNodeData>[]>([]);
   const [baseEdges, setBaseEdges] = useState<Edge<ReportingEdgeData>[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
@@ -194,12 +209,55 @@ function OrgChartInner() {
     Edge<ReportingEdgeData>
   >([]);
 
+  useEffect(() => {
+    setDensity(readStoredDensity());
+  }, []);
+
+  const toggleCollapse = useCallback((id: string) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const rebuildLayout = useCallback(
+    (
+      roots: OrgChartPayloadNode[],
+      nextDensity: ChartDensity,
+      collapsed: Set<string>,
+    ) => {
+      const pruned = applyCollapseToForest(roots, collapsed);
+      const laid = layoutOrgChart(pruned, { density: nextDensity });
+      const withHandlers = laid.nodes.map((n) => ({
+        ...n,
+        data: {
+          ...n.data,
+          onToggleCollapse:
+            n.data.directReports > 0
+              ? () => toggleCollapse(n.id)
+              : undefined,
+        },
+      }));
+      setBaseNodes(withHandlers);
+      setBaseEdges(laid.edges);
+    },
+    [toggleCollapse],
+  );
+
+  const setDensityPreference = useCallback((next: ChartDensity) => {
+    setDensity(next);
+    writeStoredDensity(next);
+  }, []);
+
   const load = useCallback(async () => {
     setStatus("loading");
     setErrorMessage(null);
     setErrorRetryable(true);
     setWarnings([]);
     setSelectedId(null);
+    setCollapsedIds(new Set());
     try {
       const res = await fetch("/api/org-chart");
       const body = (await res.json()) as OrgChartResponse;
@@ -220,7 +278,6 @@ function OrgChartInner() {
         });
         return;
       }
-      const laid = layoutOrgChart(body.roots);
       const flatPeople = body.nodes ?? [];
       const index = new Map(
         flatPeople.map((n) => [
@@ -237,10 +294,7 @@ function OrgChartInner() {
       };
       setManagerIndex(index);
       setPeopleIndex(people);
-      setBaseNodes(laid.nodes);
-      setBaseEdges(laid.edges);
-      setNodes(laid.nodes);
-      setEdges(laid.edges);
+      setForestRoots(body.roots);
       setMeta(nextMeta);
       setWarnings(warningsFromMeta(nextMeta));
       setStatus("ready");
@@ -253,14 +307,23 @@ function OrgChartInner() {
       setErrorMessage(mapped.message);
       setErrorRetryable(mapped.retryable);
     }
-  }, [setEdges, setNodes]);
+  }, []);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   useEffect(() => {
+    if (status !== "ready" || forestRoots.length === 0) return;
+    rebuildLayout(forestRoots, density, collapsedIds);
+  }, [collapsedIds, density, forestRoots, rebuildLayout, status]);
+
+  useEffect(() => {
     if (status !== "ready") return;
+    if (selectedId && !baseNodes.some((n) => n.id === selectedId)) {
+      setSelectedId(null);
+      return;
+    }
     const next = applySelection(baseNodes, baseEdges, selectedId, managerIndex);
     setNodes(next.nodes);
     setEdges(next.edges);
@@ -366,6 +429,36 @@ function OrgChartInner() {
       className={`relative h-full w-full ${reducedMotion ? "" : "org-chart-enter"}`}
     >
       <div className="absolute left-3 right-3 top-3 z-20 flex flex-col gap-1 md:left-auto md:right-3 md:w-80">
+        <div
+          className="flex items-center gap-1 self-end rounded-norma-md border border-norma-border bg-norma-surface p-0.5 shadow-norma-sm"
+          role="group"
+          aria-label="Node density"
+        >
+          <button
+            type="button"
+            aria-pressed={density === "comfortable"}
+            className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+              density === "comfortable"
+                ? "bg-norma-accent-soft text-norma-royal"
+                : "text-norma-ink-muted hover:text-norma-prussian"
+            }`}
+            onClick={() => setDensityPreference("comfortable")}
+          >
+            Comfortable
+          </button>
+          <button
+            type="button"
+            aria-pressed={density === "compact"}
+            className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
+              density === "compact"
+                ? "bg-norma-accent-soft text-norma-royal"
+                : "text-norma-ink-muted hover:text-norma-prussian"
+            }`}
+            onClick={() => setDensityPreference("compact")}
+          >
+            Compact
+          </button>
+        </div>
         <label className="sr-only" htmlFor="org-search">
           Search people by name or title
         </label>
