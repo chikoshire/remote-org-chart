@@ -8,16 +8,18 @@ const css = readFileSync(
 );
 
 describe("Acme design tokens", () => {
-  it("defines Markel/Neuro brand cues", () => {
-    expect(css).toMatch(/--norma-royal:\s*#e85d04/i);
-    expect(css).toMatch(/--norma-prussian:\s*#0b2a32/i);
-    expect(css).toMatch(/--norma-spray:\s*#2a9d8f/i);
+  it("defines pastel / liquid-glass brand cues", () => {
+    expect(css).toMatch(/--norma-royal:\s*#121212/i);
+    expect(css).toMatch(/--norma-prussian:\s*#121212/i);
+    expect(css).toMatch(/--norma-canvas:\s*#f4f1eb/i);
+    expect(css).toMatch(/--norma-lavender:\s*#e8e0f5/i);
+    expect(css).toMatch(/--norma-mint:\s*#d8f0e6/i);
   });
 
   it("exposes a Tailwind theme bridge for brand colors", () => {
     expect(css).toContain("--color-norma-royal:");
     expect(css).toContain("--color-norma-prussian:");
-    expect(css).toContain("--color-norma-spray:");
+    expect(css).toContain("--color-norma-lavender:");
     expect(css).toContain("--color-norma-canvas:");
     expect(css).toContain("--font-display:");
   });

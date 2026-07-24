@@ -1,17 +1,16 @@
 /**
- * Restrained department accents — Prussian / Spray family only.
- * Color differentiates lightly without a cartoon rainbow.
+ * Pastel department accents — lavender / mint / peach / sky / rose.
  */
-const MUTED = [
-  "#0b2a32", // Prussian
-  "#1a4550",
-  "#245a52", // Spray-leaning
-  "#2f6570",
-  "#164038",
-  "#3a6b75",
+const PASTELS = [
+  "#9b8ec4", // lavender
+  "#6aae96", // mint
+  "#d4a05a", // peach-gold
+  "#6a9ec4", // sky
+  "#c48aa0", // rose
+  "#8a9eb0", // cool gray-blue
 ] as const;
 
-const FALLBACK = "#0b2a32";
+const FALLBACK = "#121212";
 
 function hashString(value: string): number {
   let hash = 0;
@@ -21,12 +20,12 @@ function hashString(value: string): number {
   return Math.abs(hash);
 }
 
-/** Stable muted accent for a department name; falls back to Prussian. */
+/** Stable pastel accent for a department name. */
 export function departmentAccent(department: string | null | undefined): string {
   const key = department?.trim();
   if (!key) return FALLBACK;
-  return MUTED[hashString(key.toLocaleLowerCase()) % MUTED.length]!;
+  return PASTELS[hashString(key.toLocaleLowerCase()) % PASTELS.length]!;
 }
 
-/** Brand bar color for charts — one accent, not a rainbow. */
-export const CHART_BAR_ACCENT = "#e85d04";
+/** Chart bar / progress accent — single quiet black, not a rainbow. */
+export const CHART_BAR_ACCENT = "#121212";

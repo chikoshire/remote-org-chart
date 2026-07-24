@@ -5,31 +5,34 @@ import {
 } from "@/lib/ui/department-accent";
 
 describe("departmentAccent", () => {
-  it("returns a stable color for the same department", () => {
+  it("is stable for the same department name", () => {
     expect(departmentAccent("Engineering")).toBe(
       departmentAccent("Engineering"),
     );
   });
 
-  it("stays within the muted Prussian family", () => {
-    const samples = [
+  it("stays in the pastel family", () => {
+    const accents = [
       "Engineering",
       "Finance",
-      "Design",
-      "Marketing",
+      "People",
       "Sales",
-      "HR",
+      "Legal",
+      "Design",
     ].map((name) => departmentAccent(name));
-    for (const color of samples) {
-      expect(color.startsWith("#")).toBe(true);
-      // No bright purple / pink / indigo leftovers from the old pastel set
-      expect(color).not.toMatch(/ae3ec9|c2255c|4c6ef5|1971c2/i);
+    for (const accent of accents) {
+      expect(accent.startsWith("#")).toBe(true);
+      expect(accent).not.toBe("#e85d04");
+      expect(accent).not.toBe("#0b2a32");
     }
-    expect(departmentAccent(null)).toBe("#0b2a32");
-    expect(departmentAccent("")).toBe("#0b2a32");
   });
 
-  it("exposes a single chart bar accent", () => {
-    expect(CHART_BAR_ACCENT).toBe("#e85d04");
+  it("falls back to black for empty departments", () => {
+    expect(departmentAccent(null)).toBe("#121212");
+    expect(departmentAccent("")).toBe("#121212");
+  });
+
+  it("uses a single quiet chart bar accent", () => {
+    expect(CHART_BAR_ACCENT).toBe("#121212");
   });
 });

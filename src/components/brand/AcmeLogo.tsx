@@ -9,6 +9,7 @@ type AcmeLogoProps = {
 
 /**
  * Acme company mark — ascending bars (signal / growth).
+ * Black mark on cream / white; light mark when inverse.
  */
 export function AcmeLogo({
   withWordmark = true,
@@ -16,8 +17,8 @@ export function AcmeLogo({
   markClassName = "",
   inverse = false,
 }: AcmeLogoProps) {
-  const bar = inverse ? "#f4f7f5" : "#0b2a32";
-  const accent = "#e85d04";
+  const plate = inverse ? "#f2efe9" : "#121212";
+  const bar = inverse ? "#121212" : "#faf8f5";
 
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
@@ -26,7 +27,7 @@ export function AcmeLogo({
         viewBox="0 0 32 32"
         className={`h-8 w-8 shrink-0 ${markClassName}`}
       >
-        <rect width="32" height="32" rx="6" fill={accent} />
+        <rect width="32" height="32" rx="10" fill={plate} />
         <rect x="6" y="18" width="3.5" height="8" rx="1" fill={bar} />
         <rect x="11.5" y="13" width="3.5" height="13" rx="1" fill={bar} />
         <rect x="17" y="8" width="3.5" height="18" rx="1" fill={bar} />
@@ -35,7 +36,7 @@ export function AcmeLogo({
       {withWordmark ? (
         <span
           className={`font-[family-name:var(--font-norma-display)] text-[15px] font-semibold uppercase tracking-[0.18em] ${
-            inverse ? "text-[#f4f7f5]" : "text-norma-prussian"
+            inverse ? "text-[#f2efe9]" : "text-norma-ink"
           }`}
         >
           Acme

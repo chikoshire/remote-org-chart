@@ -1059,7 +1059,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "chart"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "chart"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("chart")}
@@ -1071,7 +1071,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "tree"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "tree"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("tree")}
@@ -1083,7 +1083,7 @@ function OrgChartInner() {
                   aria-pressed={viewMode === "map"}
                   className={`flex-1 rounded-norma-sm px-2.5 py-1.5 text-[11px] font-semibold tracking-wide ${
                     viewMode === "map"
-                      ? "bg-[#e85d04] text-white shadow-norma-sm"
+                      ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
                       : "text-norma-ink-muted hover:text-norma-prussian"
                   }`}
                   onClick={() => setViewMode("map")}
@@ -1430,7 +1430,7 @@ function OrgChartInner() {
                 <MiniMap
                   pannable
                   zoomable
-                  nodeColor={() => "#e85d04"}
+                  nodeColor={() => "#121212"}
                   maskColor="rgb(26 26 26 / 0.08)"
                   aria-label="Organization chart overview map"
                 />

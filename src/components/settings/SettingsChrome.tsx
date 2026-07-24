@@ -12,7 +12,7 @@ type SettingsChromeProps = {
 export function SettingsChrome({ children }: SettingsChromeProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="shrink-0 border-b border-norma-border/70 bg-white/75 px-4 py-3 backdrop-blur-sm md:px-6 lg:px-8 xl:px-10">
+      <div className="norma-glass shrink-0 border-b border-norma-border/70 px-4 py-3 md:px-6 lg:px-8 xl:px-10">
         <SettingsSubnav />
       </div>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>

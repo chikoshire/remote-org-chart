@@ -22,11 +22,11 @@ export function RemoteConnectWizard({
       role="dialog"
       aria-modal="true"
       aria-labelledby="remote-connect-title"
-      className="mt-4 rounded-norma-lg border border-norma-border bg-white p-5 shadow-norma-md"
+      className="norma-glass mt-4 rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-md"
     >
       <h3
         id="remote-connect-title"
-        className="text-sm font-semibold text-norma-prussian"
+        className="text-sm font-semibold text-norma-ink"
       >
         Connect Remote
       </h3>
@@ -46,14 +46,14 @@ export function RemoteConnectWizard({
           <div className="flex flex-wrap gap-2 pt-1">
             <button
               type="button"
-              className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-norma-prussian hover:bg-[#ff7a2f]"
+              className="norma-cta px-5 py-2 text-sm"
               onClick={() => setStep("confirm")}
             >
               Continue
             </button>
             <button
               type="button"
-              className="rounded-norma-sm border border-norma-border px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-prussian"
+              className="rounded-full border border-norma-border px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-ink"
               onClick={onCancel}
             >
               Cancel
@@ -86,7 +86,7 @@ export function RemoteConnectWizard({
           <div className="flex flex-wrap gap-2 pt-1">
             <button
               type="button"
-              className="rounded-norma-sm bg-[#e85d04] px-4 py-2 text-sm font-semibold text-norma-prussian hover:bg-[#ff7a2f]"
+              className="norma-cta px-5 py-2 text-sm"
               onClick={() => {
                 onConnected();
                 setStep("done");
@@ -96,7 +96,7 @@ export function RemoteConnectWizard({
             </button>
             <button
               type="button"
-              className="rounded-norma-sm border border-norma-border px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-prussian"
+              className="rounded-full border border-norma-border px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-ink"
               onClick={() => setStep("intro")}
             >
               Back
@@ -114,7 +114,7 @@ export function RemoteConnectWizard({
           </p>
           <button
             type="button"
-            className="rounded-norma-sm bg-norma-prussian px-4 py-2 text-sm font-semibold text-white hover:bg-[#143a44]"
+            className="norma-cta px-5 py-2 text-sm"
             onClick={onCancel}
           >
             Done
