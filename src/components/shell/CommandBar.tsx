@@ -36,8 +36,8 @@ const NAV_ACTIONS: NavAction[] = [
   {
     id: "nav-departments",
     label: "Go to Departments",
-    hint: "Teams by department",
-    href: "/app/departments",
+    hint: "People by department",
+    href: "/app/people?view=departments",
   },
   {
     id: "nav-health",
