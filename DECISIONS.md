@@ -549,7 +549,7 @@ Vertical list Tree still felt file-browser-like; users wanted chart-like left→
 
 ## 2026-07-24 — Departments inside People
 
-**Status:** Accepted  
+**Status:** Superseded (same day — browse removed)  
 
 **Context:**  
 Primary nav had both People and Departments, while People already filtered by department. Two pages duplicated the same employment set.
@@ -562,6 +562,25 @@ Primary nav had both People and Departments, while People already filtered by de
 **Consequences:**  
 - One directory surface; department sidebar only when that view is active.  
 - Dashboard / command bar deep-link the People Departments view.
+
+---
+
+## 2026-07-24 — Drop People Departments browse
+
+**Status:** Accepted  
+
+**Context:**  
+The Departments layout under People still felt like a thin catalog (sidebar + cards) duplicated by the department filter and by Dashboard “Headcount by department.” Moving it into Settings would mix reference data with Connect/theme/Data Health.
+
+**Decision:**  
+1. Remove the Departments layout from People (Grid | List only + department dropdown).  
+2. Delete `DepartmentsBrowse`.  
+3. Redirect `/app/departments` to `/app/dashboard`.  
+4. Point department deep links at Dashboard.
+
+**Consequences:**  
+- People stays a person directory.  
+- Department inventory lives on Dashboard where insights already are.
 
 ---
 
