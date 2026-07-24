@@ -1,7 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
+import { isIncompletePerson } from "@/lib/org/data-health";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { formatCountryLabel } from "@/lib/ui/format-country";
 import { personMorphName } from "@/lib/ui/motion";
@@ -42,11 +45,21 @@ export function PeopleDirectory({
   onSelect,
   onOpenInChart,
 }: PeopleDirectoryProps) {
+  const searchParams = useSearchParams();
   const [localQuery, setLocalQuery] = useState("");
   const [deptOnly, setDeptOnly] = useState<string | "all">("all");
+  const [incompleteOnly, setIncompleteOnly] = useState(
+    () => searchParams.get("incomplete") === "1",
+  );
   const [view, setView] = useState<DirectoryView>("grid");
   const query = controlledQuery ?? localQuery;
   const setQuery = onQueryChange ?? setLocalQuery;
+
+  useEffect(() => {
+    if (searchParams.get("incomplete") === "1") {
+      setIncompleteOnly(true);
+    }
+  }, [searchParams]);
 
   const departments = useMemo(() => {
     const set = new Set<string>();
@@ -56,11 +69,39 @@ export function PeopleDirectory({
     return [...set].sort((a, b) => a.localeCompare(b));
   }, [people]);
 
+  const incompleteCount = useMemo(
+    () =>
+      people.filter((p) =>
+        isIncompletePerson({
+          id: p.id,
+          fullName: p.fullName ?? null,
+          jobTitle: p.jobTitle ?? null,
+          department: p.department ?? null,
+          country: p.country ?? null,
+          managerEmploymentId: p.managerEmploymentId,
+        }),
+      ).length,
+    [people],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLocaleLowerCase();
     return people
       .filter((p) => {
         if (deptOnly !== "all" && (p.department?.trim() ?? "") !== deptOnly) {
+          return false;
+        }
+        if (
+          incompleteOnly &&
+          !isIncompletePerson({
+            id: p.id,
+            fullName: p.fullName ?? null,
+            jobTitle: p.jobTitle ?? null,
+            department: p.department ?? null,
+            country: p.country ?? null,
+            managerEmploymentId: p.managerEmploymentId,
+          })
+        ) {
           return false;
         }
         if (!q) return true;
@@ -71,7 +112,7 @@ export function PeopleDirectory({
         return hay.includes(q);
       })
       .sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
-  }, [deptOnly, people, query]);
+  }, [deptOnly, incompleteOnly, people, query]);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-transparent">
@@ -137,6 +178,28 @@ export function PeopleDirectory({
                 ))}
               </select>
             </label>
+            <label className="flex items-center gap-2 self-end pb-2 text-xs font-medium text-norma-ink-muted">
+              <input
+                type="checkbox"
+                checked={incompleteOnly}
+                onChange={(e) => setIncompleteOnly(e.target.checked)}
+                className="rounded border-norma-border text-norma-royal focus:ring-norma-royal"
+              />
+              Incomplete only
+              {incompleteCount > 0 ? (
+                <span className="rounded-norma-sm bg-norma-surface-muted px-1.5 py-0.5 text-[10px] font-semibold text-norma-prussian">
+                  {incompleteCount}
+                </span>
+              ) : null}
+            </label>
+            {incompleteCount > 0 ? (
+              <Link
+                href="/settings/data-health"
+                className="self-end pb-2.5 text-xs font-semibold text-norma-royal hover:underline"
+              >
+                Data Health
+              </Link>
+            ) : null}
           </div>
         </div>
         <label className="mt-4 block">
@@ -219,6 +282,14 @@ function PersonCard({
   const countryLabel = formatCountryLabel(person.country);
   const reports = person.directReports ?? 0;
   const isList = layout === "list";
+  const incomplete = isIncompletePerson({
+    id: person.id,
+    fullName: person.fullName ?? null,
+    jobTitle: person.jobTitle ?? null,
+    department: person.department ?? null,
+    country: person.country ?? null,
+    managerEmploymentId: person.managerEmploymentId,
+  });
 
   return (
     <article
@@ -289,6 +360,11 @@ function PersonCard({
               <span className="font-semibold text-norma-prussian">
                 {reports === 1 ? "1 report" : `${reports} reports`}
               </span>
+              {incomplete ? (
+                <span className="font-semibold text-norma-ink-muted">
+                  Incomplete
+                </span>
+              ) : null}
             </span>
           ) : (
             <>
@@ -318,8 +394,15 @@ function PersonCard({
                   Top of reporting line
                 </span>
               )}
-              <span className="mt-2 inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-prussian">
-                {reports === 1 ? "1 report" : `${reports} reports`}
+              <span className="mt-2 inline-flex flex-wrap items-center gap-1.5">
+                <span className="inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-prussian">
+                  {reports === 1 ? "1 report" : `${reports} reports`}
+                </span>
+                {incomplete ? (
+                  <span className="inline-flex rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-[11px] font-semibold text-norma-ink-muted">
+                    Incomplete
+                  </span>
+                ) : null}
               </span>
             </>
           )}

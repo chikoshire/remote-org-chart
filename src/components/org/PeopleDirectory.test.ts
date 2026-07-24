@@ -17,6 +17,8 @@ describe("PeopleDirectory visuals", () => {
     expect(directory).toContain('aria-pressed={view === "list"}');
     expect(directory).not.toContain("DepartmentsBrowse");
     expect(directory).not.toContain('"departments"');
+    expect(directory).toContain("isIncompletePerson");
+    expect(directory).toContain("Incomplete only");
     expect(directory).not.toContain("#1a1a1a");
   });
 });
