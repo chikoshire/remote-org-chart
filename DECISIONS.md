@@ -504,6 +504,24 @@ Data Health was a primary nav item with a narrow `max-w-3xl` column that left la
 
 ---
 
+## 2026-07-24 — Map zoom, pan, and clearer pin selection
+
+**Status:** Accepted  
+
+**Context:**  
+Europe pins overlapped at world scale; selected pins showed a rectangular focus ring; country identity was unclear from numbers alone.
+
+**Decision:**  
+1. Add scroll-wheel zoom, drag pan, +/- / Reset controls, and click-to-zoom on a country.  
+2. Scale pin/label geometry by zoom so markers stay readable.  
+3. Show country label only for hover/active pins; selected state is a circular orange ring (no square focus chrome).
+
+**Consequences:**  
+- Dense regions become readable after zooming.  
+- Map interaction is slightly richer than a static SVG.
+
+---
+
 ## Template for future entries
 
 
