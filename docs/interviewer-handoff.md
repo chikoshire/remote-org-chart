@@ -14,15 +14,15 @@ Paste-ready notes for Clara / Remote interviewers.
 
 ## Product map (authenticated)
 
-**Dashboard · Org Chart · People · Departments · Settings (gear)**  
+**Dashboard · Org Chart · People · Settings (gear)**  
+Departments is a view under People (Grid | List | Departments), not a top-level tab.
 Data Health lives under Settings → Data Health.
 
 | Surface | Why look |
 |---------|----------|
 | Dashboard | Headcount, departments, managers, completeness, deep links |
 | Org Chart | React Flow hierarchy; optional Chart \| Tree list; Cycle / Unlinked / Incomplete badges |
-| People | Searchable directory; profile drawer; morph into detail |
-| Departments | Headcount by department; lead heuristic; mini people |
+| People | Grid / List directory, or Departments browse; profile drawer |
 | Data Health | Reporting cycles, manager missing, incomplete profiles (Settings) |
 | Settings | Connect / disconnect Remote (no secrets in UI); light / dark theme |
 | ⌘K / Ctrl+K | Command bar: jump to people or primary routes |
