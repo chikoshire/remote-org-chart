@@ -25,9 +25,36 @@ const sizeClass = {
   lg: "h-14 w-14 text-base",
 } as const;
 
-/** Circular profile avatar: Remote photo → generated portrait → initials. */
+function InitialsAvatar({
+  fullName,
+  department,
+  size,
+  className,
+}: {
+  fullName?: string | null;
+  department?: string | null;
+  size: "sm" | "md" | "lg";
+  className: string;
+}) {
+  const accent = departmentAccent(department);
+  return (
+    <span
+      aria-hidden
+      className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white shadow-norma-sm ring-1 ring-black/5 ${sizeClass[size]} ${className}`}
+      style={{ backgroundColor: accent }}
+    >
+      {initials(fullName)}
+    </span>
+  );
+}
+
+/**
+ * Circular profile avatar.
+ * Uses Remote profile photo URLs only; otherwise department-colored initials
+ * (same pattern Remote shows when no photo is on file).
+ */
 export function PersonAvatar({
-  personId,
+  personId: _personId,
   fullName,
   department,
   avatarUrl,
@@ -35,23 +62,21 @@ export function PersonAvatar({
   className = "",
 }: PersonAvatarProps) {
   const [failed, setFailed] = useState(false);
-  const src = resolveAvatarSrc({ avatarUrl, personId, fullName });
-  const accent = departmentAccent(department);
+  const src = resolveAvatarSrc({ avatarUrl });
 
-  if (failed) {
+  if (!src || failed) {
     return (
-      <span
-        aria-hidden
-        className={`inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white shadow-norma-sm ${sizeClass[size]} ${className}`}
-        style={{ backgroundColor: accent }}
-      >
-        {initials(fullName)}
-      </span>
+      <InitialsAvatar
+        fullName={fullName}
+        department={department}
+        size={size}
+        className={className}
+      />
     );
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- remote/CDN avatars; next/image host allowlist varies
+    // eslint-disable-next-line @next/next/no-img-element -- Remote CDN URLs; host allowlist varies
     <img
       src={src}
       alt=""
