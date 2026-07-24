@@ -17,7 +17,7 @@ export type RemoteEnv = z.infer<typeof remoteEnvSchema>;
 function readCloudflareBindings(): Record<string, string | undefined> {
   try {
     const { env } = getCloudflareContext();
-    const bindings = env as Record<string, unknown>;
+    const bindings = env as unknown as Record<string, unknown>;
     return {
       REMOTE_API_TOKEN:
         typeof bindings.REMOTE_API_TOKEN === "string"
