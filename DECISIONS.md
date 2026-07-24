@@ -663,6 +663,21 @@ Replace loading with pulsed org-card skeletons; empty uses a light SVG tree illu
 
 ---
 
+## 2026-07-24 — Compare-mode discovery
+
+**Status:** Accepted  
+
+**Context:**  
+Reporting-distance compare lived only under a collapsed Tools accordion.
+
+**Decision:**  
+Surface a **Start compare** callout in the Org Chart workspace (plus ⌘K nav hint). Exit remains in Tools when active.
+
+**Consequences:**  
+- Interviewers can find compare without hunting Tools.
+
+---
+
 ## Template for future entries
 
 
