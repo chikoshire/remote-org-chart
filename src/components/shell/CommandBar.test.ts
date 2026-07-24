@@ -19,7 +19,7 @@ describe("CommandBar", () => {
     expect(bar).toContain("Go to Data Health");
     expect(bar).toContain("Go to Help");
     expect(bar).toContain("Jump to person or page…");
-    expect(bar).toContain("min-w-[16rem]");
+    expect(bar).toContain("min-w-[17rem]");
     expect(bar).toContain("max-w-2xl");
     expect(shell).toContain("CommandBar");
   });
