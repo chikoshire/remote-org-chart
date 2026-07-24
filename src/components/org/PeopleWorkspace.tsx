@@ -186,20 +186,23 @@ export function PeopleWorkspace() {
   }
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <PeopleDirectory
-        people={directoryPeople}
-        selectedId={selectedId}
-        onSelect={selectPerson}
-        onOpenInChart={(id) => {
-          const search = withPersonSearchParam("", id);
-          void withViewTransition(() => {
-            router.push(`/app${search}`);
-          });
-        }}
-      />
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+      <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
+        <PeopleDirectory
+          people={directoryPeople}
+          selectedId={selectedId}
+          onSelect={selectPerson}
+          onOpenInChart={(id) => {
+            const search = withPersonSearchParam("", id);
+            void withViewTransition(() => {
+              router.push(`/app${search}`);
+            });
+          }}
+        />
+      </div>
       {selected ? (
         <PersonDetailDrawer
+          placement="dock"
           person={selected.person}
           pathToRoot={selected.pathToRoot}
           reports={selected.reports}

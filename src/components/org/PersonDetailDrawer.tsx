@@ -25,6 +25,11 @@ export type PersonDetailDrawerProps = {
   reports: PersonDetail[];
   onClose: () => void;
   onSelectPerson: (id: string) => void;
+  /**
+   * `overlay` (default): absolute sheet over the parent.
+   * `dock`: side/bottom rail that shares space so the grid stays readable.
+   */
+  placement?: "overlay" | "dock";
 };
 
 export function PersonDetailDrawer({
@@ -33,6 +38,7 @@ export function PersonDetailDrawer({
   reports,
   onClose,
   onSelectPerson,
+  placement = "overlay",
 }: PersonDetailDrawerProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -41,6 +47,7 @@ export function PersonDetailDrawer({
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
+  const docked = placement === "dock";
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -72,11 +79,16 @@ export function PersonDetailDrawer({
   return (
     <aside
       role="dialog"
-      aria-modal="true"
+      aria-modal={docked ? undefined : "true"}
       aria-labelledby={titleId}
-      className="bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+      className={
+        docked
+          ? "bloom-enter flex h-[min(42%,22rem)] w-full shrink-0 flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:h-auto md:w-[360px] md:border-l md:border-t-0"
+          : "bloom-enter absolute inset-x-0 bottom-0 z-30 flex max-h-[70%] flex-col border-t border-norma-border bg-norma-surface shadow-norma-md md:inset-y-0 md:left-auto md:right-0 md:max-h-none md:w-[360px] md:border-l md:border-t-0"
+      }
       style={{ viewTransitionName: personMorphName(person.id) }}
       data-morph-person={person.id}
+      data-drawer-placement={placement}
     >
       <div className="flex items-start gap-3 border-b border-norma-border px-4 py-3">
         <PersonAvatar

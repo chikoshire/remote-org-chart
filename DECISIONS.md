@@ -617,6 +617,22 @@ Global ⌘K and page-level search fields read the same (“search people”), so
 
 ---
 
+## 2026-07-24 — People profile dock (not overlay)
+
+**Status:** Accepted  
+
+**Context:**  
+The profile drawer covered directory cards on desktop even after raising the header z-index.
+
+**Decision:**  
+On People, use a **docked** rail (`placement="dock"`) that shares horizontal space with the grid. Chart keeps the overlay sheet so the canvas stays full-bleed.
+
+**Consequences:**  
+- Grid stays readable with a profile open.  
+- Mobile still uses a bottom sheet height cap inside the dock layout.
+
+---
+
 ## Template for future entries
 
 
