@@ -54,22 +54,19 @@ test.describe("org chart smoke", () => {
     await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
   });
 
-  test("IA stub routes render under product shell", async ({ page }) => {
+  test("dashboard shows organisational insight cards", async ({ page }) => {
+    await mockOrgChart(page, orgChartReadyFixture);
     await loginAsDemo(page);
-    for (const { path, heading } of [
-      { path: "/app/dashboard", heading: "Dashboard" },
-      { path: "/app/departments", heading: "Departments" },
-    ]) {
-      await page.goto(path);
-      await expect(
-        page.getByRole("heading", { name: heading, exact: true }),
-      ).toBeVisible();
-      await expect(
-        page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-          name: heading,
-        }),
-      ).toHaveAttribute("aria-current", "page");
-    }
+    await page.goto("/app/dashboard");
+    await expect(
+      page.getByRole("heading", { name: "Dashboard", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Organisational intelligence")).toBeVisible();
+    await expect(page.getByText("Data completeness")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Browse People" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Review Data Health" }),
+    ).toBeVisible();
   });
 
   test("data health route lists trust sections", async ({ page }) => {
