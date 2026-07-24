@@ -375,7 +375,7 @@ Ship the serial wow track GH#58–#68 plus morph polish #70 (Linear TUXX-1593–
 - Morph/bloom only where the same entity continues across views; honour `prefers-reduced-motion`.  
 
 **Revisit when:**  
-Interview handoff date forces cutting optional #66–#67 or #70.
+Interview handoff date forces cutting optional #66–#67 or #70. (Update 2026-07-24: #66–#70 and #68 QA shipped; see `docs/interviewer-handoff.md`.)
 
 ---
 
