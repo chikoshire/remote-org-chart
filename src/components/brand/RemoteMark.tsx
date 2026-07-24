@@ -1,9 +1,9 @@
 /**
- * Official Remote mark (sourced from remote.com Contentstack assets).
- * Trademark belongs to Remote — used here only to label the Remote integration.
+ * Official Remote mark — the chunky lowercase “r” from remote.com’s
+ * `remote-logo.svg` wordmark (Contentstack). Black monochrome for product UI.
  */
 export function RemoteMark({
-  className = "h-5 w-5",
+  className = "h-6 w-auto",
   title = "Remote",
 }: {
   className?: string;
@@ -14,8 +14,8 @@ export function RemoteMark({
     <img
       src="/brand/remote-mark.svg"
       alt={title}
-      width={20}
-      height={20}
+      width={29}
+      height={40}
       className={className}
       decoding="async"
     />

@@ -48,7 +48,10 @@ describe("OrgTreeList optional wow", () => {
     expect(canvas).toContain("Tree");
   });
 
-  it("defaults expansion to two levels of managers", () => {
+  it("defaults tree expansion to all expandable managers", () => {
+    expect(tree).toContain("collectExpandableIds(roots)");
+    expect(canvas).toContain("cSuiteFocusNodeIds");
+    expect(canvas).toContain("setCollapsedIds(new Set())");
     const forest = [
       node({
         id: "root",

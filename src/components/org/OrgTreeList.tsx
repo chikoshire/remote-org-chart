@@ -290,8 +290,8 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
   const expandableIds = useMemo(() => collectExpandableIds(roots), [roots]);
 
   useEffect(() => {
-    // Default: expand two levels (roots + their direct-report managers).
-    setExpanded(new Set(collectIdsToDepth(roots, 1)));
+    // Default: full tree expanded; Collapse all remains available.
+    setExpanded(new Set(collectExpandableIds(roots)));
     setSeeded(true);
   }, [roots]);
 

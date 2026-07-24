@@ -871,7 +871,7 @@ Chart preferences left empty space beside Comfortable/Compact with no visual of 
 
 **Decision:**  
 1. Add `DensityPreview` on Settings using real `PersonNodeCard` samples that switch with the density toggle (prefs already write on click so the org chart matches).  
-2. Ship `public/brand/remote-mark.svg` from Remote’s public Contentstack asset (`Union.svg` on remote.com) and render via `RemoteMark`.
+2. Ship `public/brand/remote-mark.svg` — the black lowercase “r” from Remote’s official `remote-logo.svg` wordmark (not the gradient product glyph).
 
 **Consequences:**  
 - Preview is illustrative sample people, not live Remote data.  
@@ -898,6 +898,27 @@ Rebuild `/` with remote.com *composition and motion language* while keeping Acme
 
 **Revisit when:**  
 Interviewers want a darker Prussian Remote chrome instead of cream pastels.
+
+---
+
+## 2026-07-24 — Expand-all default + C-suite landing zoom + official Remote mark
+
+**Status:** Accepted  
+
+**Context:**  
+Landing on Org Chart fit the entire expanded company into view (tiny nodes). Branches past depth one started collapsed. Integrations used the gradient product glyph (`Union.svg`), not the black wordmark “r” from remote.com.
+
+**Decision:**  
+1. Default `collapsedIds` empty (full chart expanded); tree view also expands all by default.  
+2. Initial `fitView` targets `cSuiteFocusNodeIds` (roots + a handful of direct reports) at ~0.92 max zoom.  
+3. Ship `remote-logo.svg` + extracted black `remote-mark.svg` from Remote’s Contentstack `remote-logo.svg`.
+
+**Consequences:**  
+- Large orgs still lay out fully; users pan/zoom or Fit for the whole graph.  
+- Collapse remains available per-node and via tree Collapse all.
+
+**Revisit when:**  
+We want remembered collapse/zoom per device.
 
 ---
 
