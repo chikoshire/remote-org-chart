@@ -1,7 +1,14 @@
 "use client";
 
+import {
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { geoNaturalEarth1, geoGraticule10, geoPath } from "d3-geo";
-import { useMemo, useState } from "react";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import { countryCentroid } from "@/lib/geo/country-centroids";
 import { alphaToNumericId, normalizeNumericId } from "@/lib/geo/iso-numeric";
@@ -33,11 +40,55 @@ type CountryCluster = {
   people: MapPerson[];
 };
 
+type MapView = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
 const MAP_WIDTH = 960;
 const MAP_HEIGHT = 480;
+const MAX_ZOOM = 8;
+const WORLD_VIEW: MapView = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT };
+
+function clampView(view: MapView): MapView {
+  const w = Math.min(MAP_WIDTH, Math.max(MAP_WIDTH / MAX_ZOOM, view.w));
+  const h = Math.min(MAP_HEIGHT, Math.max(MAP_HEIGHT / MAX_ZOOM, view.h));
+  const x = Math.min(MAP_WIDTH - w, Math.max(0, view.x));
+  const y = Math.min(MAP_HEIGHT - h, Math.max(0, view.y));
+  return { x, y, w, h };
+}
+
+function zoomAtPoint(
+  view: MapView,
+  factor: number,
+  anchorX: number,
+  anchorY: number,
+): MapView {
+  const nextW = view.w / factor;
+  const nextH = view.h / factor;
+  const rx = (anchorX - view.x) / view.w;
+  const ry = (anchorY - view.y) / view.h;
+  return clampView({
+    x: anchorX - nextW * rx,
+    y: anchorY - nextH * ry,
+    w: nextW,
+    h: nextH,
+  });
+}
 
 export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) {
   const [activeCode, setActiveCode] = useState<string | null>(null);
+  const [view, setView] = useState<MapView>(WORLD_VIEW);
+  const [hoverCode, setHoverCode] = useState<string | null>(null);
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    origin: MapView;
+  } | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   const { clusters, unknownCount, byNumericId } = useMemo(() => {
     const byCode = new Map<string, MapPerson[]>();
@@ -106,10 +157,102 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
 
   const active = activeCode ? (clustersByCode.get(activeCode) ?? null) : null;
   const activeNumeric = active?.numericId ?? null;
+  const zoomLevel = MAP_WIDTH / view.w;
+  const screenScale = 1 / zoomLevel;
+
+  const clientToMap = useCallback((clientX: number, clientY: number) => {
+    const svg = svgRef.current;
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    const scale = Math.min(rect.width / MAP_WIDTH, rect.height / MAP_HEIGHT);
+    const offsetX = (rect.width - MAP_WIDTH * scale) / 2;
+    const offsetY = (rect.height - MAP_HEIGHT * scale) / 2;
+    const svgX = (clientX - rect.left - offsetX) / scale;
+    const svgY = (clientY - rect.top - offsetY) / scale;
+    return {
+      x: view.x + (svgX / MAP_WIDTH) * view.w,
+      y: view.y + (svgY / MAP_HEIGHT) * view.h,
+    };
+  }, [view]);
+
+  const focusCluster = useCallback(
+    (cluster: CountryCluster, zoomFactor = 3.2) => {
+      const point = projection([cluster.lng, cluster.lat]);
+      if (!point) {
+        setActiveCode(cluster.code);
+        return;
+      }
+      const [cx, cy] = point;
+      const nextW = MAP_WIDTH / zoomFactor;
+      const nextH = MAP_HEIGHT / zoomFactor;
+      setView(
+        clampView({
+          x: cx - nextW / 2,
+          y: cy - nextH / 2,
+          w: nextW,
+          h: nextH,
+        }),
+      );
+      setActiveCode(cluster.code);
+    },
+    [projection],
+  );
+
+  const onWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
+    event.preventDefault();
+    const anchor = clientToMap(event.clientX, event.clientY);
+    if (!anchor) return;
+    const factor = event.deltaY < 0 ? 1.18 : 1 / 1.18;
+    setView((prev) => zoomAtPoint(prev, factor, anchor.x, anchor.y));
+  };
+
+  const onPointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0) return;
+    const target = event.target as Element;
+    if (target.closest("[data-map-pin], [data-map-country]")) return;
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      origin: view,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const drag = dragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const scale = Math.min(rect.width / MAP_WIDTH, rect.height / MAP_HEIGHT);
+    const dx = ((event.clientX - drag.startX) / scale) * (drag.origin.w / MAP_WIDTH);
+    const dy = ((event.clientY - drag.startY) / scale) * (drag.origin.h / MAP_HEIGHT);
+    setView(
+      clampView({
+        ...drag.origin,
+        x: drag.origin.x - dx,
+        y: drag.origin.y - dy,
+      }),
+    );
+  };
+
+  const endDrag = (event: ReactPointerEvent<SVGSVGElement>) => {
+    if (dragRef.current?.pointerId === event.pointerId) {
+      dragRef.current = null;
+    }
+  };
+
+  const zoomBy = (factor: number) => {
+    setView((prev) =>
+      zoomAtPoint(prev, factor, prev.x + prev.w / 2, prev.y + prev.h / 2),
+    );
+  };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[linear-gradient(165deg,#e8f4f8_0%,#f4f7fb_50%,#eef6f2_100%)]">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-norma-border/70 bg-white/70 px-4 py-3 backdrop-blur-sm md:px-6">
+    <div className="flex h-full min-h-0 flex-col bg-[linear-gradient(165deg,#e8f4f1_0%,#f4f7f5_48%,#eef3f8_100%)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-norma-border/70 bg-white/75 px-4 py-3 backdrop-blur-sm md:px-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
             Location view
@@ -122,9 +265,43 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
               : ""}
           </p>
         </div>
-        <p className="text-xs text-norma-ink-subtle">
-          Click a country or pin to list people
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="hidden text-xs text-norma-ink-subtle sm:block">
+            Scroll to zoom · drag to pan · click a pin to zoom in
+          </p>
+          <div
+            className="flex items-center gap-1 rounded-norma-md border border-norma-border bg-white p-1 shadow-norma-sm"
+            role="group"
+            aria-label="Map zoom"
+          >
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-norma-sm text-sm font-semibold text-norma-prussian hover:bg-norma-surface-muted"
+              aria-label="Zoom out"
+              onClick={() => zoomBy(1 / 1.35)}
+            >
+              −
+            </button>
+            <span className="min-w-[3rem] text-center text-[11px] font-semibold text-norma-ink-muted">
+              {Math.round(zoomLevel * 100)}%
+            </span>
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-norma-sm text-sm font-semibold text-norma-prussian hover:bg-norma-surface-muted"
+              aria-label="Zoom in"
+              onClick={() => zoomBy(1.35)}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              className="rounded-norma-sm px-2 py-1.5 text-[11px] font-semibold text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-prussian"
+              onClick={() => setView(WORLD_VIEW)}
+            >
+              Reset
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="relative min-h-0 flex-1 overflow-hidden p-3 md:p-5">
@@ -134,9 +311,16 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
           aria-label="World map of people by country"
         >
           <svg
-            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-            className="absolute inset-0 h-full w-full"
+            ref={svgRef}
+            viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
+            className="absolute inset-0 h-full w-full touch-none [&_*:focus]:outline-none [&_*:focus-visible]:outline-none"
+            style={{ outline: "none" }}
             preserveAspectRatio="xMidYMid meet"
+            onWheel={onWheel}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
           >
             <defs>
               <linearGradient id="oceanFill" x1="0" y1="0" x2="0" y2="1">
@@ -148,7 +332,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                   dx="0"
                   dy="1"
                   stdDeviation="1.2"
-                  floodColor="#00234B"
+                  floodColor="#0b2a32"
                   floodOpacity="0.12"
                 />
               </filter>
@@ -159,8 +343,8 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
               d={graticulePath}
               fill="none"
               stroke="#7eb6c8"
-              strokeWidth={0.4}
-              opacity={0.45}
+              strokeWidth={0.35 / Math.sqrt(zoomLevel)}
+              opacity={0.35}
             />
             <path
               d={landPath}
@@ -186,20 +370,36 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
               return (
                 <path
                   key={numericId ?? d.slice(0, 24)}
+                  data-map-country={hasPeople ? "true" : undefined}
+                  data-map-interactive={hasPeople ? "true" : undefined}
                   d={d}
                   fill={
                     isActive || selectedHere
-                      ? "#624DE3"
+                      ? "#2a9d8f"
                       : hasPeople
-                        ? "#00234B"
+                        ? "#0b2a32"
                         : "#d7e4d2"
                   }
                   fillOpacity={
-                    isActive || selectedHere ? 0.92 : hasPeople ? 0.85 : 1
+                    isActive || selectedHere ? 0.92 : hasPeople ? 0.82 : 1
                   }
-                  stroke={hasPeople ? "#75E8F0" : "#7a9578"}
-                  strokeWidth={hasPeople ? 1 : 0.5}
-                  className={hasPeople ? "cursor-pointer outline-none" : undefined}
+                  stroke={
+                    isActive || selectedHere
+                      ? "#e85d04"
+                      : hasPeople
+                        ? "#75E8F0"
+                        : "#7a9578"
+                  }
+                  strokeWidth={
+                    (isActive || selectedHere ? 1.6 : hasPeople ? 1 : 0.5) /
+                    Math.sqrt(zoomLevel)
+                  }
+                  className={
+                    hasPeople
+                      ? "cursor-pointer outline-none focus:outline-none focus-visible:outline-none"
+                      : undefined
+                  }
+                  style={hasPeople ? { outline: "none" } : undefined}
                   tabIndex={hasPeople ? 0 : undefined}
                   role={hasPeople ? "button" : undefined}
                   aria-label={
@@ -207,19 +407,20 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                       ? `${cluster.label}: ${cluster.count} people`
                       : undefined
                   }
-                  onClick={() => {
+                  onClick={(event) => {
                     if (!cluster) return;
-                    setActiveCode((prev) =>
-                      prev === cluster.code ? null : cluster.code,
-                    );
+                    (event.currentTarget as SVGPathElement).blur();
+                    if (activeCode === cluster.code) {
+                      setActiveCode(null);
+                      return;
+                    }
+                    focusCluster(cluster);
                   }}
                   onKeyDown={(event) => {
                     if (!cluster) return;
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      setActiveCode((prev) =>
-                        prev === cluster.code ? null : cluster.code,
-                      );
+                      focusCluster(cluster);
                     }
                   }}
                 />
@@ -229,46 +430,84 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
             <path
               d={spherePath}
               fill="none"
-              stroke="#00234B"
-              strokeOpacity={0.2}
-              strokeWidth={1.2}
+              stroke="#0b2a32"
+              strokeOpacity={0.18}
+              strokeWidth={1.2 / Math.sqrt(zoomLevel)}
             />
 
             {clusters.map((cluster) => {
               const point = projection([cluster.lng, cluster.lat]);
               if (!point) return null;
               const [x, y] = point;
-              const size = Math.min(22, 9 + Math.sqrt(cluster.count) * 3.2);
               const open = activeCode === cluster.code;
-              const selectedHere = cluster.people.some((p) => p.id === selectedId);
+              const hovered = hoverCode === cluster.code;
+              const selectedHere = cluster.people.some(
+                (p) => p.id === selectedId,
+              );
+              const emphasized = open || selectedHere || hovered;
+              const size = (8 + Math.sqrt(cluster.count) * 2.6) * screenScale;
+              const ring = size + 5 * screenScale;
+              const label = emphasized ? cluster.label : null;
+
+              const activate = () => {
+                if (activeCode === cluster.code && zoomLevel > 1.4) {
+                  setActiveCode(null);
+                  return;
+                }
+                focusCluster(cluster);
+              };
+
               return (
-                <g key={`pin-${cluster.code}`} transform={`translate(${x},${y})`}>
+                <g
+                  key={`pin-${cluster.code}`}
+                  data-map-pin="true"
+                  transform={`translate(${x},${y})`}
+                >
+                  {emphasized ? (
+                    <circle
+                      r={ring}
+                      fill="none"
+                      stroke="#e85d04"
+                      strokeWidth={2.4 * screenScale}
+                      opacity={0.95}
+                      className="pointer-events-none"
+                    />
+                  ) : null}
                   <circle
-                    r={size + 3}
+                    r={size + 2.2 * screenScale}
                     fill="#ffffff"
-                    opacity={0.9}
+                    className="pointer-events-none"
                   />
                   <circle
                     r={size}
-                    fill={open || selectedHere ? "#624DE3" : "#e85d04"}
-                    stroke="#ffffff"
-                    strokeWidth={1.6}
-                    className="cursor-pointer"
+                    fill={open || selectedHere ? "#e85d04" : "#0b2a32"}
                     role="button"
                     tabIndex={0}
+                    data-map-interactive="true"
                     aria-label={`${cluster.label}: ${cluster.count} people`}
                     aria-pressed={open}
-                    onClick={() =>
-                      setActiveCode((prev) =>
-                        prev === cluster.code ? null : cluster.code,
+                    className="cursor-pointer"
+                    style={{ outline: "none" }}
+                    onMouseEnter={() => setHoverCode(cluster.code)}
+                    onMouseLeave={() =>
+                      setHoverCode((prev) =>
+                        prev === cluster.code ? null : prev,
                       )
                     }
+                    onFocus={() => setHoverCode(cluster.code)}
+                    onBlur={() =>
+                      setHoverCode((prev) =>
+                        prev === cluster.code ? null : prev,
+                      )
+                    }
+                    onClick={(event) => {
+                      event.currentTarget.blur();
+                      activate();
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        setActiveCode((prev) =>
-                          prev === cluster.code ? null : cluster.code,
-                        );
+                        activate();
                       }
                     }}
                   />
@@ -276,12 +515,38 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill="#ffffff"
-                    fontSize={size > 14 ? 11 : 9}
+                    fontSize={Math.max(7 * screenScale, size * 0.9)}
                     fontWeight={700}
                     className="pointer-events-none select-none"
                   >
                     {cluster.count}
                   </text>
+                  {label ? (
+                    <g
+                      transform={`translate(0, ${size + 11 * screenScale})`}
+                      className="pointer-events-none"
+                    >
+                      <rect
+                        x={-Math.min(52, label.length * 3.2) * screenScale}
+                        y={-7.5 * screenScale}
+                        width={Math.min(104, label.length * 6.4) * screenScale}
+                        height={15 * screenScale}
+                        rx={7.5 * screenScale}
+                        fill="#ffffff"
+                        opacity={0.96}
+                      />
+                      <text
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fill="#0b2a32"
+                        fontSize={9 * screenScale}
+                        fontWeight={600}
+                        className="select-none"
+                      >
+                        {label.length > 16 ? `${label.slice(0, 14)}…` : label}
+                      </text>
+                    </g>
+                  ) : null}
                 </g>
               );
             })}
@@ -297,7 +562,7 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
       </div>
 
       {active ? (
-        <div className="max-h-[40%] shrink-0 border-t border-norma-border bg-norma-surface">
+        <div className="max-h-[38%] shrink-0 border-t border-norma-border bg-norma-surface">
           <div className="flex items-center justify-between gap-3 px-4 py-3 md:px-6">
             <div>
               <h2 className="font-[family-name:var(--font-norma-display)] text-base font-semibold text-norma-prussian">
@@ -307,16 +572,25 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
                 {active.count} {active.count === 1 ? "person" : "people"}
               </p>
             </div>
-            <button
-              type="button"
-              className="text-xs font-semibold text-norma-ink-muted hover:text-norma-prussian"
-              onClick={() => setActiveCode(null)}
-            >
-              Close
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="text-xs font-semibold text-norma-ink-muted hover:text-norma-prussian"
+                onClick={() => focusCluster(active, 4.2)}
+              >
+                Zoom here
+              </button>
+              <button
+                type="button"
+                className="text-xs font-semibold text-norma-ink-muted hover:text-norma-prussian"
+                onClick={() => setActiveCode(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
           <ul
-            className="max-h-56 overflow-auto divide-y divide-norma-border/70 px-2 pb-3 md:px-4"
+            className="max-h-52 overflow-auto divide-y divide-norma-border/70 px-2 pb-3 md:px-4"
             aria-label={`People in ${active.label}`}
           >
             {active.people.map((person) => {
