@@ -22,6 +22,8 @@ describe("Org Intelligence IA routes", () => {
         expect(src).toContain("DataHealthWorkspace");
       } else if (segment === "dashboard") {
         expect(src).toContain("DashboardWorkspace");
+      } else if (segment === "departments") {
+        expect(src).toContain("DepartmentsWorkspace");
       } else {
         expect(src).toContain("SurfaceStub");
       }
