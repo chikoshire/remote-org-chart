@@ -48,6 +48,7 @@ import { OrgInsightsPanel } from "@/components/org/OrgInsightsPanel";
 import { OrgFiltersBar } from "@/components/org/OrgFiltersBar";
 import { SyncRunsPanel } from "@/components/org/SyncRunsPanel";
 import { WebhookEventsPanel } from "@/components/org/WebhookEventsPanel";
+import { OrgTreeList } from "@/components/org/OrgTreeList";
 import {
   mapOrgChartHttpError,
   warningCopy,
@@ -287,6 +288,7 @@ function OrgChartInner() {
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
   const [remoteConnected, setRemoteConnected] = useState(true);
+  const [viewMode, setViewMode] = useState<"chart" | "tree">("chart");
   const router = useRouter();
   const initialFitDone = useRef(false);
   const hasReadyData = useRef(false);
@@ -1035,6 +1037,36 @@ function OrgChartInner() {
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="flex flex-col gap-3">
+              <div
+                className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted p-1"
+                role="group"
+                aria-label="Org chart presentation"
+              >
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "chart"}
+                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                    viewMode === "chart"
+                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
+                  }`}
+                  onClick={() => setViewMode("chart")}
+                >
+                  Chart
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={viewMode === "tree"}
+                  className={`flex-1 rounded-norma-sm px-3 py-1.5 text-[11px] font-semibold tracking-wide ${
+                    viewMode === "tree"
+                      ? "bg-[#e85d04] text-norma-prussian shadow-norma-sm"
+                      : "text-norma-ink-muted hover:text-norma-prussian"
+                  }`}
+                  onClick={() => setViewMode("tree")}
+                >
+                  Tree
+                </button>
+              </div>
               <Link
                 href="/app/people"
                 className="w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-center text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian"
@@ -1312,6 +1344,12 @@ function OrgChartInner() {
                   onClick={() => setFilters(EMPTY_ORG_FILTERS)}
                 />
               }
+            />
+          ) : viewMode === "tree" ? (
+            <OrgTreeList
+              roots={filteredForest}
+              selectedId={selectedId}
+              onSelect={focusPerson}
             />
           ) : (
             <ReactFlow
