@@ -48,7 +48,7 @@ export function PersonNodeCard({
   return (
     <article
       aria-label={accessibleName}
-      className={`w-[220px] rounded-norma-md border px-3 py-2.5 transition-colors ${variantClass[variant]}`}
+      className={`w-[220px] rounded-norma-md border px-3 py-2.5 transition-[border-color,box-shadow,background-color,transform] duration-200 ease-out motion-safe:data-[variant=selected]:scale-[1.02] ${variantClass[variant]}`}
       data-variant={variant}
       data-in-cycle={inCycle ? "true" : "false"}
     >
