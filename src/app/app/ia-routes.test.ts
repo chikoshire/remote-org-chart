@@ -24,17 +24,17 @@ describe("Org Intelligence IA routes", () => {
     expect(src).not.toContain("view=departments");
   });
 
-  it("keeps Data Health as a primary surface with settings redirect", () => {
-    const appHealth = join(process.cwd(), "src/app/app/data-health/page.tsx");
+  it("keeps Data Health under Settings with redirect from old path", () => {
     const settingsHealth = join(
       process.cwd(),
       "src/app/settings/data-health/page.tsx",
     );
-    expect(existsSync(appHealth)).toBe(true);
+    const legacy = join(process.cwd(), "src/app/app/data-health/page.tsx");
     expect(existsSync(settingsHealth)).toBe(true);
-    expect(readFileSync(appHealth, "utf8")).toContain("DataHealthWorkspace");
-    expect(readFileSync(settingsHealth, "utf8")).toContain(
-      'redirect("/app/data-health")',
+    expect(existsSync(legacy)).toBe(true);
+    expect(readFileSync(settingsHealth, "utf8")).toContain("DataHealthWorkspace");
+    expect(readFileSync(legacy, "utf8")).toContain(
+      'redirect("/settings/data-health")',
     );
   });
 });

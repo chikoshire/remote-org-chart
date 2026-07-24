@@ -5,6 +5,7 @@ import { ProductShell } from "@/components/shell/ProductShell";
 import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
+import { SettingsChrome } from "@/components/settings/SettingsChrome";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
   readAppPrefs,
@@ -84,7 +85,8 @@ export default function SettingsPage() {
 
   return (
     <ProductShell status={<span>Preferences</span>}>
-      <ProductPageFrame>
+      <SettingsChrome>
+        <ProductPageFrame>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
@@ -277,7 +279,8 @@ export default function SettingsPage() {
               {saved ? "Saved" : "Save preferences"}
             </button>
           </section>
-      </ProductPageFrame>
+        </ProductPageFrame>
+      </SettingsChrome>
     </ProductShell>
   );
 }
