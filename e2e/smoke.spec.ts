@@ -293,7 +293,7 @@ test.describe("org chart smoke", () => {
       page.locator('[data-morph-person="emp_report"].bloom-enter'),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Open full profile" }),
+      page.getByRole("button", { name: "Open full profile" }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Close person details" }).click();
