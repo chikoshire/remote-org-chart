@@ -522,6 +522,24 @@ Europe pins overlapped at world scale; selected pins showed a rectangular focus 
 
 ---
 
+## 2026-07-24 — Horizontal Tree + density
+
+**Status:** Accepted  
+
+**Context:**  
+Vertical list Tree still felt file-browser-like; users wanted chart-like left→right branching, deeper default expand, and a compact mode for ~149 people.
+
+**Decision:**  
+1. Render Tree as a **left-to-right** branching hierarchy with spray rails.  
+2. Default expand **two levels** (`collectIdsToDepth(..., 1)`); keep Expand all / Collapse all / “2 levels”.  
+3. Add Comfortable | Compact density for card size.
+
+**Consequences:**  
+- Tree is horizontally scrollable for wide orgs.  
+- Chart (React Flow) remains the primary interactive layout.
+
+---
+
 ## Template for future entries
 
 
