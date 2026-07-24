@@ -60,9 +60,9 @@ Paste-ready walkthrough: [docs/interviewer-handoff.md](./docs/interviewer-handof
 | `/app/dashboard` | Organisational insights (incl. headcount by department) |
 | `/app` | Org Chart (Chart \| Tree \| Map) |
 | `/app/people` | People directory (Grid \| List + department filter) |
+| `/app/data-health` | Trust / edge-case review |
 | `/app/departments` | Redirects to Dashboard |
-| `/settings/data-health` | Trust / edge-case review (also redirected from `/app/data-health`) |
-| `/settings` | Remote connect + theme |
+| `/settings` | Preferences (Remote connect + theme); `/settings/data-health` redirects to Data Health |
 
 ### Keyboard shortcuts
 

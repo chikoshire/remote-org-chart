@@ -19,6 +19,11 @@ const PRIMARY_NAV = [
     match: (p: string) => p === "/app" || p === "/",
   },
   { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
+  {
+    href: "/app/data-health",
+    label: "Data Health",
+    match: (p: string) => p.startsWith("/app/data-health"),
+  },
 ] as const;
 
 function navClass(active: boolean) {
@@ -31,7 +36,7 @@ function navClass(active: boolean) {
 
 export function ProductShellInner({ children, status }: ProductShellProps) {
   const pathname = usePathname();
-  const settingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
+  const settingsActive = pathname === "/settings";
   const router = useRouter();
 
   async function logout() {
