@@ -51,7 +51,10 @@ export function PeopleDirectory({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [localQuery, setLocalQuery] = useState("");
-  const [deptOnly, setDeptOnly] = useState<string | "all">("all");
+  const [deptOnly, setDeptOnly] = useState<string | "all">(() => {
+    const fromUrl = searchParams.get("department")?.trim();
+    return fromUrl && fromUrl.length > 0 ? fromUrl : "all";
+  });
   const [incompleteOnly, setIncompleteOnly] = useState(
     () => searchParams.get("incomplete") === "1",
   );
@@ -63,6 +66,8 @@ export function PeopleDirectory({
     if (searchParams.get("incomplete") === "1") {
       setIncompleteOnly(true);
     }
+    const fromUrl = searchParams.get("department")?.trim();
+    if (fromUrl) setDeptOnly(fromUrl);
   }, [searchParams]);
 
   const departments = useMemo(() => {
@@ -192,7 +197,15 @@ export function PeopleDirectory({
             <DepartmentFilterSelect
               departments={departments}
               value={deptOnly === "all" ? null : deptOnly}
-              onChange={(dept) => setDeptOnly(dept ?? "all")}
+              onChange={(dept) => {
+                const next = dept ?? "all";
+                setDeptOnly(next);
+                const params = new URLSearchParams(searchParams.toString());
+                if (next === "all") params.delete("department");
+                else params.set("department", next);
+                const qs = params.toString();
+                router.replace(qs ? `/app/people?${qs}` : "/app/people");
+              }}
               className="min-w-[12rem]"
             />
           </div>

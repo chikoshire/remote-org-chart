@@ -4,6 +4,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -42,6 +43,8 @@ type OrgWorldMapProps = {
   people: MapPerson[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  /** Country label or ISO code from deep link (`?country=`). */
+  focusCountry?: string | null;
 };
 
 type CountryCluster = {
@@ -54,7 +57,12 @@ type CountryCluster = {
   people: MapPerson[];
 };
 
-export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) {
+export function OrgWorldMap({
+  people,
+  selectedId,
+  onSelect,
+  focusCountry = null,
+}: OrgWorldMapProps) {
   const [activeCode, setActiveCode] = useState<string | null>(null);
   const [view, setView] = useState<MapView>(WORLD_VIEW);
   const [hoverCode, setHoverCode] = useState<string | null>(null);
@@ -177,6 +185,18 @@ export function OrgWorldMap({ people, selectedId, onSelect }: OrgWorldMapProps) 
     },
     [projection],
   );
+
+  useEffect(() => {
+    const needle = focusCountry?.trim();
+    if (!needle || clusters.length === 0) return;
+    const lower = needle.toLowerCase();
+    const upper = needle.toUpperCase();
+    const match =
+      clusters.find((c) => c.label.toLowerCase() === lower) ??
+      clusters.find((c) => c.code === upper) ??
+      clusters.find((c) => c.label.toLowerCase().includes(lower));
+    if (match) focusCluster(match);
+  }, [clusters, focusCluster, focusCountry]);
 
   const onWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
     event.preventDefault();

@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   expandCollapsedAncestors,
+  mapCountryHref,
+  peopleDepartmentHref,
   personDeepLinkHref,
   readCompareFlagFromSearch,
+  readCountryFromSearch,
+  readDepartmentFromSearch,
   readPersonIdFromSearch,
+  readViewModeFromSearch,
   resolvePersonDeepLink,
   withCompareSearchParam,
   withPersonSearchParam,
@@ -54,5 +59,19 @@ describe("deep-links", () => {
     expect(withCompareSearchParam("?q=hi", true)).toBe("?q=hi&compare=1");
     expect(withCompareSearchParam("?compare=1&q=hi", false)).toBe("?q=hi");
     expect(withCompareSearchParam("", true)).toBe("?compare=1");
+  });
+
+  it("builds map country and people department hrefs", () => {
+    expect(mapCountryHref("Singapore")).toBe(
+      "/app?view=map&country=Singapore",
+    );
+    expect(peopleDepartmentHref("Marketing")).toBe(
+      "/app/people?department=Marketing",
+    );
+    expect(readViewModeFromSearch("?view=map")).toBe("map");
+    expect(readCountryFromSearch("?country=Singapore")).toBe("Singapore");
+    expect(readDepartmentFromSearch("?department=Marketing")).toBe(
+      "Marketing",
+    );
   });
 });
