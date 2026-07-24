@@ -194,7 +194,7 @@ export function PeopleDirectory({
             </label>
             {incompleteCount > 0 ? (
               <Link
-                href="/settings/data-health"
+                href="/app/data-health"
                 className="self-end pb-2.5 text-xs font-semibold text-norma-royal hover:underline"
               >
                 Data Health
