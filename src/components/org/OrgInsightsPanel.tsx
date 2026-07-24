@@ -9,7 +9,7 @@ type OrgInsightsPanelProps = {
 };
 
 function formatSpan(value: number | null): string {
-  if (value === null) return "—";
+  if (value === null) return "Not set";
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
