@@ -14,7 +14,7 @@ describe("PersonNodeCard", () => {
     expect(card).toContain('"path"');
     expect(card).toContain('"root"');
     expect(card).toContain("norma-royal");
-    expect(card).toContain("#0b2a32");
+    expect(card).toContain("norma-prussian");
     expect(card).toContain("#2a9d8f");
   });
 

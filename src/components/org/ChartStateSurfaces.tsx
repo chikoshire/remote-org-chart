@@ -8,7 +8,7 @@ type SurfaceProps = {
 
 export function ChartLoadingState({
   title = "Loading organization…",
-  description = "Fetching employments from Remote sandbox and building the reporting tree.",
+  description = "Getting the latest people and reporting lines from Remote.",
 }: Partial<SurfaceProps>) {
   return (
     <div
@@ -31,8 +31,8 @@ export function ChartLoadingState({
 }
 
 export function ChartEmptyState({
-  title = "No people to chart",
-  description = "Remote returned no active employments for this company. Check sandbox data or status filters.",
+  title = "No people to show",
+  description = "Remote didn’t return any active people for this company. Try refreshing, or check your Remote connection in Settings.",
   action,
 }: Partial<SurfaceProps>) {
   return (
@@ -56,7 +56,7 @@ export function ChartEmptyState({
 
 export function ChartErrorState({
   title = "Couldn’t load the org chart",
-  description = "The Remote API request failed. Token stays server-side — retry, or check /api/health/remote.",
+  description = "Something went wrong loading people from Remote. Try again in a moment.",
   action,
 }: Partial<SurfaceProps>) {
   return (

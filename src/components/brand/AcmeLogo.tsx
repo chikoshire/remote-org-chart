@@ -8,7 +8,7 @@ type AcmeLogoProps = {
 };
 
 /**
- * Acme Sandbox Corp mark — ascending bars (signal / growth), Markel-adjacent.
+ * Acme company mark — ascending bars (signal / growth).
  */
 export function AcmeLogo({
   withWordmark = true,
@@ -41,7 +41,7 @@ export function AcmeLogo({
           Acme
         </span>
       ) : null}
-      <span className="sr-only">Acme Sandbox Corp</span>
+      <span className="sr-only">Acme</span>
     </span>
   );
 }
