@@ -78,7 +78,7 @@ export function warningsFromMeta(meta: {
 export function warningCopy(warning: ChartWarning): string {
   switch (warning.type) {
     case "cycles":
-      return `${warning.count} employment${warning.count === 1 ? "" : "s"} sit on a reporting cycle — marked on their cards.`;
+      return `${warning.count} employment${warning.count === 1 ? "" : "s"} sit on a reporting cycle. Marked on their cards.`;
     case "orphan_managers":
       return `${warning.count} manager id${warning.count === 1 ? "" : "s"} referenced but missing from the active set.`;
     default: {

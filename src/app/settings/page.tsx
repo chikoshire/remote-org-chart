@@ -10,6 +10,9 @@ import {
   readAppPrefs,
   writeDensityPref,
   writeLiveDefault,
+  writeThemePref,
+  applyThemeClass,
+  type AppTheme,
 } from "@/lib/ui/prefs";
 import {
   clearSessionOrgPayload,
@@ -25,6 +28,7 @@ type Health = {
 export default function SettingsPage() {
   const [density, setDensity] = useState<ChartDensity>("comfortable");
   const [liveDefault, setLiveDefault] = useState(false);
+  const [theme, setTheme] = useState<AppTheme>("light");
   const [saved, setSaved] = useState(false);
   const [connected, setConnected] = useState(true);
   const [healthOk, setHealthOk] = useState<boolean | null>(null);
@@ -34,8 +38,9 @@ export default function SettingsPage() {
     const prefs = readAppPrefs();
     setDensity(prefs.density);
     setLiveDefault(prefs.liveDefault);
+    setTheme(prefs.theme);
     setConnected(readRemoteConnected());
-  }, []);
+    applyThemeClass(prefs.theme);  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,9 +62,11 @@ export default function SettingsPage() {
   const save = useCallback(() => {
     writeDensityPref(density);
     writeLiveDefault(liveDefault);
+    writeThemePref(theme);
+    applyThemeClass(theme);
     setSaved(true);
     window.setTimeout(() => setSaved(false), 1600);
-  }, [density, liveDefault]);
+  }, [density, liveDefault, theme]);
 
   const disconnect = () => {
     writeRemoteConnected(false);
@@ -200,6 +207,51 @@ export default function SettingsPage() {
                   Compact
                 </button>
               </div>
+            </div>
+
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+                Appearance
+              </h3>
+              <div
+                className="mt-3 flex gap-2"
+                role="group"
+                aria-label="Color theme"
+              >
+                <button
+                  type="button"
+                  aria-pressed={theme === "light"}
+                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                    theme === "light"
+                      ? "bg-[#e85d04] text-norma-prussian"
+                      : "border border-norma-border text-norma-ink-muted"
+                  }`}
+                  onClick={() => {
+                    setTheme("light");
+                    applyThemeClass("light");
+                  }}
+                >
+                  Light
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={theme === "dark"}
+                  className={`rounded-norma-sm px-3 py-2 text-sm font-medium ${
+                    theme === "dark"
+                      ? "bg-[#e85d04] text-norma-prussian"
+                      : "border border-norma-border text-norma-ink-muted"
+                  }`}
+                  onClick={() => {
+                    setTheme("dark");
+                    applyThemeClass("dark");
+                  }}
+                >
+                  Dark
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-norma-ink-muted">
+                Theme is controlled here only. It is saved on this device.
+              </p>
             </div>
 
             <label className="flex items-start gap-2 text-sm text-norma-prussian">
