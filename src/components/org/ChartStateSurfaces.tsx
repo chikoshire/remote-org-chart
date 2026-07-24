@@ -14,14 +14,16 @@ export function ChartLoadingState({
     <div
       role="status"
       aria-live="polite"
-      className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 px-6 text-center"
+      className="flex h-full min-h-[320px] flex-col items-center justify-center gap-4 bg-[radial-gradient(ellipse_at_center,rgb(232_93_4/0.08),transparent_55%)] px-6 text-center"
     >
       <span
         aria-hidden
-        className="h-9 w-9 animate-spin rounded-full border-2 border-norma-border border-t-norma-royal"
+        className="h-10 w-10 animate-spin rounded-full border-2 border-[#0b2a32]/20 border-t-[#e85d04]"
       />
       <div className="max-w-md">
-        <h2 className="text-base font-semibold text-norma-prussian">{title}</h2>
+        <h2 className="font-[family-name:var(--font-norma-display)] text-lg font-semibold tracking-tight text-norma-prussian">
+          {title}
+        </h2>
         <p className="mt-1 text-sm text-norma-ink-muted">{description}</p>
       </div>
     </div>
