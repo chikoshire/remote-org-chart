@@ -11,7 +11,7 @@ type MarketingAppShotProps = {
 
 /**
  * Real product screenshot - used instead of invented marketing mocks.
- * Uses contain (not cover) so UI chrome and sidebars are never cropped.
+ * Full-bleed in the frame (no inset padding) so the UI stays readable.
  */
 export function MarketingAppShot({
   src,
@@ -24,13 +24,13 @@ export function MarketingAppShot({
     <Image
       src={src}
       alt={alt}
-      width={1728}
-      height={1025}
+      width={1600}
+      height={900}
       priority={priority}
       className={
         framed
-          ? "h-auto w-full rounded-[0.85rem] object-contain object-top"
-          : `h-auto w-full object-contain object-top ${className}`
+          ? "h-auto w-full object-cover object-top"
+          : `h-auto w-full object-cover object-top ${className}`
       }
       sizes="(max-width: 768px) 100vw, 60vw"
     />
@@ -42,7 +42,7 @@ export function MarketingAppShot({
 
   return (
     <div
-      className={`overflow-hidden rounded-[1.35rem] border border-norma-border/70 bg-norma-canvas shadow-[0_28px_80px_rgb(18_18_18/0.12)] ring-1 ring-white/70 ${className}`}
+      className={`overflow-hidden rounded-[1.35rem] border border-norma-border/70 bg-white shadow-[0_28px_80px_rgb(18_18_18/0.12)] ring-1 ring-white/70 ${className}`}
     >
       <div className="flex h-10 shrink-0 items-center gap-2 border-b border-norma-border/70 bg-white/90 px-3">
         <span className="h-2.5 w-2.5 rounded-full bg-norma-rose" />
@@ -52,7 +52,7 @@ export function MarketingAppShot({
           app.acme
         </span>
       </div>
-      <div className="bg-norma-canvas p-3 sm:p-4">{image}</div>
+      <div className="relative w-full bg-norma-canvas">{image}</div>
     </div>
   );
 }
