@@ -15,12 +15,29 @@ async function mockOrgChart(page: Page, body: unknown, status = 200) {
   });
 }
 
-test.describe("org chart smoke", () => {
-  test("home redirects to /app with product shell", async ({ page }) => {
-    await mockOrgChart(page, orgChartReadyFixture);
-    await page.goto("/");
+async function loginAsDemo(page: Page) {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("demo@acme.example");
+  await page.getByLabel("Password").fill("<scrubbed-old-demo-password>");
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page).toHaveURL(/\/app/);
+}
 
-    await expect(page).toHaveURL(/\/app/);
+test.describe("org chart smoke", () => {
+  test("marketing home offers log in", async ({ page }) => {
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: /see how acme is organised/i }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Log in" }).first()).toBeVisible();
+  });
+
+  test("login gates the app and shows product shell", async ({ page }) => {
+    await mockOrgChart(page, orgChartReadyFixture);
+    await page.goto("/app");
+    await expect(page).toHaveURL(/\/login/);
+
+    await loginAsDemo(page);
     await expect(page.getByRole("banner")).toContainText("Acme");
     const primary = page.getByRole("navigation", { name: "Primary" });
     await expect(primary).toBeVisible();
@@ -34,11 +51,11 @@ test.describe("org chart smoke", () => {
       await expect(primary.getByRole("link", { name })).toBeVisible();
     }
     await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
-    await expect(primary.getByRole("link", { name: "Welcome" })).toHaveCount(0);
-    await expect(page.locator("#org-chart")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
   });
 
   test("IA stub routes render under product shell", async ({ page }) => {
+    await loginAsDemo(page);
     for (const { path, heading } of [
       { path: "/app/dashboard", heading: "Dashboard" },
       { path: "/app/departments", heading: "Departments" },
@@ -57,6 +74,7 @@ test.describe("org chart smoke", () => {
 
   test("data health route lists trust sections", async ({ page }) => {
     await mockOrgChart(page, orgChartReadyFixture);
+    await loginAsDemo(page);
     await page.goto("/app/data-health");
     await expect(
       page.getByRole("heading", { name: "Data Health", exact: true }),
@@ -71,6 +89,7 @@ test.describe("org chart smoke", () => {
   });
 
   test("settings route loads preferences and integrations", async ({ page }) => {
+    await loginAsDemo(page);
     await page.goto("/settings");
     await expect(
       page.getByRole("heading", { name: "Settings", exact: true }),
@@ -86,6 +105,7 @@ test.describe("org chart smoke", () => {
     page,
   }) => {
     await mockOrgChart(page, orgChartReadyFixture);
+    await loginAsDemo(page);
     await page.goto("/app");
 
     await expect(page.getByText(/2 people · 1 teams/)).toBeVisible({
@@ -119,6 +139,7 @@ test.describe("org chart smoke", () => {
     page,
   }) => {
     await mockOrgChart(page, orgChartReadyFixture);
+    await loginAsDemo(page);
     await page.goto("/app/people");
 
     await expect(
@@ -147,6 +168,7 @@ test.describe("org chart smoke", () => {
 
   test("shows empty state when API returns no people", async ({ page }) => {
     await mockOrgChart(page, orgChartEmptyFixture);
+    await loginAsDemo(page);
     await page.goto("/app");
 
     await expect(
@@ -157,6 +179,7 @@ test.describe("org chart smoke", () => {
 
   test("shows error state when API fails", async ({ page }) => {
     await mockOrgChart(page, orgChartErrorFixture, 401);
+    await loginAsDemo(page);
     await page.goto("/app");
 
     await expect(
@@ -166,5 +189,14 @@ test.describe("org chart smoke", () => {
       page.getByText(/couldn’t authorize this connection/i),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+  });
+
+  test("logout returns to marketing", async ({ page }) => {
+    await loginAsDemo(page);
+    await page.getByRole("button", { name: "Log out" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByRole("heading", { name: /see how acme is organised/i }),
+    ).toBeVisible();
   });
 });

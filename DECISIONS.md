@@ -394,6 +394,21 @@ Theme toggle (#63) needs dark variants of the same recipe.
 
 ---
 
+## 2026-07-24 — Marketing landing + demo app session
+
+**Status:** Accepted  
+
+**Context:**  
+Interviewers need a public story and a gated product without exposing `REMOTE_API_TOKEN`.
+
+**Decision:**  
+`/` is marketing. Demo login (`demo@acme.example` / `<scrubbed-old-demo-password>`, overridable via env) sets an httpOnly signed cookie. Middleware gates `/app/*` and `/settings`. Logout clears the cookie and returns to marketing. Remote Bearer remains server-only.
+
+**Revisit when:**  
+Real identity provider is required beyond demo credentials.
+
+---
+
 ## 2026-07-24 — Remote Connect Option B; OAuth scaffolded but off
 
 **Status:** Accepted  

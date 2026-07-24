@@ -8,17 +8,27 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 
 | Check | Expected |
 |-------|----------|
-| Home | Interactive React Flow chart (~149 people, ~10 roots) |
+| Home `/` | Marketing landing with Log in |
+| Login | Demo: `demo@acme.example` / `<scrubbed-old-demo-password>` → `/app` |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
 | `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15–25s |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
 
 > First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** to force a rebuild.
 
+### Demo login (interview handoff)
+
+| Field | Value |
+|-------|-------|
+| Email | `demo@acme.example` |
+| Password | `<scrubbed-old-demo-password>` |
+
+Override with `DEMO_APP_EMAIL` / `DEMO_APP_PASSWORD` / `APP_SESSION_SECRET` (Wrangler secrets in production). This **app session** is separate from `REMOTE_API_TOKEN` (server-only).
+
 ### Links for the interview team
 
 - **Live app:** https://remote-org-chart.shirechiko.workers.dev  
-- **Welcome / product landing:** https://remote-org-chart.shirechiko.workers.dev/welcome  
+- **Marketing landing:** https://remote-org-chart.shirechiko.workers.dev/  
 - **Source:** https://github.com/chikoshire/remote-org-chart  
 - **Security notes:** [SECURITY.md](./SECURITY.md)  
 - **Production readiness:** [PRODUCTION.md](./PRODUCTION.md)  
@@ -80,6 +90,10 @@ Open [http://localhost:3000](http://localhost:3000).
 ```bash
 REMOTE_API_TOKEN=ra_test_…
 REMOTE_API_BASE_URL=https://gateway.remote-sandbox.com
+# Optional app login overrides (defaults documented above)
+# DEMO_APP_EMAIL=demo@acme.example
+# DEMO_APP_PASSWORD=<scrubbed-old-demo-password>
+# APP_SESSION_SECRET=…
 ```
 
 Token source: sandbox Company settings → Integrations & APIs → Remote API (read-only).  
