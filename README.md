@@ -38,6 +38,7 @@ Interactive org chart for **Acme Sandbox Corp**, built against the **Remote sand
 8. **Compare** two people for reporting distance and lowest common manager (highlights both paths)
 9. **KV snapshot cache** (15m TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
 10. **Sync log** (Cloudflare D1) records cold/refresh/cache-hit attempts — **Sync log** panel + `/api/sync-runs`
+11. **Webhooks** (`POST /api/webhooks/remote`) with HMAC verify + D1 inbox; **Live** poll + **Webhook events** panel
 
 ### Keyboard shortcuts
 

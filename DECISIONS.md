@@ -294,6 +294,29 @@ Webhooks (#27) need a richer event inbox (#29).
 
 ---
 
+## 2026-07-24 — Webhook inbox in D1 (not Supabase)
+
+**Status:** Accepted  
+
+**Context:**  
+Tier 3 employment webhooks need HMAC verification, idempotent storage, and snapshot invalidation. Supabase was previously deferred; D1 already powers sync runs.
+
+**Decision:**  
+- Receiver: `POST /api/webhooks/remote` — verify `X-Remote-Signature` before parse.  
+- Secret: `REMOTE_WEBHOOK_SIGNING_KEY` (Wrangler secret / `.env.local`) — never in git.  
+- Inbox: D1 table `webhook_events` (same DB as sync runs), unique `delivery_key`.  
+- On `employment.*`: delete KV org-chart snapshot so the next load rebuilds.  
+- Live updates (#28): optional **Live** toggle uses SSE `/api/org-chart/stream` (KV notify stamp), not Supabase Realtime.  
+- Event UI (#29): **Webhook events** panel + `GET /api/webhooks/events`.
+
+**Consequences:**  
+Subscription (`POST /v1/webhook-callbacks`) is a manual ops step — confirm URL + events with the user before creating. Signing key is shown once at subscribe time.
+
+**Revisit when:**  
+Sandbox webhook subscription is created for the live Workers URL.
+
+---
+
 ## Template for future entries
 
 
