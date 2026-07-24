@@ -43,7 +43,7 @@ const NAV_ACTIONS: NavAction[] = [
     id: "nav-health",
     label: "Go to Data Health",
     hint: "Cycles and missing managers",
-    href: "/settings/data-health",
+    href: "/app/data-health",
   },
   {
     id: "nav-settings",

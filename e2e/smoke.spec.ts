@@ -46,11 +46,11 @@ test.describe("org chart smoke", () => {
       "Dashboard",
       "Org Chart",
       "People",
-      "Departments",
+      "Data Health",
     ]) {
       await expect(primary.getByRole("link", { name })).toBeVisible();
     }
-    await expect(primary.getByRole("link", { name: "Data Health" })).toHaveCount(0);
+    await expect(primary.getByRole("link", { name: "Departments" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Log out" })).toBeVisible();
   });
@@ -78,10 +78,10 @@ test.describe("org chart smoke", () => {
       page.getByRole("heading", { name: "People", exact: true }),
     ).toBeVisible();
 
-    await primary.getByRole("link", { name: "Departments" }).click();
-    await expect(page).toHaveURL(/\/app\/departments/);
+    await primary.getByRole("link", { name: "Data Health" }).click();
+    await expect(page).toHaveURL(/\/app\/data-health/);
     await expect(
-      page.getByRole("heading", { name: "Departments", exact: true }),
+      page.getByRole("heading", { name: "Data Health", exact: true }),
     ).toBeVisible();
 
     await page.getByRole("link", { name: "Settings" }).click();
@@ -89,14 +89,9 @@ test.describe("org chart smoke", () => {
     await expect(
       page.getByRole("heading", { name: "Preferences", exact: true }),
     ).toBeVisible();
-
-    await page.getByRole("navigation", { name: "Settings sections" })
-      .getByRole("link", { name: "Data Health" })
-      .click();
-    await expect(page).toHaveURL(/\/settings\/data-health/);
     await expect(
-      page.getByRole("heading", { name: "Data Health", exact: true }),
-    ).toBeVisible();
+      page.getByRole("navigation", { name: "Settings sections" }),
+    ).toHaveCount(0);
   });
 
   test("command bar opens with keyboard shortcut", async ({ page }) => {
@@ -146,10 +141,22 @@ test.describe("org chart smoke", () => {
     ).toBeVisible({ timeout: 20_000 });
   });
 
-  test("data health route lists trust sections", async ({ page }) => {
+  test("legacy settings data-health redirects to primary surface", async ({
+    page,
+  }) => {
     await mockOrgChart(page, orgChartReadyFixture);
     await loginAsDemo(page);
     await page.goto("/settings/data-health");
+    await expect(page).toHaveURL(/\/app\/data-health/);
+    await expect(
+      page.getByRole("heading", { name: "Data Health", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+  });
+
+  test("data health route lists trust sections", async ({ page }) => {
+    await mockOrgChart(page, orgChartReadyFixture);
+    await loginAsDemo(page);
+    await page.goto("/app/data-health");
     await expect(
       page.getByRole("heading", { name: "Data Health", exact: true }),
     ).toBeVisible({ timeout: 20_000 });
@@ -251,7 +258,7 @@ test.describe("org chart smoke", () => {
     await expect(page.getByText("Unlinked", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Incomplete", { exact: true }).first()).toBeVisible();
 
-    await page.goto("/settings/data-health");
+    await page.goto("/app/data-health");
     await expect(
       page.getByRole("heading", { name: "Reporting cycles" }),
     ).toBeVisible();

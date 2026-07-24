@@ -9,6 +9,7 @@ import {
   RetryButton,
 } from "@/components/org/ChartStateSurfaces";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
+import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import {
   computeDataHealth,
   type HealthPerson,
@@ -218,8 +219,7 @@ export function DataHealthWorkspace() {
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto">
-      <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8 xl:px-10">
+    <ProductPageFrame>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-norma-ink-subtle">
@@ -234,12 +234,6 @@ export function DataHealthWorkspace() {
               Remote.
             </p>
           </div>
-          <Link
-            href="/app"
-            className="rounded-norma-md border border-norma-border bg-white px-3 py-2 text-xs font-semibold text-norma-prussian shadow-norma-sm hover:border-norma-spray/50"
-          >
-            Open org chart
-          </Link>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -321,7 +315,6 @@ export function DataHealthWorkspace() {
             {report.orphanManagerIds.length === 1 ? "" : "s"} referenced.
           </p>
         ) : null}
-      </div>
-    </div>
+    </ProductPageFrame>
   );
 }
