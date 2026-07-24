@@ -178,8 +178,8 @@ export function CommandBar() {
         type="button"
         onClick={openPalette}
         className="hidden min-w-[14rem] items-center gap-3 rounded-norma-md border border-norma-border bg-norma-surface-muted px-3 py-2 text-left text-sm text-norma-ink-muted hover:border-norma-royal hover:text-norma-prussian md:inline-flex lg:min-w-[18rem]"
-        aria-label="Open command bar"
-        title="Search (⌘K)"
+        aria-label="Open command palette"
+        title="Jump anywhere (⌘K)"
       >
         <svg
           aria-hidden
@@ -194,7 +194,7 @@ export function CommandBar() {
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
-        <span className="min-w-0 flex-1 truncate">Search people or pages…</span>
+        <span className="min-w-0 flex-1 truncate">Jump to person or page…</span>
         <kbd className="shrink-0 rounded border border-norma-border bg-norma-surface px-1.5 py-0.5 font-mono text-[10px] text-norma-ink-subtle">
           ⌘K
         </kbd>
@@ -236,7 +236,7 @@ export function CommandBar() {
                     runItem(results[activeIndex]!);
                   }
                 }}
-                placeholder="Search people or jump to a page…"
+                placeholder="Jump to a person or page…"
                 className="w-full bg-transparent py-2 text-sm text-norma-ink outline-none placeholder:text-norma-ink-subtle"
                 autoComplete="off"
               />
