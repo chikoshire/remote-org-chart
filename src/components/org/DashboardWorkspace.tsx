@@ -20,6 +20,10 @@ import {
   PERSON_OVERRIDES_CHANGED_EVENT,
   applyPersonOverrides,
 } from "@/lib/org/person-overrides";
+import {
+  mapCountryHref,
+  peopleDepartmentHref,
+} from "@/lib/org/deep-links";
 import { departmentAccent } from "@/lib/ui/department-accent";
 import { withViewTransition } from "@/lib/ui/motion";
 import {
@@ -116,7 +120,7 @@ function KpiCard({
     <button
       type="button"
       onClick={() => onNavigate(href)}
-      className={`bloom-enter group flex flex-col rounded-norma-lg border p-5 text-left shadow-norma-sm transition hover:-translate-y-1 hover:shadow-norma-md ${
+      className={`bloom-enter group flex cursor-pointer flex-col rounded-norma-lg border p-5 text-left shadow-norma-sm transition hover:-translate-y-1 hover:shadow-norma-md ${
         tall ? "min-h-[9.5rem]" : "min-h-[8.25rem]"
       } ${TONE_STYLES[tone]} ${delayClass}`}
     >
@@ -197,9 +201,11 @@ function IconAlert() {
 function DepartmentShare({
   items,
   empty,
+  onSelect,
 }: {
   items: NamedCount[];
   empty: string;
+  onSelect: (department: string) => void;
 }) {
   const top = items.slice(0, 6);
   const total = top.reduce((sum, item) => sum + item.count, 0) || 1;
@@ -269,20 +275,26 @@ function DepartmentShare({
           </div>
           <ul className="w-full space-y-2.5" aria-label="Headcount by department">
             {arcs.map((arc) => (
-              <li key={arc.name} className="flex items-center gap-3 text-sm">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: arc.color }}
-                />
-                <span className="min-w-0 flex-1 truncate font-medium text-norma-ink">
-                  {arc.name}
-                </span>
-                <span className="shrink-0 tabular-nums text-norma-ink-muted">
-                  {arc.count}
-                  <span className="ml-1 text-[11px] text-norma-ink-subtle">
-                    ({arc.pct}%)
+              <li key={arc.name}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(arc.name)}
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-norma-md px-1 py-1 text-left text-sm transition hover:bg-white/70"
+                >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: arc.color }}
+                  />
+                  <span className="min-w-0 flex-1 truncate font-medium text-norma-ink">
+                    {arc.name}
                   </span>
-                </span>
+                  <span className="shrink-0 tabular-nums text-norma-ink-muted">
+                    {arc.count}
+                    <span className="ml-1 text-[11px] text-norma-ink-subtle">
+                      ({arc.pct}%)
+                    </span>
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -308,9 +320,11 @@ const COUNTRY_DOT_PALETTE = [
 function CountryDots({
   items,
   empty,
+  onSelect,
 }: {
   items: NamedCount[];
   empty: string;
+  onSelect: (country: string) => void;
 }) {
   const top = items.slice(0, 8);
   const max = top[0]?.count ?? 1;
@@ -331,27 +345,32 @@ function CountryDots({
               COUNTRY_DOT_PALETTE[index % COUNTRY_DOT_PALETTE.length]!;
             return (
               <li key={item.name}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="truncate text-sm font-semibold text-norma-ink">
-                    {item.name}
-                  </span>
-                  <span className="shrink-0 text-sm tabular-nums text-norma-ink-muted">
-                    {item.count}
-                  </span>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-1.5" aria-hidden>
-                  {Array.from({ length: dots }).map((_, i) => (
-                    <span
-                      key={i}
-                      className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
-                      style={{
-                        backgroundColor: color,
-                        // Density cue without washing out on cream
-                        opacity: 0.78 + (i / Math.max(dots - 1, 1)) * 0.22,
-                      }}
-                    />
-                  ))}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => onSelect(item.name)}
+                  className="w-full cursor-pointer rounded-norma-md px-1 py-1 text-left transition hover:bg-white/70"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="truncate text-sm font-semibold text-norma-ink">
+                      {item.name}
+                    </span>
+                    <span className="shrink-0 text-sm tabular-nums text-norma-ink-muted">
+                      {item.count}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5" aria-hidden>
+                    {Array.from({ length: dots }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                        style={{
+                          backgroundColor: color,
+                          opacity: 0.78 + (i / Math.max(dots - 1, 1)) * 0.22,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </button>
               </li>
             );
           })}
@@ -388,6 +407,14 @@ export function DashboardWorkspace() {
           const el = document.getElementById(hash);
           if (el) {
             el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.classList.add("ring-2", "ring-norma-ink/25", "ring-offset-2");
+            window.setTimeout(() => {
+              el.classList.remove(
+                "ring-2",
+                "ring-norma-ink/25",
+                "ring-offset-2",
+              );
+            }, 1400);
             return;
           }
         }
@@ -523,7 +550,7 @@ export function DashboardWorkspace() {
       items.push({
         label: "Incomplete profiles",
         count: insights.incompleteCount,
-        href: "/app/people?incomplete=1",
+        href: "/settings/data-health",
         tone: "neutral",
       });
     }
@@ -592,7 +619,7 @@ export function DashboardWorkspace() {
         <button
           type="button"
           disabled={refreshing || !remoteConnected}
-          className="rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:opacity-50"
+          className="cursor-pointer rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-medium text-norma-ink-muted shadow-norma-sm hover:text-norma-prussian disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => void load({ refresh: true })}
         >
           {refreshing ? "Refreshing…" : "Refresh from Remote"}
@@ -649,14 +676,16 @@ export function DashboardWorkspace() {
         />
       </div>
 
-      <div className="mt-6 grid scroll-mt-4 gap-5 lg:grid-cols-2" id="departments">
+      <div className="mt-6 grid scroll-mt-4 gap-5 rounded-norma-lg lg:grid-cols-2" id="departments">
         <DepartmentShare
           items={insights.departments}
           empty="No departments on file yet."
+          onSelect={(department) => navigate(peopleDepartmentHref(department))}
         />
         <CountryDots
           items={insights.countries}
           empty="No countries on file yet."
+          onSelect={(country) => navigate(mapCountryHref(country))}
         />
       </div>
 
@@ -666,7 +695,7 @@ export function DashboardWorkspace() {
             <h2 className="text-sm font-semibold text-norma-ink">Largest teams</h2>
             <Link
               href="/app"
-              className="text-xs font-semibold text-norma-ink hover:underline"
+              className="cursor-pointer text-xs font-semibold text-norma-ink hover:underline"
               onClick={(event) => {
                 event.preventDefault();
                 navigate("/app");
@@ -682,19 +711,25 @@ export function DashboardWorkspace() {
           ) : (
             <ul className="mt-4 divide-y divide-norma-border/60" aria-label="Largest teams">
               {insights.topManagers.map((manager) => (
-                <li key={manager.id} className="flex items-center gap-3 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-norma-ink">
-                      {manager.fullName}
-                    </p>
-                    <p className="truncate text-xs text-norma-ink-muted">
-                      {manager.jobTitle || "Not set"}
-                      {manager.department ? ` · ${manager.department}` : ""}
-                    </p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-norma-ink px-2.5 py-1 text-[11px] font-semibold tabular-nums text-norma-ink-inverse">
-                    {manager.directReports}
-                  </span>
+                <li key={manager.id}>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/app/people/${manager.id}`)}
+                    className="flex w-full cursor-pointer items-center gap-3 py-3 text-left transition hover:bg-white/50"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-norma-ink">
+                        {manager.fullName}
+                      </p>
+                      <p className="truncate text-xs text-norma-ink-muted">
+                        {manager.jobTitle || "Not set"}
+                        {manager.department ? ` · ${manager.department}` : ""}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-norma-ink px-2.5 py-1 text-[11px] font-semibold tabular-nums text-norma-ink-inverse">
+                      {manager.directReports}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -706,7 +741,7 @@ export function DashboardWorkspace() {
             <h2 className="text-sm font-semibold text-norma-ink">Needs attention</h2>
             <Link
               href="/settings/data-health"
-              className="text-xs font-semibold text-norma-ink hover:underline"
+              className="cursor-pointer text-xs font-semibold text-norma-ink hover:underline"
               onClick={(event) => {
                 event.preventDefault();
                 navigate("/settings/data-health");
@@ -726,7 +761,7 @@ export function DashboardWorkspace() {
                 <li key={item.label}>
                   <button
                     type="button"
-                    className="flex w-full items-center gap-3 rounded-norma-md border border-white/70 bg-white/70 px-3.5 py-3 text-left shadow-norma-sm transition hover:-translate-y-0.5 hover:border-norma-ink/20 hover:shadow-norma-md"
+                    className="flex w-full cursor-pointer items-center gap-3 rounded-norma-md border border-white/70 bg-white/70 px-3.5 py-3 text-left shadow-norma-sm transition hover:-translate-y-0.5 hover:border-norma-ink/20 hover:shadow-norma-md"
                     onClick={() => navigate(item.href)}
                   >
                     <span

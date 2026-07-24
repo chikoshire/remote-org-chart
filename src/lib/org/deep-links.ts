@@ -4,6 +4,15 @@ export const PERSON_QUERY_PARAM = "person";
 /** Query param to open org chart compare mode (`/app?compare=1`). */
 export const COMPARE_QUERY_PARAM = "compare";
 
+/** Org Chart view mode (`/app?view=map`). */
+export const VIEW_QUERY_PARAM = "view";
+
+/** Focus a country on the org map (`/app?view=map&country=Singapore`). */
+export const COUNTRY_QUERY_PARAM = "country";
+
+/** People directory department filter (`/app/people?department=Marketing`). */
+export const DEPARTMENT_QUERY_PARAM = "department";
+
 /** Read `person` from a `location.search` string (with or without leading `?`). */
 export function readPersonIdFromSearch(search: string): string | null {
   const raw = search.startsWith("?") ? search.slice(1) : search;
@@ -18,6 +27,34 @@ export function readCompareFlagFromSearch(search: string): boolean {
   const raw = search.startsWith("?") ? search.slice(1) : search;
   const value = new URLSearchParams(raw).get(COMPARE_QUERY_PARAM);
   return value === "1" || value === "true";
+}
+
+/** Read org chart view mode from search (`chart` | `tree` | `map`). */
+export function readViewModeFromSearch(
+  search: string,
+): "chart" | "tree" | "map" | null {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const value = new URLSearchParams(raw).get(VIEW_QUERY_PARAM)?.trim().toLowerCase();
+  if (value === "chart" || value === "tree" || value === "map") return value;
+  return null;
+}
+
+/** Country focus label/code from search (for map deep links). */
+export function readCountryFromSearch(search: string): string | null {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const value = new URLSearchParams(raw).get(COUNTRY_QUERY_PARAM);
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Department filter from People search. */
+export function readDepartmentFromSearch(search: string): string | null {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const value = new URLSearchParams(raw).get(DEPARTMENT_QUERY_PARAM);
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 /**
@@ -56,6 +93,21 @@ export function withPersonSearchParam(
   }
   const next = params.toString();
   return next ? `?${next}` : "";
+}
+
+/** Map deep link: `/app?view=map&country=Singapore`. */
+export function mapCountryHref(countryLabel: string): string {
+  const params = new URLSearchParams();
+  params.set(VIEW_QUERY_PARAM, "map");
+  params.set(COUNTRY_QUERY_PARAM, countryLabel.trim());
+  return `/app?${params.toString()}`;
+}
+
+/** People directory filtered by department. */
+export function peopleDepartmentHref(department: string): string {
+  const params = new URLSearchParams();
+  params.set(DEPARTMENT_QUERY_PARAM, department.trim());
+  return `/app/people?${params.toString()}`;
 }
 
 /** Absolute share URL for a person on the current origin/path. */

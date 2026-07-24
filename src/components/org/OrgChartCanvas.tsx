@@ -65,7 +65,9 @@ import { personAccessibleName } from "@/lib/org/person-a11y";
 import {
   COMPARE_QUERY_PARAM,
   expandCollapsedAncestors,
+  readCountryFromSearch,
   readPersonIdFromSearch,
+  readViewModeFromSearch,
   resolvePersonDeepLink,
   withCompareSearchParam,
   withPersonSearchParam,
@@ -298,6 +300,7 @@ function OrgChartInner() {
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
   const [remoteConnected, setRemoteConnected] = useState(true);
   const [viewMode, setViewMode] = useState<"chart" | "tree" | "map">("chart");
+  const [mapFocusCountry, setMapFocusCountry] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -561,6 +564,16 @@ function OrgChartInner() {
       router.replace("/app/people");
     }
   }, [router]);
+
+  useEffect(() => {
+    const mode = readViewModeFromSearch(`?${searchParams.toString()}`);
+    if (mode) setViewMode(mode);
+    const country = readCountryFromSearch(`?${searchParams.toString()}`);
+    if (country) {
+      setMapFocusCountry(country);
+      setViewMode("map");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (status !== "ready") return;
@@ -1586,6 +1599,7 @@ function OrgChartInner() {
               }))}
               selectedId={selectedId}
               onSelect={focusPerson}
+              focusCountry={mapFocusCountry}
             />
           ) : (
             <ReactFlow
