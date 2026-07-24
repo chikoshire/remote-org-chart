@@ -5,8 +5,23 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function sanitizePersonId(personId: string): string {
+  return personId.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
+/** Shared-element name for a whole person card / drawer shell (legacy). */
 export function personMorphName(personId: string): string {
-  return `person-${personId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+  return `person-${sanitizePersonId(personId)}`;
+}
+
+/** Avatar circle morph partner across chart → drawer → profile. */
+export function personAvatarMorphName(personId: string): string {
+  return `person-avatar-${sanitizePersonId(personId)}`;
+}
+
+/** Display name morph partner. */
+export function personNameMorphName(personId: string): string {
+  return `person-name-${sanitizePersonId(personId)}`;
 }
 
 type ViewTransitionDocument = Document & {

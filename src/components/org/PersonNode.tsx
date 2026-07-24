@@ -33,6 +33,7 @@ export function PersonNode({ data, selected, id }: NodeProps) {
         collapsed={person.collapsed}
         collapsedCount={person.collapsedCount}
         onToggleCollapse={person.onToggleCollapse}
+        morphActive={Boolean(person.morphActive)}
       />
       <Handle type="source" position={Position.Bottom} />
       {/* id kept for React Flow focus targeting */}

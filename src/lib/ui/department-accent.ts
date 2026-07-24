@@ -10,7 +10,7 @@ const PASTELS = [
   "#8a9eb0", // cool gray-blue
 ] as const;
 
-const FALLBACK = "#121212";
+const FALLBACK = "#8a8580";
 
 function hashString(value: string): number {
   let hash = 0;

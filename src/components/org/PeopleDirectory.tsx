@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
+import { DepartmentColorLegend } from "@/components/org/DepartmentColorLegend";
 import { isIncompletePerson } from "@/lib/org/data-health";
 import { formatCountryLabel } from "@/lib/ui/format-country";
-import { personMorphName } from "@/lib/ui/motion";
+import {
+  personNameMorphName,
+  withViewTransition,
+} from "@/lib/ui/motion";
+import { captureProfileReturn } from "@/lib/ui/profile-return";
 
 export type DirectoryPerson = {
   id: string;
@@ -44,6 +48,7 @@ export function PeopleDirectory({
   onSelect,
   onOpenInChart,
 }: PeopleDirectoryProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [localQuery, setLocalQuery] = useState("");
   const [deptOnly, setDeptOnly] = useState<string | "all">("all");
@@ -112,6 +117,13 @@ export function PeopleDirectory({
       })
       .sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
   }, [deptOnly, incompleteOnly, people, query]);
+
+  const openFullProfile = (id: string) => {
+    captureProfileReturn(id);
+    void withViewTransition(() => {
+      router.push(`/app/people/${id}`);
+    });
+  };
 
   return (
     <div className="relative flex h-full min-h-0 flex-col bg-transparent">
@@ -212,6 +224,10 @@ export function PeopleDirectory({
             autoComplete="off"
           />
         </label>
+        <DepartmentColorLegend
+          departments={departments}
+          className="mt-3"
+        />
       </div>
 
       {filtered.length === 0 ? (
@@ -222,6 +238,7 @@ export function PeopleDirectory({
         <ul
           className="relative grid flex-1 grid-cols-1 gap-4 overflow-auto p-4 sm:grid-cols-2 md:p-6 xl:grid-cols-3"
           aria-label="People directory"
+          data-people-scroll
         >
           {filtered.map((person) => (
             <li key={person.id}>
@@ -231,6 +248,7 @@ export function PeopleDirectory({
                 layout="grid"
                 onSelect={onSelect}
                 onOpenInChart={onOpenInChart}
+                onOpenProfile={openFullProfile}
               />
             </li>
           ))}
@@ -239,6 +257,7 @@ export function PeopleDirectory({
         <ul
           className="relative flex-1 divide-y divide-norma-border/70 overflow-auto"
           aria-label="People directory"
+          data-people-scroll
         >
           {filtered.map((person) => (
             <li key={person.id} className="px-4 md:px-6">
@@ -248,6 +267,7 @@ export function PeopleDirectory({
                 layout="list"
                 onSelect={onSelect}
                 onOpenInChart={onOpenInChart}
+                onOpenProfile={openFullProfile}
               />
             </li>
           ))}
@@ -263,17 +283,20 @@ function PersonCard({
   layout,
   onSelect,
   onOpenInChart,
+  onOpenProfile,
 }: {
   person: DirectoryPerson;
   selected: boolean;
   layout: DirectoryView;
   onSelect: (id: string) => void;
   onOpenInChart: (id: string) => void;
+  onOpenProfile: (id: string) => void;
 }) {
   const name = person.fullName?.trim() || "Unknown person";
   const countryLabel = formatCountryLabel(person.country);
   const reports = person.directReports ?? 0;
   const isList = layout === "list";
+  const morph = !selected;
   const incomplete = isIncompletePerson({
     id: person.id,
     fullName: person.fullName ?? null,
@@ -289,11 +312,6 @@ function PersonCard({
         className={`relative flex flex-row items-center gap-3 py-3 ${
           selected ? "bg-norma-accent-soft/40" : ""
         }`}
-        style={
-          selected
-            ? undefined
-            : { viewTransitionName: personMorphName(person.id) }
-        }
         data-morph-person={person.id}
       >
         <button
@@ -308,15 +326,24 @@ function PersonCard({
             department={person.department}
             avatarUrl={person.avatarUrl}
             size="sm"
+            morph={morph}
           />
           <span className="min-w-0 flex-1">
-            <span className="block truncate font-[family-name:var(--font-norma-display)] text-sm font-semibold tracking-tight text-norma-ink">
+            <span
+              className="block truncate font-[family-name:var(--font-norma-display)] text-sm font-semibold tracking-tight text-norma-ink"
+              style={
+                morph
+                  ? { viewTransitionName: personNameMorphName(person.id) }
+                  : undefined
+              }
+              data-morph-name={morph ? person.id : undefined}
+            >
               {name}
             </span>
             <span className="mt-0.5 block truncate text-sm text-norma-ink-muted">
               {person.jobTitle?.trim() || "No title"}
             </span>
-            <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-norma-ink-subtle">
+            <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-norma-ink-muted">
               <span className="truncate">
                 {person.department?.trim() || "Not set"}
               </span>
@@ -340,12 +367,13 @@ function PersonCard({
           </span>
         </button>
         <div className="flex shrink-0 items-center gap-3">
-          <Link
-            href={`/app/people/${person.id}`}
+          <button
+            type="button"
+            onClick={() => onOpenProfile(person.id)}
             className="norma-cta px-4 py-1.5 text-xs"
           >
             Full profile
-          </Link>
+          </button>
           <button
             type="button"
             className="text-xs font-medium text-norma-ink-muted hover:text-norma-ink hover:underline"
@@ -365,11 +393,6 @@ function PersonCard({
           ? "border-norma-royal ring-2 ring-norma-royal/25"
           : "border-norma-border/80 hover:border-norma-spray/45 hover:shadow-norma-md"
       }`}
-      style={
-        selected
-          ? undefined
-          : { viewTransitionName: personMorphName(person.id) }
-      }
       data-morph-person={person.id}
     >
       <button
@@ -389,9 +412,18 @@ function PersonCard({
             department={person.department}
             avatarUrl={person.avatarUrl}
             size="lg"
+            morph={morph}
           />
         </div>
-        <span className="mt-3 block w-full truncate font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-ink">
+        <span
+          className="mt-3 block w-full truncate font-[family-name:var(--font-norma-display)] text-base font-semibold tracking-tight text-norma-ink"
+          style={
+            morph
+              ? { viewTransitionName: personNameMorphName(person.id) }
+              : undefined
+          }
+          data-morph-name={morph ? person.id : undefined}
+        >
           {name}
         </span>
         <span className="mt-1 line-clamp-2 w-full text-sm leading-snug text-norma-ink-muted">
@@ -404,7 +436,7 @@ function PersonCard({
             </span>
           ) : null}
           {countryLabel ? (
-            <span className="truncate text-xs text-norma-ink-subtle">
+            <span className="truncate text-xs text-norma-ink-muted">
               {countryLabel}
             </span>
           ) : null}
@@ -414,7 +446,7 @@ function PersonCard({
             Reports to {person.managerName}
           </span>
         ) : (
-          <span className="mt-2 block w-full truncate text-xs text-norma-ink-subtle">
+          <span className="mt-2 block w-full truncate text-xs text-norma-ink-muted">
             Top of reporting line
           </span>
         )}
@@ -430,12 +462,13 @@ function PersonCard({
         </span>
       </button>
       <div className="mt-auto flex shrink-0 justify-center gap-4 border-t border-norma-border/60 px-4 py-3">
-        <Link
-          href={`/app/people/${person.id}`}
+        <button
+          type="button"
+          onClick={() => onOpenProfile(person.id)}
           className="norma-cta px-4 py-1.5 text-xs"
         >
           Full profile
-        </Link>
+        </button>
         <button
           type="button"
           className="text-xs font-medium text-norma-ink-muted hover:text-norma-ink hover:underline"

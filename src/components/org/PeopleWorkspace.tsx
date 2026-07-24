@@ -19,6 +19,7 @@ import {
 import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
 import { withViewTransition } from "@/lib/ui/motion";
+import { consumeReturnScrollIfMatching } from "@/lib/ui/profile-return";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -78,6 +79,10 @@ export function PeopleWorkspace() {
     void withViewTransition(() => {
       setSelectedId(id);
     });
+  }, []);
+
+  useEffect(() => {
+    consumeReturnScrollIfMatching("/app/people");
   }, []);
 
   const load = useCallback(async () => {

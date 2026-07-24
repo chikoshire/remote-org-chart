@@ -67,11 +67,11 @@ async function main() {
 
     const firstCard = page.locator('[data-morph-person]').first();
     await expect("people cards render", (await firstCard.count()) > 0);
-    const fullProfileLinks = page.getByRole("link", { name: "Full profile" });
+    const fullProfileButtons = page.getByRole("button", { name: "Full profile" });
     await expect(
       "Full profile links present",
-      (await fullProfileLinks.count()) > 0,
-      String(await fullProfileLinks.count()),
+      (await fullProfileButtons.count()) > 0,
+      String(await fullProfileButtons.count()),
     );
 
     // Side dock via card body click (not Full profile link)
@@ -81,11 +81,11 @@ async function main() {
     await expect("side dock opens", await dialog.isVisible());
     await expect(
       "Open full profile in dock",
-      await dialog.getByRole("link", { name: "Open full profile" }).isVisible(),
+      await dialog.getByRole("button", { name: "Open full profile" }).isVisible(),
     );
 
     // Full profile page
-    await dialog.getByRole("link", { name: "Open full profile" }).click();
+    await dialog.getByRole("button", { name: "Open full profile" }).click();
     await page.waitForURL(/\/app\/people\/[^/]+/);
     await expect("full profile route", /\/app\/people\/[^/]+$/.test(new URL(page.url()).pathname), page.url());
     await page.getByRole("heading", { name: "About" }).waitFor({ state: "visible", timeout: 30000 });
@@ -93,6 +93,10 @@ async function main() {
     await expect(
       "profile Reporting section",
       await page.getByRole("heading", { name: "Reporting" }).isVisible(),
+    );
+    await expect(
+      "profile back to People",
+      await page.getByRole("button", { name: /← People/ }).isVisible(),
     );
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 

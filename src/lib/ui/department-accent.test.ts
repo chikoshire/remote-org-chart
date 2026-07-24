@@ -28,8 +28,8 @@ describe("departmentAccent", () => {
   });
 
   it("falls back to black for empty departments", () => {
-    expect(departmentAccent(null)).toBe("#121212");
-    expect(departmentAccent("")).toBe("#121212");
+    expect(departmentAccent(null)).toBe("#8a8580");
+    expect(departmentAccent("")).toBe("#8a8580");
   });
 
   it("uses a single quiet chart bar accent", () => {

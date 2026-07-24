@@ -24,6 +24,8 @@ describe("PersonDetailDrawer", () => {
     expect(drawer).toContain("Copy link");
     expect(drawer).toContain("/app/people/");
     expect(drawer).toContain("Open full profile");
+    expect(drawer).toContain("captureProfileReturn");
+    expect(drawer).toContain("withViewTransition");
   });
 
   it("supports docked People layout without covering the grid", () => {

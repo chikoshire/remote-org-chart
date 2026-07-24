@@ -14,7 +14,16 @@ import { withPersonSearchParam } from "@/lib/org/deep-links";
 import { mapOrgChartHttpError } from "@/lib/org/chart-state";
 import type { PersonProfilePayload } from "@/lib/remote/person-profile";
 import { formatCountryLabel } from "@/lib/ui/format-country";
-import { withViewTransition } from "@/lib/ui/motion";
+import {
+  personNameMorphName,
+  withViewTransition,
+} from "@/lib/ui/motion";
+import {
+  clearProfileReturn,
+  defaultProfileReturn,
+  readProfileReturn,
+  type ProfileReturnState,
+} from "@/lib/ui/profile-return";
 import {
   readRemoteConnected,
   readSessionOrgPayload,
@@ -75,6 +84,14 @@ export function PersonProfileView({ personId }: { personId: string }) {
   const [people, setPeople] = useState<FlatPerson[]>([]);
   const [profile, setProfile] = useState<PersonProfilePayload | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [returnTo, setReturnTo] = useState<ProfileReturnState>(() =>
+    defaultProfileReturn(),
+  );
+
+  useEffect(() => {
+    const stored = readProfileReturn(personId) ?? readProfileReturn();
+    if (stored) setReturnTo(stored);
+  }, [personId]);
 
   const load = useCallback(async () => {
     if (!readRemoteConnected()) {
@@ -83,7 +100,6 @@ export function PersonProfileView({ personId }: { personId: string }) {
       setProfile(null);
       return;
     }
-    setStatus("loading");
     setErrorMessage(null);
     setProfileError(null);
 
@@ -91,6 +107,10 @@ export function PersonProfileView({ personId }: { personId: string }) {
       const session = readSessionOrgPayload() as OrgChartResponse | null;
       if (session?.ok && session.nodes?.length) {
         setPeople(session.nodes);
+        // Soft start: show org snapshot immediately while Remote profile loads.
+        setStatus("ready");
+      } else {
+        setStatus("loading");
       }
 
       const [orgRes, profileRes] = await Promise.all([
@@ -164,6 +184,21 @@ export function PersonProfileView({ personId }: { personId: string }) {
     [people, personId],
   );
 
+  const goBack = useCallback(() => {
+    const target = returnTo.href || "/app/people";
+    // Keep return state until the destination consumes scroll (People),
+    // or clear after chart deep-link (Org Chart focuses via ?person=).
+    const goingToChart =
+      target === "/app" ||
+      target.startsWith("/app?") ||
+      target.startsWith("/app#");
+    void withViewTransition(() => {
+      router.push(target);
+    }).then(() => {
+      if (goingToChart) clearProfileReturn();
+    });
+  }, [returnTo.href, router]);
+
   if (status === "loading") return <ChartLoadingState />;
   if (status === "error") {
     return (
@@ -232,16 +267,18 @@ export function PersonProfileView({ personId }: { personId: string }) {
 
       <div className="relative mx-auto max-w-3xl space-y-5 px-4 py-6 md:px-8 md:py-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/app/people"
+          <button
+            type="button"
+            onClick={goBack}
             className="text-sm font-medium text-norma-ink-muted hover:text-norma-ink"
           >
-            ← People
-          </Link>
+            ← {returnTo.label || "People"}
+          </button>
           <button
             type="button"
             className="text-sm font-semibold text-norma-royal hover:underline"
             onClick={() => {
+              clearProfileReturn();
               const search = withPersonSearchParam("", personId);
               void withViewTransition(() => {
                 router.push(`/app${search}`);
@@ -252,7 +289,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
           </button>
         </div>
 
-        <section className="norma-glass overflow-hidden rounded-norma-lg border border-norma-border/80 shadow-norma-md">
+        <section className="bloom-enter norma-glass overflow-hidden rounded-norma-lg border border-norma-border/80 shadow-norma-md">
           <div
             aria-hidden
             className="h-28 bg-gradient-to-br from-norma-lavender via-norma-sky to-norma-mint md:h-36"
@@ -266,11 +303,16 @@ export function PersonProfileView({ personId }: { personId: string }) {
                   department={department}
                   avatarUrl={avatarUrl}
                   size="xl"
+                  morph
                 />
               </div>
             </div>
             <div className="mt-4 text-center">
-              <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-ink md:text-3xl">
+              <h1
+                className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-ink md:text-3xl"
+                style={{ viewTransitionName: personNameMorphName(personId) }}
+                data-morph-name={personId}
+              >
                 {name}
               </h1>
               {profile?.pronouns ? (
@@ -290,8 +332,8 @@ export function PersonProfileView({ personId }: { personId: string }) {
           </div>
         </section>
 
-        <section className="norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+        <section className="bloom-enter bloom-enter-delay-2 norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
             About
           </h2>
           {profileError ? (
@@ -321,8 +363,8 @@ export function PersonProfileView({ personId }: { personId: string }) {
           </dl>
         </section>
 
-        <section className="norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
+        <section className="bloom-enter bloom-enter-delay-3 norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
             Reporting
           </h2>
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -449,7 +491,7 @@ function ProfileField({
   const display = value?.trim() || "—";
   return (
     <div>
-      <dt className="text-xs text-norma-ink-subtle">{label}</dt>
+      <dt className="text-xs text-norma-ink-muted">{label}</dt>
       <dd
         className={`mt-1 text-sm text-norma-ink ${mono ? "font-mono text-[13px]" : "font-medium"}`}
       >
