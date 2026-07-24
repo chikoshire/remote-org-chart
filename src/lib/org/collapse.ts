@@ -66,7 +66,7 @@ export function densityMetrics(density: ChartDensity): {
   ranksep: number;
 } {
   if (density === "compact") {
-    return { width: 180, height: 96, nodesep: 28, ranksep: 64 };
+    return { width: 190, height: 108, nodesep: 36, ranksep: 78 };
   }
-  return { width: 240, height: 128, nodesep: 52, ranksep: 110 };
+  return { width: 260, height: 152, nodesep: 68, ranksep: 132 };
 }

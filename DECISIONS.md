@@ -379,6 +379,21 @@ Interview handoff date forces cutting optional #66–#67 or #70.
 
 ---
 
+## 2026-07-24 — Org Intelligence visual system (chart + People)
+
+**Status:** Accepted  
+
+**Context:**  
+After product IA routes (#58), chart cards and the People directory still mixed black chrome and tight spacing.
+
+**Decision:**  
+Shared light card recipe: white surfaces, department pastel accent strip + avatar, report badge, friendly country labels. Generous dagre spacing (`260×152` comfortable). People at `/app/people` is the directory surface (search-first, no black header). Chart workspace stays graph-only.
+
+**Revisit when:**  
+Theme toggle (#63) needs dark variants of the same recipe.
+
+---
+
 ## 2026-07-24 — Remote Connect Option B; OAuth scaffolded but off
 
 **Status:** Accepted  
