@@ -1,6 +1,9 @@
 /** Query param for shareable person deep links (`/?person=<employmentId>`). */
 export const PERSON_QUERY_PARAM = "person";
 
+/** Query param to open org chart compare mode (`/app?compare=1`). */
+export const COMPARE_QUERY_PARAM = "compare";
+
 /** Read `person` from a `location.search` string (with or without leading `?`). */
 export function readPersonIdFromSearch(search: string): string | null {
   const raw = search.startsWith("?") ? search.slice(1) : search;
@@ -8,6 +11,32 @@ export function readPersonIdFromSearch(search: string): string | null {
   if (!value) return null;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** True when search asks the org chart to enter compare mode. */
+export function readCompareFlagFromSearch(search: string): boolean {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const value = new URLSearchParams(raw).get(COMPARE_QUERY_PARAM);
+  return value === "1" || value === "true";
+}
+
+/**
+ * Build the search string with `compare` set or cleared.
+ * Preserves unrelated query params.
+ */
+export function withCompareSearchParam(
+  search: string,
+  enabled: boolean,
+): string {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  const params = new URLSearchParams(raw);
+  if (enabled) {
+    params.set(COMPARE_QUERY_PARAM, "1");
+  } else {
+    params.delete(COMPARE_QUERY_PARAM);
+  }
+  const next = params.toString();
+  return next ? `?${next}` : "";
 }
 
 /**

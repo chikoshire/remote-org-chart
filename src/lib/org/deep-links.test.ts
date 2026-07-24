@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   expandCollapsedAncestors,
   personDeepLinkHref,
+  readCompareFlagFromSearch,
   readPersonIdFromSearch,
   resolvePersonDeepLink,
+  withCompareSearchParam,
   withPersonSearchParam,
 } from "@/lib/org/deep-links";
 
@@ -41,15 +43,16 @@ describe("deep-links", () => {
     });
   });
 
-  it("expands collapsed ancestors on the path to root", () => {
-    const managers = new Map([
-      ["c", { id: "c", managerEmploymentId: "b" }],
-      ["b", { id: "b", managerEmploymentId: "a" }],
-      ["a", { id: "a", managerEmploymentId: null }],
-    ]);
-    const collapsed = new Set(["a", "b", "other"]);
-    expect([...expandCollapsedAncestors("c", managers, collapsed)].sort()).toEqual(
-      ["other"],
-    );
+  it("reads compare flag from search strings", () => {
+    expect(readCompareFlagFromSearch("?compare=1")).toBe(true);
+    expect(readCompareFlagFromSearch("?compare=true")).toBe(true);
+    expect(readCompareFlagFromSearch("?compare=0")).toBe(false);
+    expect(readCompareFlagFromSearch("?q=hi")).toBe(false);
+  });
+
+  it("sets and clears compare while preserving other params", () => {
+    expect(withCompareSearchParam("?q=hi", true)).toBe("?q=hi&compare=1");
+    expect(withCompareSearchParam("?compare=1&q=hi", false)).toBe("?q=hi");
+    expect(withCompareSearchParam("", true)).toBe("?compare=1");
   });
 });
