@@ -104,13 +104,13 @@ export default function MarketingHomePage() {
                     href="/login"
                     className={`marketing-surface-panel group block overflow-hidden rounded-[1.75rem] border border-norma-border/70 bg-gradient-to-b ${surface.accent} shadow-norma-sm`}
                   >
-                    <div className="relative aspect-[16/9] overflow-hidden bg-norma-canvas p-3 sm:p-4">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-norma-surface-muted">
                       <Image
                         src={surface.src}
                         alt={surface.alt}
-                        width={1728}
-                        height={1025}
-                        className="h-full w-full rounded-[0.85rem] object-contain object-top transition duration-500 group-hover:scale-[1.015]"
+                        width={1600}
+                        height={900}
+                        className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.02]"
                         sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     </div>
