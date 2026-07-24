@@ -317,6 +317,26 @@ Write-scoped sandbox token is available and subscription is created for the live
 
 ---
 
+## 2026-07-24 — Product shell overhaul; drop PNG/SVG from UI
+
+**Status:** Accepted  
+
+**Context:**  
+Stretch export (#22) and other tools lived in a floating stack over React Flow. That made the chart cramped, default `fitView` unreadably small at ~149 nodes, and branding repeated across header/page/footer. PNG/SVG export was interview flex, not core to the brief.
+
+**Decision:**  
+Ship a fuller **product shell**: top nav (Acme once · Org · Welcome · Settings) + side panel (Chart|Directory, search, filters including job title, Tools disclosure) + dedicated `/app`, `/welcome`, `/settings`. Preferences (density, Live default) persist in `localStorage`. **Remove PNG/SVG from the product UI** (helper code may remain unused). Secondary surfaces (Compare, Live, Sync, Webhooks, Insights) live under side-panel Tools — not a second floating pile.
+
+**Consequences:**  
+- Chart stage is never covered by primary controls; initial fit uses higher `maxZoom` / `minZoom` for readability.  
+- Directory is first-class with manager context and shared side-panel filters.  
+- Tracking: GH #50–#54 / Linear TUXX-1587–1591.
+
+**Revisit when:**  
+Interview feedback asks for image export as a headline feature — then re-expose under Tools, not chrome.
+
+---
+
 ## Template for future entries
 
 

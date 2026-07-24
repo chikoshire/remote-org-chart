@@ -21,4 +21,9 @@ describe("PersonNodeCard", () => {
   it("exposes an accessible name on the person article", () => {
     expect(card).toContain("aria-label={accessibleName}");
   });
+
+  it("shows a Profile affordance when selected", () => {
+    expect(card).toContain('variant === "selected"');
+    expect(card).toContain("Profile");
+  });
 });

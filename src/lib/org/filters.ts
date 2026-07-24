@@ -3,33 +3,39 @@ import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";
 export type OrgFilters = {
   department: string | null;
   country: string | null;
+  jobTitle: string | null;
 };
 
 export const EMPTY_ORG_FILTERS: OrgFilters = {
   department: null,
   country: null,
+  jobTitle: null,
 };
 
 export function filtersAreActive(filters: OrgFilters): boolean {
-  return Boolean(filters.department || filters.country);
+  return Boolean(filters.department || filters.country || filters.jobTitle);
 }
 
 export function collectFilterOptions(roots: OrgChartPayloadNode[]): {
   departments: string[];
   countries: string[];
+  jobTitles: string[];
 } {
   const departments = new Set<string>();
   const countries = new Set<string>();
+  const jobTitles = new Set<string>();
   const stack = [...roots];
   while (stack.length > 0) {
     const node = stack.pop()!;
     if (node.department?.trim()) departments.add(node.department.trim());
     if (node.country?.trim()) countries.add(node.country.trim());
+    if (node.jobTitle?.trim()) jobTitles.add(node.jobTitle.trim());
     for (const child of node.children ?? []) stack.push(child);
   }
   return {
     departments: [...departments].sort((a, b) => a.localeCompare(b)),
     countries: [...countries].sort((a, b) => a.localeCompare(b)),
+    jobTitles: [...jobTitles].sort((a, b) => a.localeCompare(b)),
   };
 }
 
@@ -43,12 +49,17 @@ function nodeMatches(node: OrgChartPayloadNode, filters: OrgFilters): boolean {
   if (filters.country && (node.country?.trim() ?? "") !== filters.country) {
     return false;
   }
+  if (
+    filters.jobTitle &&
+    (node.jobTitle?.trim() ?? "") !== filters.jobTitle
+  ) {
+    return false;
+  }
   return true;
 }
 
 /**
  * Keep matching people and ancestors needed to preserve their path to root.
- * Non-matching ancestors stay as connectors when they have matching descendants.
  */
 export function filterOrgForest(
   roots: OrgChartPayloadNode[],
@@ -67,7 +78,6 @@ export function filterOrgForest(
     return {
       ...node,
       children: childResults,
-      // Keep original directReports for badges; visible kids may be a subset.
     };
   };
 
