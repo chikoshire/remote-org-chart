@@ -16,6 +16,4 @@ Toggle density preferences (**callout 3**). Preferences persist on this device.
 
 **Log out** lives under Settings → Session (**callout 1 / 3**, not in the main header). Logout clears the session cookie and returns to the marketing landing.
 
-## Data Health
-
-Settings hosts a Data Health entry in the subnav (**callout 1**). You can also open the same surface from the **Health** pill next to search (before Help): faster when you are already in the product.
+Data Health is not under Settings. Open it from the **Health** control in the header.

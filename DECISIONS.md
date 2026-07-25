@@ -1118,6 +1118,27 @@ Custom domain for OG, or public unauthenticated person preview cards.
 
 ---
 
+## 2026-07-25 — Health only in header (drop Settings duplicate)
+
+**Status:** Accepted  
+
+**Context:**  
+Health already sits in the product header (Search → Health → Help → Settings). Settings still showed a Preferences / Data Health subnav, which duplicated the entry.
+
+**Decision:**  
+1. Remove Settings subnav / `SettingsChrome`. Preferences is a single Settings page.  
+2. Data Health stays at `/settings/data-health` for deep links, opened only via header **Health** (and command bar / Dashboard links).  
+3. Help copy no longer describes Settings → Data Health.
+
+**Consequences:**  
+- One path into Data Health from chrome.  
+- URL under `/settings/` remains for backwards compatibility; IA reads as header Health.
+
+**Revisit when:**  
+Moving Data Health to `/app/health` for a cleaner path.
+
+---
+
 ## Template for future entries
 
 

@@ -12,7 +12,7 @@ Demo login credentials are shared **separately** with the interview team (privat
 |-------|----------|
 | Home `/` | Marketing landing with Log in |
 | Login | Demo credentials (shared privately) → `/app/dashboard` |
-| Product shell | Dashboard · Org Chart · People · Help · Settings (Data Health inside Settings) |
+| Product shell | Dashboard · Org Chart · People · header Health / Help / Settings |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
 | `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15-25s |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
