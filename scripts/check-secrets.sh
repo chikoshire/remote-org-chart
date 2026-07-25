@@ -49,7 +49,7 @@ match_forbidden() {
 }
 
 # Old published demo password must never re-enter the tree.
-match_forbidden '<scrubbed-old-demo-password>' 'published demo password'
+match_forbidden 'acme-org-demo' 'published demo password'
 
 # Real-looking sandbox tokens (allow short fixtures like ra_test_example / ra_test_ci_placeholder).
 match_forbidden 'ra_test_[A-Za-z0-9_]{24,}' 'long ra_test token'
