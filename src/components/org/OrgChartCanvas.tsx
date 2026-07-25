@@ -1851,8 +1851,7 @@ function OrgChartInner() {
                     key={`minimap-${minimapEpoch}`}
                     pannable
                     zoomable
-                    width={168}
-                    height={118}
+                    style={{ width: 168, height: 118 }}
                     bgColor="#f4f1eb"
                     nodeColor={() => "#121212"}
                     nodeStrokeColor="#f4f1eb"
