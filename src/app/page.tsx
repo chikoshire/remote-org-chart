@@ -38,7 +38,7 @@ const SURFACES = [
   },
   {
     name: "Map",
-    line: "See where people sit by country across the company.",
+    line: "See where people sit by country. Live counts come from Remote, not a fixed marketing number.",
     src: "/marketing/app-map.png",
     alt: "Acme world map",
     accent: "from-norma-sky/55 via-white to-white",

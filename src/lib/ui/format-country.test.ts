@@ -14,6 +14,11 @@ describe("formatCountryLabel", () => {
     expect(formatCountryLabel("HKG")).toBe("Hong Kong");
     expect(formatCountryLabel(null)).toBeNull();
   });
+
+  it("strips trailing ISO aliases from Remote display names", () => {
+    expect(formatCountryLabel("United Kingdom (UK)")).toBe("United Kingdom");
+    expect(formatCountryLabel("United States (USA)")).toBe("United States");
+  });
 });
 
 describe("canonicalCountryCode", () => {

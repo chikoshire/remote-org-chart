@@ -170,7 +170,7 @@ export function ProductTour() {
             className="rounded-full px-3 py-1.5 text-xs font-medium text-norma-ink-muted hover:bg-norma-surface-muted hover:text-norma-ink"
             onClick={finish}
           >
-            Skip
+            Skip tour
           </button>
           <div className="flex gap-2">
             {stepIndex > 0 ? (

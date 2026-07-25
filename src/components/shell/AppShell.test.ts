@@ -72,4 +72,10 @@ describe("ProductTour", () => {
     expect(tour).toContain("markProductTourDone");
     expect(tour).toContain("isProductTourDone");
   });
+
+  it("shows Done only on the final step (#145)", () => {
+    expect(tour).toContain('isLast ? "Done" : "Next"');
+    expect(tour).toContain("Skip tour");
+    expect(tour).toContain("PRODUCT_TOUR_STEPS.length - 1");
+  });
 });

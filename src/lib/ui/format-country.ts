@@ -55,7 +55,8 @@ export function formatCountryLabel(
   code: string | null | undefined,
 ): string | null {
   if (!code?.trim()) return null;
-  const trimmed = code.trim();
+  // Remote sometimes returns "United Kingdom (UK)" — strip the alias suffix.
+  const trimmed = code.trim().replace(/\s*\([A-Za-z]{2,3}\)\s*$/, "").trim();
   const key = trimmed.toUpperCase();
   if (COUNTRY_LABELS[key]) return COUNTRY_LABELS[key];
   // Already a full name (or unknown string): return as-is without uppercasing.
