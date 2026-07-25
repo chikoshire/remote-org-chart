@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AcmeLogo } from "@/components/brand/AcmeLogo";
 
 /**
  * remote.com hero pattern: left copy + right product visual with floating chips.
@@ -20,12 +19,7 @@ export function MarketingHero() {
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-12 md:grid-cols-12 md:gap-10 md:px-8 md:pb-28 md:pt-24">
         <div className="marketing-hero-copy md:col-span-5">
-          <AcmeLogo
-            withWordmark
-            className="origin-left scale-[1.05] md:scale-[1.15]"
-            markClassName="!h-9 !w-9 md:!h-10 md:!w-10"
-          />
-          <h1 className="marketing-hero-title mt-8 font-[family-name:var(--font-norma-display)] text-[clamp(2.35rem,8vw,4.25rem)] leading-[1.05] tracking-tight text-norma-ink md:mt-10 md:leading-[1.02]">
+          <h1 className="marketing-hero-title font-[family-name:var(--font-norma-display)] text-[clamp(2.35rem,8vw,4.25rem)] leading-[1.05] tracking-tight text-norma-ink md:leading-[1.02]">
             See how Acme is organised
           </h1>
           <p className="marketing-hero-copy mt-5 max-w-md text-base leading-relaxed text-norma-ink-muted md:mt-6 md:text-xl md:leading-relaxed">
