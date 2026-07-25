@@ -251,7 +251,7 @@ export default function SettingsPage() {
                   <span>
                     Auto-refresh when Remote sends updates
                     <span className="mt-0.5 block text-xs font-normal text-norma-ink-muted">
-                      Useful for live demos
+                      Useful when Remote sends updates
                     </span>
                   </span>
                 </label>
@@ -274,7 +274,7 @@ export default function SettingsPage() {
               <div>
                 <h2 className="text-sm font-semibold text-norma-ink">Session</h2>
                 <p className="mt-0.5 text-xs text-norma-ink-muted">
-                  End this browser session for the Acme demo app
+                  End this browser session and return to the marketing site
                 </p>
               </div>
               <button

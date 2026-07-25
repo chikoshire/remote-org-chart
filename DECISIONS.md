@@ -1028,6 +1028,51 @@ Making the repo public, or interviewers report login failure after rotate.
 
 ---
 
+## 2026-07-25 — Persist profile edits to Remote (hybrid)
+
+**Status:** Accepted  
+
+**Context:**  
+People / Data Health “fix” previously only wrote `localStorage` overlays because the app token is read-only. A Full Access token already existed for webhook subscribe. Interview demo needs department/manager changes to stick in sandbox Remote when possible.
+
+**Decision:**  
+1. Keep `REMOTE_API_TOKEN` read-only for everyday GET/org-chart.  
+2. Add optional `REMOTE_API_WRITE_TOKEN` (Full Access / `employment:write`; `REMOTE_WEBHOOK_ADMIN_TOKEN` still accepted as alias).  
+3. `PATCH /api/people/:id` maps department → `department_id` (create dept if needed) and manager employment → `manager_id` (user id), then `PATCH /v1/employments/:id`.  
+4. Job title / country are attempted but usually blocked on **active** Global Payroll employments; those fields fall back to local overlays with an explicit note.  
+5. Successful Remote writes invalidate the org-chart KV snapshot.
+
+**Consequences:**  
+- Department + manager can persist across browsers after Refresh from Remote.  
+- Title/country may remain overlay-only until Remote allows amendments via API.  
+- Workers need `REMOTE_API_WRITE_TOKEN` set for production writes.
+
+**Revisit when:**  
+Remote exposes a supported active-employment path for job title / country, or we add contract-amendment flow.
+
+---
+
+## 2026-07-25 — Help in utilities; annotated shots; first-login tour
+
+**Status:** Accepted  
+
+**Context:**  
+Help sat in the primary nav (crowding Dashboard / Org Chart / People). KB screenshots needed clearer callouts. First-time users needed an onboarding path without a separate welcome page.
+
+**Decision:**  
+1. Move **Help** into the header utilities cluster: Search → Health → Help → Settings. Primary nav stays Dashboard / Org Chart / People.  
+2. Help shots use numbered pins, spray highlight rings, and optional compass pointer arrows (`HelpShot` + `{{shot:id}}`).  
+3. Ship a first-login **product tour** (`localStorage` `acme-org-chart:product-tour-v1`). Restart via Help index / topic, chat “Restart tour”, or saying “start the product tour”.
+
+**Consequences:**  
+- Header matches the Health-between-search-and-settings brief plus Help as docs entry.  
+- Tour is client-only; clearing site data re-triggers it.
+
+**Revisit when:**  
+We want a multi-page deep tour (Chart filters, Compare) or remote-synced “seen tour” per user.
+
+---
+
 ## Template for future entries
 
 

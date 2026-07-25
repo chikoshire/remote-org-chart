@@ -117,7 +117,7 @@ const FEATURES: {
   {
     id: "chart",
     title: "Org chart",
-    body: "Pan, zoom, and compare reporting lines on the live employment graph from Remote.",
+    body: "Pan, zoom, and compare reporting lines on the live employment graph.",
     src: "/marketing/hero-org-chart.png",
     alt: "Acme org chart showing managers and direct reports",
     tone: "from-norma-peach/90 to-norma-peach/50",

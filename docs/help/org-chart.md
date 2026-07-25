@@ -1,26 +1,29 @@
 # Org Chart
 
-Interactive reporting hierarchy for Acme Sandbox Corp.
+Interactive reporting hierarchy for Acme.
+
+{{shot:org-chart-workspace}}
 
 ## Views
 
-- **Chart:** canvas with pan, zoom, and collapse
-- **Tree:** indented list of the same hierarchy
-- **Map:** people by country (scroll-zoom stays on the map)
+- **Chart (callout 1):** canvas with pan, zoom, and collapse
+- **Tree (callout 1):** indented list of the same hierarchy
+- **Map (callout 1):** people by country (scroll-zoom stays on the map)
 
 ## Find someone
 
-- Use the search box (or `/` to focus it)
+- Use the search box (**callout 3**, or `/` to focus it)
 - Selecting a person highlights their **path to root**
 - **Copy link** shares a deep link (`?person=…`)
 - Keyboard: ↑ manager, ↓ first report, ←/→ siblings, Esc clears search then selection
+- Incomplete badges on cards (**callout 5**) match issues listed under **Health**
 
 ## Compare reporting distance
 
-Open **Compare** (or `?compare=1`, or ⌘K then Compare). Pick Person 1 and Person 2 to see how they connect through the tree. Clear or Exit when done.
+Open **Compare** (**callout 4**, or `?compare=1`, or ⌘K then Compare). Pick Person 1 and Person 2 to see how they connect through the tree. Clear or Exit when done.
 
 ## Refresh and live updates
 
-- **Refresh** pulls a fresh snapshot from Remote
+- **Refresh (callout 2)** pulls a fresh snapshot from Remote
 - Live update badges and the sync log reflect webhook or cache activity when available
-- Incomplete, Unlinked, and Cycle badges flag data-quality issues. Open Data Health for the full lists.
+- Incomplete, Unlinked, and Cycle badges flag data-quality issues. Open **Health** in the header for the full lists.

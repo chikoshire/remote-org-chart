@@ -9,14 +9,17 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { requestProductTour } from "@/lib/tour/storage";
 
 type ChatTurn = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
+  "Start the product tour",
   "How do I compare two people?",
   "What does Refresh from Remote do?",
-  "How do local profile fixes work?",
 ];
+
+const TOUR_PHRASE = /product tour|start (the )?tour|restart (the )?tour/i;
 
 export function HelpChatWidget() {
   const titleId = useId();
@@ -68,6 +71,21 @@ export function HelpChatWidget() {
     const next: ChatTurn[] = [...messages, { role: "user", content }];
     setMessages(next);
     setInput("");
+
+    if (TOUR_PHRASE.test(content)) {
+      setMessages([
+        ...next,
+        {
+          role: "assistant",
+          content:
+            "Starting the product tour. You can skip anytime, or restart later from Help.",
+        },
+      ]);
+      setOpen(false);
+      window.setTimeout(() => requestProductTour(), 200);
+      return;
+    }
+
     setBusy(true);
     try {
       const res = await fetch("/api/help/chat", {
@@ -120,12 +138,27 @@ export function HelpChatWidget() {
               >
                 Help assistant
               </h2>
-              <Link
-                href="/help"
-                className="text-[11px] font-medium text-norma-royal hover:underline"
-              >
-                Browse Help
-              </Link>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <Link
+                  href="/help"
+                  className="text-[11px] font-medium text-norma-royal hover:underline"
+                >
+                  Browse Help
+                </Link>
+                <span className="text-[11px] text-norma-ink-subtle" aria-hidden>
+                  ·
+                </span>
+                <button
+                  type="button"
+                  className="cursor-pointer text-[11px] font-medium text-norma-royal hover:underline"
+                  onClick={() => {
+                    setOpen(false);
+                    window.setTimeout(() => requestProductTour(), 200);
+                  }}
+                >
+                  Restart tour
+                </button>
+              </div>
             </div>
             <button
               type="button"
@@ -201,6 +234,7 @@ export function HelpChatWidget() {
         aria-controls={open ? titleId : undefined}
         aria-label={open ? "Close help assistant" : "Open help assistant"}
         title={open ? "Close help" : "Help"}
+        data-tour="help-chat"
       >
         {open ? (
           <svg

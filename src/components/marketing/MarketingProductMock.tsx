@@ -26,7 +26,7 @@ export function MarketingProductMock() {
           </span>
         </div>
         <span className="hidden font-[family-name:var(--font-norma-mono)] text-[10px] text-norma-ink-subtle sm:inline">
-          Live · Sandbox
+          Live · Connected
         </span>
       </div>
 
@@ -68,7 +68,7 @@ export function MarketingProductMock() {
               Sync
             </p>
             <p className="mt-0.5 text-[11px] font-semibold text-norma-ink">
-              Remote employments
+              Live employments
             </p>
             <p className="text-[10px] text-norma-success">Live · 42 people</p>
           </div>

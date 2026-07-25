@@ -29,8 +29,8 @@ export function MarketingHero() {
             See how Acme is organised
           </h1>
           <p className="marketing-hero-copy mt-6 max-w-md text-lg leading-relaxed text-norma-ink-muted md:text-xl md:leading-relaxed">
-            Reporting lines, people, and data health in one place. Built on
-            Remote so the chart stays close to live employment data.
+            Reporting lines, people, and data health in one Acme workspace.
+            Connected to your HRIS so the chart stays close to live employment data.
           </p>
           <div className="marketing-hero-cta mt-11 flex flex-wrap items-center gap-4">
             <Link href="/login" className="norma-cta min-h-12 px-8 text-base">
@@ -64,7 +64,7 @@ export function MarketingHero() {
                 Sync
               </p>
               <p className="mt-1 text-sm font-semibold text-norma-ink">
-                Remote employments
+                Live employments
               </p>
               <p className="text-xs text-norma-success">Live · 149 people</p>
             </div>

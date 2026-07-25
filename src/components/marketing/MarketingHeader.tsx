@@ -7,7 +7,7 @@ import { AcmeLogo } from "@/components/brand/AcmeLogo";
 const NAV = [
   { href: "#product", label: "Product" },
   { href: "#surfaces", label: "Surfaces" },
-  { href: "#source", label: "Remote" },
+  { href: "#source", label: "Integrations" },
 ] as const;
 
 export function MarketingHeader() {

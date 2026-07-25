@@ -2,6 +2,8 @@
 
 Markdown how-tos for Acme Org Chart. These pages also ground the floating Help assistant.
 
+Annotated screenshots live in `public/help/` and are referenced from markdown with `{{shot:id}}` (see `src/lib/help/shots.ts`). After editing `docs/help/*.md`, run `npm run help:sync` to refresh `src/lib/help/content.ts`.
+
 | Page | File |
 |------|------|
 | [Overview](./overview.md) | Product intro and navigation |

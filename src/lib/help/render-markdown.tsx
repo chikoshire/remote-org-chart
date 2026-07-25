@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { createElement, Fragment } from "react";
+import { HelpShot } from "@/components/help/HelpShot";
+import { getHelpShot } from "@/lib/help/shots";
 
 function inline(text: string, keyPrefix: string): ReactNode[] {
   const nodes: ReactNode[] = [];
@@ -49,8 +51,11 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
   return nodes;
 }
 
+const SHOT_RE = /^\{\{shot:([a-z0-9-]+)\}\}$/i;
+const IMAGE_RE = /^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/;
+
 /**
- * Lightweight markdown → React for Help pages (headings, lists, tables, paragraphs).
+ * Lightweight markdown → React for Help pages (headings, lists, tables, shots, images).
  */
 export function renderHelpMarkdown(markdown: string): ReactNode {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
@@ -61,6 +66,30 @@ export function renderHelpMarkdown(markdown: string): ReactNode {
   while (i < lines.length) {
     const line = lines[i] ?? "";
     if (!line.trim()) {
+      i += 1;
+      continue;
+    }
+
+    const shotMatch = SHOT_RE.exec(line.trim());
+    if (shotMatch) {
+      const shot = getHelpShot(shotMatch[1]!);
+      if (shot) {
+        blocks.push(createElement(HelpShot, { key: key++, ...shot }));
+      }
+      i += 1;
+      continue;
+    }
+
+    const imageMatch = IMAGE_RE.exec(line.trim());
+    if (imageMatch) {
+      blocks.push(
+        createElement(HelpShot, {
+          key: key++,
+          src: imageMatch[2]!,
+          alt: imageMatch[1] || "Help screenshot",
+          lead: imageMatch[3],
+        }),
+      );
       i += 1;
       continue;
     }
@@ -210,7 +239,9 @@ export function renderHelpMarkdown(markdown: string): ReactNode {
       (lines[i] ?? "").trim() &&
       !(lines[i] ?? "").startsWith("#") &&
       !(lines[i] ?? "").trim().startsWith("|") &&
-      !/^[-*] /.test((lines[i] ?? "").trim())
+      !/^[-*] /.test((lines[i] ?? "").trim()) &&
+      !SHOT_RE.test((lines[i] ?? "").trim()) &&
+      !IMAGE_RE.test((lines[i] ?? "").trim())
     ) {
       para.push((lines[i] ?? "").trim());
       i += 1;

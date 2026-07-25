@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "check:secrets": "bash scripts/check-secrets.sh",
+    "help:sync": "node scripts/sync-help-content.mjs",
     "hooks:install": "bash scripts/install-git-hooks.sh",
     "prepare": "bash scripts/install-git-hooks.sh",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

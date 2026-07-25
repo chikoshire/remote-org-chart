@@ -6,20 +6,20 @@ const ITEMS = [
   { label: "World map", dot: "bg-norma-sky" },
   { label: "People directory", dot: "bg-norma-mint" },
   { label: "Data health", dot: "bg-norma-rose" },
-  { label: "Remote sandbox", dot: "bg-norma-spray" },
+  { label: "HRIS integration", dot: "bg-norma-spray" },
   { label: "Live updates", dot: "bg-norma-peach" },
   { label: "Department filters", dot: "bg-norma-lavender" },
 ] as const;
 
 /**
- * Trust / capability strip under the hero - remote.com logo-marquee structure.
+ * Capability strip under the hero.
  */
 export function MarketingMarquee() {
   const row = [...ITEMS, ...ITEMS];
   return (
     <section className="border-y border-norma-border/70 bg-gradient-to-r from-norma-lavender/40 via-norma-surface/80 to-norma-mint/35 py-10 backdrop-blur-md md:py-12">
       <p className="text-center font-[family-name:var(--font-norma-mono)] text-xs uppercase tracking-[0.22em] text-norma-ink-muted">
-        Organisational intelligence on Remote
+        Organisational intelligence
       </p>
       <div
         className="marketing-marquee relative mt-7 overflow-hidden"
