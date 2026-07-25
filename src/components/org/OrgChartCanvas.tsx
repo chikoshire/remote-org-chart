@@ -321,6 +321,8 @@ function OrgChartInner() {
   const [mapFocusCountry, setMapFocusCountry] = useState<string | null>(null);
   /** False until React Flow has nodes + an initial fit — hides blank beige flash. */
   const [layoutReady, setLayoutReady] = useState(false);
+  /** Remount MiniMap after viewport fits settle — avoids garbled SVG viewBox (#127). */
+  const [minimapEpoch, setMinimapEpoch] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -950,6 +952,10 @@ function OrgChartInner() {
         maxZoom: 1.05,
         duration: reducedMotion ? 0 : 420,
       });
+      window.setTimeout(
+        () => setMinimapEpoch((n) => n + 1),
+        reducedMotion ? 0 : 450,
+      );
     });
   }, [fitView, reducedMotion, relation]);
 
@@ -1000,6 +1006,10 @@ function OrgChartInner() {
         duration: reducedMotion ? 0 : 420,
       });
       setLayoutReady(true);
+      window.setTimeout(
+        () => setMinimapEpoch((n) => n + 1),
+        reducedMotion ? 0 : 450,
+      );
     };
 
     requestAnimationFrame(() => {
@@ -1836,13 +1846,20 @@ function OrgChartInner() {
                   className={isMobile ? "!m-2 !mb-14" : undefined}
                   aria-label="Chart zoom controls"
                 />
-                {!isMobile ? (
+                {!isMobile && layoutReady ? (
                   <MiniMap
+                    key={`minimap-${minimapEpoch}`}
                     pannable
                     zoomable
+                    width={168}
+                    height={118}
+                    bgColor="#f4f1eb"
                     nodeColor={() => "#121212"}
-                    maskColor="rgb(26 26 26 / 0.08)"
-                    aria-label="Organization chart overview map"
+                    nodeStrokeColor="#f4f1eb"
+                    nodeStrokeWidth={1}
+                    nodeBorderRadius={3}
+                    maskColor="rgb(26 26 26 / 0.1)"
+                    ariaLabel="Organization chart overview map"
                   />
                 ) : null}
               </ReactFlow>

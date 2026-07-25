@@ -105,6 +105,10 @@ export function layoutOrgChart(
     const pos = g.node(node.id);
     return {
       ...node,
+      // Explicit size keeps MiniMap bounds finite before React Flow measures DOM.
+      width: metrics.width,
+      height: metrics.height,
+      style: { width: metrics.width, height: metrics.height },
       position: {
         x: pos.x - metrics.width / 2,
         y: pos.y - metrics.height / 2,

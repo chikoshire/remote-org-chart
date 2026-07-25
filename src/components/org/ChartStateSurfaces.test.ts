@@ -34,3 +34,13 @@ describe("chart empty flash (#126)", () => {
     expect(canvas).toContain('aria-busy={canvasBuilding}');
   });
 });
+
+describe("minimap render (#127)", () => {
+  it("defers MiniMap until layout is ready and remounts after fits", () => {
+    expect(canvas).toContain("minimapEpoch");
+    expect(canvas).toContain("!isMobile && layoutReady");
+    expect(canvas).toContain('key={`minimap-${minimapEpoch}`}');
+    expect(canvas).toContain("bgColor=");
+    expect(canvas).toContain("ariaLabel=");
+  });
+});

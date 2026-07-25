@@ -45,6 +45,10 @@ describe("layoutOrgChart", () => {
     const child = nodes.find((n) => n.id === "child")!;
     expect(root.position.y).toBeLessThan(child.position.y);
     expect(root.data.variant).toBe("root");
+    expect(root.width).toBeGreaterThan(0);
+    expect(root.height).toBeGreaterThan(0);
+    expect(root.style?.width).toBe(root.width);
+    expect(root.style?.height).toBe(root.height);
   });
 });
 
