@@ -59,10 +59,10 @@ Demo login credentials are shared **separately** with the interview team (privat
 | `/app` | Org Chart (Chart \| Tree \| Map) |
 | `/app/people` | People directory (Grid \| List + department filter) |
 | `/app/departments` | Redirects to Dashboard |
-| `/app/data-health` | Redirects to Settings → Data Health |
+| `/app/data-health` | Redirects to header Health (`/settings/data-health`) |
 | `/help` | Product how-tos + assistant entry |
 | `/settings` | Preferences (Remote connect + theme + session) |
-| `/settings/data-health` | Trust / edge-case review |
+| `/settings/data-health` | Data Health (open via header **Health**) |
 
 ### Keyboard shortcuts
 
