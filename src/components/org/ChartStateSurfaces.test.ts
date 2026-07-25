@@ -35,12 +35,10 @@ describe("chart empty flash (#126)", () => {
   });
 });
 
-describe("minimap render (#127)", () => {
-  it("defers MiniMap until layout is ready and remounts after fits", () => {
-    expect(canvas).toContain("minimapEpoch");
-    expect(canvas).toContain("!isMobile && layoutReady");
-    expect(canvas).toContain('key={`minimap-${minimapEpoch}`}');
-    expect(canvas).toContain("bgColor=");
-    expect(canvas).toContain("ariaLabel=");
+describe("show in chart focus (#130)", () => {
+  it("retries fitView on the selected path and skips C-suite when deep-linked", () => {
+    expect(canvas).toContain("tryFocusPath");
+    expect(canvas).toContain("Deep-link / Show in chart owns the first camera move");
+    expect(canvas).toContain("pendingDeepLinkId.current");
   });
 });

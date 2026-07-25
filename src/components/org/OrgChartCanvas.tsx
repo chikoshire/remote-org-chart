@@ -930,17 +930,47 @@ function OrgChartInner() {
         }
         setQuery("");
       });
-      requestAnimationFrame(() => {
-        const path = pathIdsToRoot(id, managerIndex);
+
+      let attempts = 0;
+      const tryFocusPath = () => {
+        attempts += 1;
+        const path = [...pathIdsToRoot(id, managerIndex)];
+        const measured = getNodes().filter(
+          (n) =>
+            path.includes(n.id) &&
+            Boolean(n.measured?.width || n.width || n.measured?.height),
+        );
+        // Wait for expand + layout + measure so we don't fit an empty / stale viewport.
+        if (measured.length === 0 && attempts < 28) {
+          window.setTimeout(tryFocusPath, 50);
+          return;
+        }
+        initialFitDone.current = true;
         void fitView({
-          nodes: [...path].map((nodeId) => ({ id: nodeId })),
-          padding: 0.2,
-          maxZoom: 1.05,
+          nodes:
+            measured.length > 0 ? measured : path.map((nodeId) => ({ id: nodeId })),
+          padding: isMobile ? 0.45 : 0.28,
+          maxZoom: isMobile ? 0.95 : 1.05,
           duration: reducedMotion ? 0 : 420,
         });
+        setLayoutReady(true);
+        window.setTimeout(
+          () => setMinimapEpoch((n) => n + 1),
+          reducedMotion ? 0 : 450,
+        );
+      };
+      requestAnimationFrame(() => {
+        requestAnimationFrame(tryFocusPath);
       });
     },
-    [applyComparePick, fitView, managerIndex, reducedMotion],
+    [
+      applyComparePick,
+      fitView,
+      getNodes,
+      isMobile,
+      managerIndex,
+      reducedMotion,
+    ],
   );
 
   useEffect(() => {
@@ -974,6 +1004,14 @@ function OrgChartInner() {
   useEffect(() => {
     if (status !== "ready" || nodes.length === 0 || initialFitDone.current) {
       return;
+    }
+
+    // Deep-link / Show in chart owns the first camera move — don't steal it with C-suite.
+    if (typeof window !== "undefined") {
+      const fromUrl = readPersonIdFromSearch(window.location.search);
+      if (fromUrl || pendingDeepLinkId.current) {
+        return;
+      }
     }
 
     let cancelled = false;
