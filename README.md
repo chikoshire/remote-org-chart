@@ -29,7 +29,7 @@ Demo login credentials are shared **separately** with the interview team (privat
 
 - **Live app:** https://remote-org-chart.shirechiko.workers.dev  
 - **Marketing landing:** https://remote-org-chart.shirechiko.workers.dev/  
-- **Source:** private GitHub repo (collaborator invite only)  
+- **Source:** https://github.com/chikoshire/remote-org-chart  
 - **In-app Help:** `/help` (after login) · markdown source in [`docs/help/`](./docs/help/)  
 - **Security notes:** [SECURITY.md](./SECURITY.md)  
 - **Production readiness:** [PRODUCTION.md](./PRODUCTION.md)  
@@ -48,7 +48,7 @@ Demo login credentials are shared **separately** with the interview team (privat
 7. Shareable deep links (`/app?person=<employmentId>`) select, center, and highlight path-to-root. **Copy link** in the person drawer
 8. Command bar (⌘K / Ctrl+K) for people search and route jumps
 9. Soft morph + bloom navigation (View Transitions where supported; respects reduced motion)
-10. **KV snapshot cache** (15m TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
+10. **KV snapshot cache** (1h TTL) + **Refresh from Remote** (keeps prior chart if refresh fails)
 11. Demo app login / logout on a marketing landing; Connect wizard in Settings (no secrets in the browser)
 
 ### Product map (after login)
@@ -224,10 +224,9 @@ Public URL pattern: `https://remote-org-chart.<account>.workers.dev`
 
 | Surface | Purpose |
 |---------|---------|
-| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues) | Executable backlog |
-| [ISSUES.md](./ISSUES.md) | Serial build order |
+| [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues?q=is%3Aissue) | Canonical backlog (parents closed on `main`) |
+| [ISSUES.md](./ISSUES.md) | Historical serial build order (mirrors `GH#N`) |
 | [DECISIONS.md](./DECISIONS.md) | Living “why we chose X” log |
-| [Linear project](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a) | Project mirror |
 
 Core brief: Tier 0 chart + deploy. **Org Intelligence wow track** (#58-#68, #70) adds product IA, insights, auth, morph polish, and this QA/handoff gate.
 
@@ -243,4 +242,4 @@ Core brief: Tier 0 chart + deploy. **Org Intelligence wow track** (#58-#68, #70)
 
 ## License
 
-Private assessment work unless otherwise noted.
+[MIT](./LICENSE)

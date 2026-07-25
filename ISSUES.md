@@ -1,8 +1,9 @@
 # Issue map (canonical IDs)
 
-**Canonical key = GitHub issue number (`GH#N`).**
-Linear (`TUXX-…`) and Orbit (`TUX-…`) auto-assign their own IDs — they will **not** equal `1…32`.
-Every parent title includes `· GH#N`. Search Linear (or Orbit) for `GH#5` to land on the matching work item.
+**Canonical backlog = [GitHub Issues](https://github.com/chikoshire/remote-org-chart/issues?q=is%3Aissue)** (`GH#N`).  
+This file is the historical **serial build order** used while shipping the assessment (one parent at a time). It is not a second tracker.
+
+Personal Linear / Orbit boards mirrored the same `GH#N` titles during development; they are optional and not required to review the repo.
 
 ## Serial build order (one parent at a time)
 
@@ -41,83 +42,71 @@ Rule: move parent **Backlog → In Progress → Review** (all children done) bef
 
 ## Org Intelligence wow track (active serial)
 
-Plan doc (Linear): [Org intelligence product plan](https://linear.app/orbit-linear/document/org-intelligence-product-plan-brief-wow-7f66395d0b8d)
-
 Locked IA (authenticated): **Dashboard · Org Chart · People · Settings (Preferences · Data Health)**.  
 Marketing + demo login/logout. Remote Connect = Option B (+ OAuth scaffold off). Theme in Preferences. No em dashes in product copy.
 
-| Seq | GH | Linear | Branch | Priority |
-|-----|----|--------|--------|----------|
-| 1 | #58 | TUXX-1593 | `feat/org-intelligence-ia` | High |
-| 2 | #59 | TUXX-1594 | `ui/org-intelligence-visuals` | High |
-| 3 | #60 | TUXX-1595 | `feat/data-health-edge-ui` | High |
-| 4 | #61 | TUXX-1596 | `feat/marketing-auth` | High |
-| 5 | #62 | TUXX-1598 | `feat/remote-connect-wizard` | High |
-| 6 | #63 | TUXX-1597 | `ui/settings-theme-copy` | Medium |
-| 7 | #64 | TUXX-1599 | `feat/dashboard-insights` | High |
-| 8 | #65 | TUXX-1600 | `feat/departments-tab` | High |
-| 9 | #66 | TUXX-1601 | `feat/command-bar` | Medium (wow) |
-| 10 | #67 | TUXX-1603 | `feat/tree-list-view` | Low (optional) |
-| 11 | #70 | TUXX-1609 | `ui/morph-bloom-transitions` | Medium (final wow) |
-| 12 | #68 | TUXX-1602 | `cross/org-intelligence-qa` | High |
+| Seq | GH | Branch | Priority |
+|-----|----|--------|----------|
+| 1 | #58 | `feat/org-intelligence-ia` | High |
+| 2 | #59 | `ui/org-intelligence-visuals` | High |
+| 3 | #60 | `feat/data-health-edge-ui` | High |
+| 4 | #61 | `feat/marketing-auth` | High |
+| 5 | #62 | `feat/remote-connect-wizard` | High |
+| 6 | #63 | `ui/settings-theme-copy` | Medium |
+| 7 | #64 | `feat/dashboard-insights` | High |
+| 8 | #65 | `feat/departments-tab` | High |
+| 9 | #66 | `feat/command-bar` | Medium (wow) |
+| 10 | #67 | `feat/tree-list-view` | Low (optional) |
+| 11 | #70 | `ui/morph-bloom-transitions` | Medium (final wow) |
+| 12 | #68 | `cross/org-intelligence-qa` | High |
 
-Linear subs (examples): TUXX-1604–1605 under #58; TUXX-1606–1608 under #62. GH parents carry full sub-issue checklists in comments.
+GitHub parents carry full sub-issue checklists in comments.
 
-| GH | Linear | Orbit | Branch | Lane | Subs |
-|----|--------|-------|--------|------|------|
-| #1 | TUXX-1468 | TUX-16894271 | `chore/scaffold-next-app` | Tier 0 | 3 |
-| #2 | TUXX-1469 | TUX-16894401 | `feat/remote-api-proxy` | Tier 0 | 3 |
-| #3 | TUXX-1470 | TUX-16894419 | `feat/employments-client` | Tier 0 | 3 |
-| #4 | TUXX-1471 | TUX-16894440 | `feat/org-hierarchy` | Tier 0 | 3 |
-| #5 | TUXX-1472 | TUX-16894454 | `feat/org-chart-react-flow` | Tier 0 | 4 |
-| #6 | TUXX-1473 | TUX-16894476 | `feat/edge-case-handling` | Tier 0 | 3 |
-| #7 | TUXX-1474 | TUX-16894502 | `feat/search-and-focus` | Tier 0 | 3 |
-| #8 | TUXX-1476 | TUX-16894503 | `feat/deploy-cloudflare` | Tier 0 | 3 |
-| #9 | TUXX-1475 | TUX-16894504 | `docs/readme-and-handoff` | Tier 0 | 3 |
-| #10 | TUXX-1477 | TUX-16894639 | `ui/norma-design-tokens` | UX | 2 |
-| #11 | TUXX-1478 | TUX-16894663 | `ui/app-chrome` | UX | 2 |
-| #12 | TUXX-1479 | TUX-16894683 | `ui/person-node` | UX | 2 |
-| #13 | TUXX-1480 | TUX-16894684 | `ui/reporting-edges` | UX | 2 |
-| #14 | TUXX-1481 | TUX-16894697 | `ui/state-surfaces` | UX | 2 |
-| #15 | TUXX-1482 | TUX-16894723 | `ui/responsive-interaction` | UX | 2 |
-| #16 | TUXX-1483 | TUX-16894727 | `ui/motion-polish` | UX | 2 |
-| #17 | TUXX-1484 | TUX-16894849 | `feat/org-insights` | Stretch 1 | 2 |
-| #18 | TUXX-1485 | TUX-16894852 | `feat/person-detail-drawer` | Stretch 1 | 2 |
-| #19 | TUXX-1486 | TUX-16894872 | `feat/org-filters` | Stretch 1 | 2 |
-| #20 | TUXX-1487 | TUX-16894898 | `feat/deep-links` | Stretch 1 | 2 |
-| #21 | TUXX-1489 | TUX-16894930 | `feat/collapse-density` | Stretch 1 | 2 |
-| #22 | TUXX-1488 | TUX-16894917 | `feat/export-keyboard` | Stretch 1 | 3 |
-| #23 | TUXX-1490 | TUX-16894947 | `feat/reporting-distance` | Stretch 1 | 2 |
-| #24 | TUXX-1491 | TUX-16894952 | `feat/employment-snapshot-cache` | Stretch 2 | 3 |
-| #25 | TUXX-1492 | TUX-16894956 | `feat/manual-remote-refresh` | Stretch 2 | 2 |
-| #26 | TUXX-1493 | TUX-16894970 | `feat/sync-run-log` | Stretch 2 | 2 |
-| #27 | TUXX-1494 | TUX-16894980 | `feat/remote-webhooks` | Stretch 3 | 2 |
-| #28 | TUXX-1495 | TUX-16895005 | `feat/live-org-updates` | Stretch 3 | 2 |
-| #29 | TUXX-1496 | TUX-16895009 | `feat/event-history-ui` | Stretch 3 | 2 |
-| #30 | TUXX-1498 | TUX-16896896 | `cross/a11y-pass` | Cross | 2 |
-| #31 | TUXX-1497 | TUX-16896875 | `cross/playwright-smoke` | Cross | 2 |
-| #32 | TUXX-1499 | TUX-16896903 | `cross/security-pii` | Cross | 2 |
+| GH | Branch | Lane | Subs |
+|----|--------|------|------|
+| #1 | `chore/scaffold-next-app` | Tier 0 | 3 |
+| #2 | `feat/remote-api-proxy` | Tier 0 | 3 |
+| #3 | `feat/employments-client` | Tier 0 | 3 |
+| #4 | `feat/org-hierarchy` | Tier 0 | 3 |
+| #5 | `feat/org-chart-react-flow` | Tier 0 | 4 |
+| #6 | `feat/edge-case-handling` | Tier 0 | 3 |
+| #7 | `feat/search-and-focus` | Tier 0 | 3 |
+| #8 | `feat/deploy-cloudflare` | Tier 0 | 3 |
+| #9 | `docs/readme-and-handoff` | Tier 0 | 3 |
+| #10 | `ui/norma-design-tokens` | UX | 2 |
+| #11 | `ui/app-chrome` | UX | 2 |
+| #12 | `ui/person-node` | UX | 2 |
+| #13 | `ui/reporting-edges` | UX | 2 |
+| #14 | `ui/state-surfaces` | UX | 2 |
+| #15 | `ui/responsive-interaction` | UX | 2 |
+| #16 | `ui/motion-polish` | UX | 2 |
+| #17 | `feat/org-insights` | Stretch 1 | 2 |
+| #18 | `feat/person-detail-drawer` | Stretch 1 | 2 |
+| #19 | `feat/org-filters` | Stretch 1 | 2 |
+| #20 | `feat/deep-links` | Stretch 1 | 2 |
+| #21 | `feat/collapse-density` | Stretch 1 | 2 |
+| #22 | `feat/export-keyboard` | Stretch 1 | 3 |
+| #23 | `feat/reporting-distance` | Stretch 1 | 2 |
+| #24 | `feat/employment-snapshot-cache` | Stretch 2 | 3 |
+| #25 | `feat/manual-remote-refresh` | Stretch 2 | 2 |
+| #26 | `feat/sync-run-log` | Stretch 2 | 2 |
+| #27 | `feat/remote-webhooks` | Stretch 3 | 2 |
+| #28 | `feat/live-org-updates` | Stretch 3 | 2 |
+| #29 | `feat/event-history-ui` | Stretch 3 | 2 |
+| #30 | `cross/a11y-pass` | Cross | 2 |
+| #31 | `cross/playwright-smoke` | Cross | 2 |
+| #32 | `cross/security-pii` | Cross | 2 |
 
 ## How IDs relate
 
-1. **GitHub `#N`** is the shared handle across tools (this is what “matching numbers” means in practice).
-2. **Linear** parents: `TUXX-1468`…`TUXX-1499`; children: `TUXX-1500`…
-3. **Orbit** parents: real keys in the table above (not the same integer as GH).
-4. Sub-issues are **Linear children** first; GitHub + Orbit get checklist comments on the parent (Orbit also mirrors many `[sub · GH#N]` cards via the Linear bridge).
-
-## How to use Linear day-to-day
-
-1. Open [Remote Org Chart Assessment](https://linear.app/orbit-linear/project/remote-org-chart-assessment-7304d7d0af9a).
-2. Search `GH#N` or expand parent → children.
-3. Update **Linear first**, then mirror a short comment on GitHub + Orbit (or ask the agent to sync).
+1. **GitHub `#N` (`GH#N`)** is the shared handle — open the issue on GitHub for status, checklists, and comments.
+2. During the build, personal Linear/Orbit boards mirrored the same `GH#N` titles. Those boards are not required to review this repo.
 
 ## Sub-issue convention
 
 - Title: `[sub · GH#N] Layer — short name`
 - Layers: `BE` | `FE` | `UX` | `Test` | `Infra` | `Docs` | `Sec`
-- Linear: real child (`parentId`)
-- GitHub: parent comment checklist
-- Orbit: parent comment + bridged sub cards where available
+- GitHub: parent comment checklist (source of truth for reviewers)
 
 ## Coverage checklist (deep dive)
 

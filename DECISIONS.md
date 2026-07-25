@@ -3,6 +3,21 @@
 Living document for the Remote org-chart assessment.  
 Update this file whenever we lock (or reverse) a meaningful choice. Prefer **why** over **what**.
 
+## Key decisions (start here)
+
+| Choice | Decision | Why (short) |
+|--------|----------|-------------|
+| Host | **Cloudflare Workers** (OpenNext / Wrangler), not Vercel | Usual deploy path; brief needs a public URL + server secrets, not a specific host |
+| Data store | **No Supabase** by default | Remote sandbox REST is source of truth; KV/D1 only where needed |
+| Auth to Remote | **Server-side Bearer** (`REMOTE_API_TOKEN`) | Token never in the browser; MCP for exploration only |
+| Chart UI | **React Flow + Dagre** (+ Tree / Map) | Interactive hierarchy; Tree/Map are stretch presentation |
+| Snapshot cache | **Cloudflare KV**, **1h TTL** + Refresh | Cold rebuild needs ~149 detail GETs; warm path is ~200ms |
+| Enrich fan-out | Dedicated Worker `remote-org-chart-enrich` | Workers Free = 6 outbound connections per isolate |
+| Demo login | App session cookie (credentials not in git) | Separate from Remote token; shared privately with interviewers |
+| Tracking | **GitHub Issues (`GH#N`)** canonical | Linear/Orbit were personal mirrors during the build |
+
+Full dated entries below. Newest substantive notes are near the bottom.
+
 Format for new entries:
 
 ```md
@@ -242,27 +257,27 @@ Remote exposes avatars or richer profile fields worth surfacing in the directory
 
 ## 2026-07-24 — Org chart snapshot cache in Cloudflare KV
 
-**Status:** Accepted  
+**Status:** Accepted (TTL later raised to **1 hour** — see code `ORG_CHART_CACHE_TTL_SECONDS`)  
 
 **Context:**  
-Cold `/api/org-chart` builds take 15–25s (employment detail fan-out under Workers Free). Interviewers and demos need a fast second load without adding Supabase.
+Cold `/api/org-chart` builds take several seconds (employment detail fan-out under Workers Free). Interviewers and demos need a fast second load without adding Supabase.
 
 **Decision:**  
 Store the **derived hierarchy JSON** (emails already stripped) in Cloudflare KV binding `ORG_CHART_CACHE`, key `org-chart:v1:active`.
 
 | Policy | Value |
 |--------|-------|
-| TTL | **15 minutes** (`expirationTtl`) |
+| TTL | **1 hour** (`expirationTtl`; originally 15m, raised for longer demo windows) |
 | Cache miss | Fetch Remote → write snapshot → return `source: "remote"` |
 | Cache hit | Return snapshot with `lastSyncedAt`, `cached: true` |
 | Manual refresh | `GET /api/org-chart?refresh=1` bypasses KV read, rewrites on success; failed refresh leaves prior KV entry intact |
 | Local `next dev` | No KV binding → always live Remote (same as miss) |
 
 **Consequences:**  
-UI shows last-synced + **Refresh from Remote**. Tier 3 webhooks (#27+) can invalidate/rewrite this key later.
+UI shows last-synced + **Refresh from Remote**. Marketing/login prefetch warms KV before demo login. Tier 3 webhooks can invalidate/rewrite this key.
 
 **Revisit when:**  
-TTL feels wrong in demos, or we add D1 sync-run history (#26).
+TTL feels wrong in demos, or Remote exposes manager IDs on the list endpoint.
 
 ---
 
