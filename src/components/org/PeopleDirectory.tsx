@@ -206,7 +206,7 @@ export function PeopleDirectory({
                 const qs = params.toString();
                 router.replace(qs ? `/app/people?${qs}` : "/app/people");
               }}
-              className="min-w-[12rem]"
+              className="w-full min-w-0 sm:min-w-[12rem] sm:w-auto"
             />
           </div>
         </div>

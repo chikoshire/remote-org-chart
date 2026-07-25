@@ -273,6 +273,8 @@ function OrgChartInner() {
   );
   const [forestRoots, setForestRoots] = useState<OrgChartPayloadNode[]>([]);
   const [density, setDensity] = useState<ChartDensity>("comfortable");
+  /** Phone widths use compact nodes so more of the tree fits. */
+  const layoutDensity: ChartDensity = isMobile ? "compact" : density;
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -632,8 +634,8 @@ function OrgChartInner() {
 
   useEffect(() => {
     if (status !== "ready" || forestRoots.length === 0) return;
-    rebuildLayout(forestRoots, density, collapsedIds, filters);
-  }, [collapsedIds, density, filters, forestRoots, rebuildLayout, status]);
+    rebuildLayout(forestRoots, layoutDensity, collapsedIds, filters);
+  }, [collapsedIds, filters, forestRoots, layoutDensity, rebuildLayout, status]);
 
   useEffect(() => {
     if (status !== "ready" || deepLinkResolved.current) return;
@@ -939,9 +941,10 @@ function OrgChartInner() {
       void fitView({
         nodes: measured.length > 0 ? measured : focusIds.map((id) => ({ id })),
         // Generous padding so direct reports under the root stay in frame.
-        padding: 0.55,
-        maxZoom: 1.05,
-        minZoom: 0.75,
+        // Mobile: more padding + lower zoom so compact cards fit the narrow pane.
+        padding: isMobile ? 0.72 : 0.55,
+        maxZoom: isMobile ? 0.92 : 1.05,
+        minZoom: isMobile ? 0.45 : 0.75,
         duration: reducedMotion ? 0 : 420,
       });
     };
@@ -953,7 +956,15 @@ function OrgChartInner() {
     return () => {
       cancelled = true;
     };
-  }, [fitView, forestRoots, getNodes, nodes.length, reducedMotion, status]);
+  }, [
+    fitView,
+    forestRoots,
+    getNodes,
+    isMobile,
+    nodes.length,
+    reducedMotion,
+    status,
+  ]);
 
   useEffect(() => {
     const pending = pendingDeepLinkId.current;
@@ -1227,7 +1238,7 @@ function OrgChartInner() {
       className={`flex h-full min-h-0 w-full flex-1 flex-col md:flex-row ${reducedMotion ? "" : "org-chart-enter"}`}
     >
       {sidePanelOpen ? (
-        <aside className="flex w-full shrink-0 flex-col border-b border-norma-border bg-norma-surface md:h-full md:w-96 md:border-b-0 md:border-r">
+        <aside className="flex w-full max-h-[40dvh] shrink-0 flex-col overflow-hidden border-b border-norma-border bg-norma-surface md:h-full md:max-h-none md:w-96 md:border-b-0 md:border-r">
           <div className="flex items-center justify-between gap-2 border-b border-norma-border px-3 py-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               Workspace
@@ -1241,7 +1252,7 @@ function OrgChartInner() {
               Hide
             </button>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-3">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
             <div className="flex flex-col gap-3">
               <div
                 className="flex items-center gap-0.5 rounded-norma-md border border-norma-border bg-norma-surface-muted/60 p-1"
@@ -1537,9 +1548,15 @@ function OrgChartInner() {
                   >
                     <button
                       type="button"
-                      aria-pressed={density === "comfortable"}
-                      className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-                        density === "comfortable"
+                      aria-pressed={layoutDensity === "comfortable"}
+                      disabled={isMobile}
+                      title={
+                        isMobile
+                          ? "Phones always use compact nodes"
+                          : undefined
+                      }
+                      className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium disabled:cursor-not-allowed disabled:opacity-50 ${
+                        layoutDensity === "comfortable"
                           ? "bg-norma-accent-soft text-norma-royal"
                           : "border border-norma-border text-norma-ink-muted hover:text-norma-prussian"
                       }`}
@@ -1549,9 +1566,9 @@ function OrgChartInner() {
                     </button>
                     <button
                       type="button"
-                      aria-pressed={density === "compact"}
+                      aria-pressed={layoutDensity === "compact"}
                       className={`rounded-norma-sm px-2 py-1 text-[11px] font-medium ${
-                        density === "compact"
+                        layoutDensity === "compact"
                           ? "bg-norma-accent-soft text-norma-royal"
                           : "border border-norma-border text-norma-ink-muted hover:text-norma-prussian"
                       }`}
@@ -1560,6 +1577,11 @@ function OrgChartInner() {
                       Compact
                     </button>
                   </div>
+                  {isMobile ? (
+                    <p className="text-[10px] text-norma-ink-subtle">
+                      Phone layout uses compact nodes automatically.
+                    </p>
+                  ) : null}
                   <button
                     type="button"
                     aria-pressed={syncLogOpen}
@@ -1677,8 +1699,8 @@ function OrgChartInner() {
               <Background color="#d7e0e3" gap={isMobile ? 18 : 24} size={1.1} />
               <Controls
                 showInteractive={false}
-                position={isMobile ? "bottom-right" : "bottom-left"}
-                className={isMobile ? "!m-2" : undefined}
+                position="bottom-left"
+                className={isMobile ? "!m-2 !mb-14" : undefined}
                 aria-label="Chart zoom controls"
               />
               {!isMobile ? (

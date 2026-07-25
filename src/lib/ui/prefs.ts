@@ -43,7 +43,10 @@ export function readSidePanelOpen(): boolean {
   if (typeof window === "undefined") return true;
   try {
     const raw = window.localStorage.getItem(SIDE_PANEL_STORAGE_KEY);
-    if (raw === null) return true;
+    if (raw === null) {
+      // Phone: keep the chart tall by default; desktop keeps the workspace open.
+      return !window.matchMedia("(max-width: 767px)").matches;
+    }
     return raw === "1";
   } catch {
     return true;

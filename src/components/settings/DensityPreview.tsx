@@ -17,7 +17,7 @@ export function DensityPreview({ density }: DensityPreviewProps) {
 
   return (
     <div
-      className="flex h-full min-h-[28rem] flex-col rounded-norma-lg border border-norma-border/70 bg-gradient-to-br from-norma-lavender/40 via-norma-surface to-norma-mint/30 p-5 shadow-norma-sm md:min-h-[32rem] md:p-6"
+      className="flex h-full min-h-[22rem] flex-col rounded-norma-lg border border-norma-border/70 bg-gradient-to-br from-norma-lavender/40 via-norma-surface to-norma-mint/30 p-4 shadow-norma-sm sm:min-h-[28rem] md:min-h-[32rem] md:p-6"
       aria-live="polite"
     >
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-norma-ink-muted">
@@ -46,7 +46,7 @@ export function DensityPreview({ density }: DensityPreviewProps) {
             className={`mx-auto h-7 w-px bg-norma-border ${gapY}`}
             aria-hidden
           />
-          <div className={`flex justify-center ${gapX}`}>
+          <div className={`flex flex-col items-center sm:flex-row sm:justify-center ${gapX}`}>
             <PersonNodeCard
               id="preview-a"
               fullName="Sam Ruiz"
@@ -73,7 +73,7 @@ export function DensityPreview({ density }: DensityPreviewProps) {
             <div className="mx-auto h-7 w-px bg-norma-border" />
             <div className="mx-auto h-7 w-px bg-norma-border opacity-0" />
           </div>
-          <div className={`flex justify-center ${gapX}`}>
+          <div className={`flex flex-col items-center sm:flex-row sm:justify-center ${gapX}`}>
             <PersonNodeCard
               id="preview-c"
               fullName="Jordan Diaz"

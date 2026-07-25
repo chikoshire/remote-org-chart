@@ -10,19 +10,19 @@ export const PRODUCT_TOUR_STEPS: ProductTourStep[] = [
   {
     id: "welcome",
     title: "Welcome to Acme",
-    body: "A short tour of the header and workspace. You can restart it anytime from Help or the chat assistant.",
+    body: "A short tour of the header and workspace. Restart anytime from Help, Settings shortcuts, or the chat assistant.",
   },
   {
     id: "primary-nav",
     target: "primary-nav",
     title: "Primary navigation",
-    body: "Dashboard, Org Chart, and People — the three main surfaces for exploring the organisation.",
+    body: "Dashboard, Org Chart, and People: the three main surfaces for exploring the organisation.",
   },
   {
     id: "command-search",
     target: "command-search",
     title: "Jump anywhere",
-    body: "Search for a person or page. Press ⌘K (Ctrl+K) from anywhere in the app.",
+    body: "Search for a person or page. On desktop use ⌘K (Ctrl+K); on phone tap the search icon.",
   },
   {
     id: "health",
@@ -40,13 +40,13 @@ export const PRODUCT_TOUR_STEPS: ProductTourStep[] = [
     id: "settings",
     target: "settings",
     title: "Settings",
-    body: "Remote connection status, chart preferences, appearance, and sign out.",
+    body: "Remote connection, chart preferences, keyboard shortcuts, and sign out.",
   },
   {
     id: "main",
     target: "main",
     title: "Your workspace",
-    body: "Each page fills this area. Start on Dashboard, then open Org Chart or People when you need depth.",
+    body: "Each page fills this area. On phones the Org Chart panel starts collapsed so the chart stays tall.",
   },
   {
     id: "help-chat",

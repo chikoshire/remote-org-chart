@@ -184,8 +184,34 @@ export function CommandBar() {
     [close, router],
   );
 
+  const searchIcon = (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-4 w-4 shrink-0 opacity-70"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+
   return (
     <>
+      <button
+        type="button"
+        onClick={openPalette}
+        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-norma-border bg-norma-surface-muted/90 text-norma-ink-muted hover:border-norma-ink/25 hover:text-norma-ink md:hidden"
+        aria-label="Open command palette"
+        title="Jump anywhere"
+        data-tour="command-search"
+      >
+        {searchIcon}
+      </button>
       <button
         type="button"
         onClick={openPalette}
@@ -194,19 +220,7 @@ export function CommandBar() {
         title="Jump anywhere (⌘K)"
         data-tour="command-search"
       >
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          className="h-4 w-4 shrink-0 opacity-70"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
+        {searchIcon}
         <span className="min-w-0 flex-1 truncate">Jump to person or page…</span>
         <kbd className="shrink-0 rounded-md border border-norma-border bg-norma-surface px-1.5 py-0.5 font-mono text-[10px] text-norma-ink-muted">
           ⌘K
