@@ -51,6 +51,12 @@ type OrgChartResponse = {
   code?: string;
 };
 
+function sessionPeople(): FlatPerson[] | null {
+  const session = readSessionOrgPayload() as OrgChartResponse | null;
+  if (!session?.ok || !session.nodes?.length) return null;
+  return applyPersonOverrides(session.nodes);
+}
+
 function toDetail(
   person: FlatPerson,
   byId: Map<string, FlatPerson>,
@@ -74,10 +80,16 @@ function toDetail(
 export function PeopleWorkspace() {
   const router = useRouter();
   const [status, setStatus] = useState<"loading" | "ready" | "empty" | "error">(
-    "loading",
+    () => {
+      if (typeof window === "undefined") return "loading";
+      if (!readRemoteConnected()) return "empty";
+      return sessionPeople() ? "ready" : "loading";
+    },
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [people, setPeople] = useState<FlatPerson[]>([]);
+  const [people, setPeople] = useState<FlatPerson[]>(
+    () => sessionPeople() ?? [],
+  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const selectPerson = useCallback((id: string | null) => {
@@ -96,21 +108,21 @@ export function PeopleWorkspace() {
       setPeople([]);
       return;
     }
-    setStatus("loading");
     setErrorMessage(null);
+    const cached = sessionPeople();
+    if (cached) {
+      // Dashboard / chart already warmed the session — skip the full-screen gate.
+      setPeople(cached);
+      setStatus("ready");
+    } else {
+      setStatus("loading");
+    }
     try {
-      const session = readSessionOrgPayload() as OrgChartResponse | null;
-      if (session?.ok && session.nodes?.length) {
-        setPeople(applyPersonOverrides(session.nodes));
-        setStatus("ready");
-      }
       const res = await fetch("/api/org-chart");
       const body = (await res.json()) as OrgChartResponse;
       if (!res.ok || !body.ok) {
         const mapped = mapOrgChartHttpError(res.status, body);
-        if (session?.ok && session.nodes?.length) {
-          return;
-        }
+        if (cached) return;
         setStatus("error");
         setErrorMessage(mapped.message);
         return;
@@ -125,6 +137,7 @@ export function PeopleWorkspace() {
       writeSessionOrgPayload(body);
       setStatus("ready");
     } catch (err) {
+      if (cached) return;
       const mapped = mapOrgChartHttpError(0, {
         code: "network",
         message: err instanceof Error ? err.message : "Network error",
@@ -140,10 +153,8 @@ export function PeopleWorkspace() {
 
   useEffect(() => {
     const onOverrides = () => {
-      const session = readSessionOrgPayload() as OrgChartResponse | null;
-      if (session?.ok && session.nodes?.length) {
-        setPeople(applyPersonOverrides(session.nodes));
-      }
+      const next = sessionPeople();
+      if (next) setPeople(next);
     };
     const onOrgUpdated = () => {
       void load();
