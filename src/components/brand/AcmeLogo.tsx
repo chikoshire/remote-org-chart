@@ -41,8 +41,9 @@ export function AcmeLogo({
         >
           Acme
         </span>
-      ) : null}
-      <span className="sr-only">Acme</span>
+      ) : (
+        <span className="sr-only">Acme</span>
+      )}
     </span>
   );
 }

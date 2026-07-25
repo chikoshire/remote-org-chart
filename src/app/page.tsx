@@ -222,6 +222,9 @@ export default function MarketingHomePage() {
             <a href="#surfaces" className="transition hover:text-norma-ink">
               Surfaces
             </a>
+            <a href="#source" className="transition hover:text-norma-ink">
+              Integrations
+            </a>
             <Link href="/login" className="transition hover:text-norma-ink">
               Log in
             </Link>

@@ -63,6 +63,17 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(header).toContain("onClick={() => setMenuOpen(false)}");
     expect(header).toContain("Marketing mobile");
 
+    expect(page).toContain('href="#source"');
+    expect(page).toMatch(/Integrations[\s\S]*Log in/);
+
+    expect(marquee).toContain("shrink-0");
+    const logo = readFileSync(
+      join(process.cwd(), "src/components/brand/AcmeLogo.tsx"),
+      "utf8",
+    );
+    expect(logo).toContain(') : (\n        <span className="sr-only">Acme</span>');
+    expect(logo).not.toMatch(/withWordmark[\s\S]*sr-only">Acme[\s\S]*sr-only">Acme/);
+
     expect(hero).toContain("md:grid-cols-12");
     expect(hero).toContain("/marketing/hero-org-chart.png");
     expect(how).toContain("aria-expanded");
