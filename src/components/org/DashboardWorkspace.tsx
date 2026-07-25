@@ -203,29 +203,44 @@ function IconAlert() {
 function DepartmentShare({
   items,
   empty,
+  orgHeadcount,
   onSelect,
 }: {
   items: NamedCount[];
   empty: string;
+  /** Full org headcount (KPI). Donut center must not contradict this. */
+  orgHeadcount: number;
   onSelect: (department: string) => void;
 }) {
-  const top = items.slice(0, 6);
-  const total = top.reduce((sum, item) => sum + item.count, 0) || 1;
+  const TOP_N = 6;
+  const top = items.slice(0, TOP_N);
+  const assigned = items.reduce((sum, item) => sum + item.count, 0);
+  const topSum = top.reduce((sum, item) => sum + item.count, 0);
+  const otherCount = Math.max(0, orgHeadcount - topSum);
+  const slices: NamedCount[] =
+    otherCount > 0
+      ? [...top, { name: "Other teams & unassigned", count: otherCount }]
+      : top;
+  const total = Math.max(orgHeadcount, 1);
   const size = 168;
   const stroke = 22;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
 
   let offset = 0;
-  const arcs = top.map((item) => {
+  const arcs = slices.map((item) => {
     const share = item.count / total;
     const length = share * c;
     const arc = {
       ...item,
       length,
       offset,
-      color: departmentAccent(item.name),
+      color:
+        item.name === "Other teams & unassigned"
+          ? "rgb(18 18 18 / 0.18)"
+          : departmentAccent(item.name),
       pct: Math.round(share * 100),
+      isOther: item.name === "Other teams & unassigned",
     };
     offset += length;
     return arc;
@@ -236,7 +251,11 @@ function DepartmentShare({
       <h2 className="text-sm font-semibold text-norma-ink">
         Headcount by department
       </h2>
-      <p className="mt-1 text-xs text-norma-ink-muted">Share of people · top teams</p>
+      <p className="mt-1 text-xs text-norma-ink-muted">
+        {assigned === orgHeadcount
+          ? `Share of all ${orgHeadcount} people · top ${TOP_N} teams highlighted`
+          : `Share of all ${orgHeadcount} people · top ${TOP_N} named teams (${assigned} with a department)`}
+      </p>
       {top.length === 0 ? (
         <p className="mt-6 text-sm text-norma-ink-muted">{empty}</p>
       ) : (
@@ -266,37 +285,55 @@ function DepartmentShare({
                 />
               ))}
             </svg>
-            <div className="absolute inset-0 flex rotate-0 flex-col items-center justify-center">
+            <div className="absolute inset-0 flex rotate-0 flex-col items-center justify-center px-3 text-center">
               <span className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tabular-nums text-norma-ink">
-                {total}
+                {orgHeadcount}
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-norma-ink-muted">
-                people
+                in org
               </span>
             </div>
           </div>
           <ul className="w-full space-y-2.5" aria-label="Headcount by department">
             {arcs.map((arc) => (
               <li key={arc.name}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(arc.name)}
-                  className="flex w-full cursor-pointer items-center gap-3 rounded-norma-md px-1 py-1 text-left text-sm transition hover:bg-white/70"
-                >
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: arc.color }}
-                  />
-                  <span className="min-w-0 flex-1 truncate font-medium text-norma-ink">
-                    {arc.name}
-                  </span>
-                  <span className="shrink-0 tabular-nums text-norma-ink-muted">
-                    {arc.count}
-                    <span className="ml-1 text-[11px] text-norma-ink-subtle">
-                      ({arc.pct}%)
+                {arc.isOther ? (
+                  <div className="flex w-full items-center gap-3 rounded-norma-md px-1 py-1 text-sm">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: arc.color }}
+                    />
+                    <span className="min-w-0 flex-1 truncate font-medium text-norma-ink-muted">
+                      {arc.name}
                     </span>
-                  </span>
-                </button>
+                    <span className="shrink-0 tabular-nums text-norma-ink-muted">
+                      {arc.count}
+                      <span className="ml-1 text-[11px] text-norma-ink-subtle">
+                        ({arc.pct}%)
+                      </span>
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onSelect(arc.name)}
+                    className="flex w-full cursor-pointer items-center gap-3 rounded-norma-md px-1 py-1 text-left text-sm transition hover:bg-white/70"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: arc.color }}
+                    />
+                    <span className="min-w-0 flex-1 truncate font-medium text-norma-ink">
+                      {arc.name}
+                    </span>
+                    <span className="shrink-0 tabular-nums text-norma-ink-muted">
+                      {arc.count}
+                      <span className="ml-1 text-[11px] text-norma-ink-subtle">
+                        ({arc.pct}%)
+                      </span>
+                    </span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -688,6 +725,7 @@ export function DashboardWorkspace() {
         <DepartmentShare
           items={insights.departments}
           empty="No departments on file yet."
+          orgHeadcount={insights.headcount}
           onSelect={(department) => navigate(peopleDepartmentHref(department))}
         />
         <CountryDots
