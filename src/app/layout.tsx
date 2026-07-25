@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, IBM_Plex_Mono, Outfit } from "next/font/google";
 import { ThemeBootstrap } from "@/components/shell/ThemeBootstrap";
+import { sharePreviewMetadata } from "@/lib/seo/share-preview";
 import "./globals.css";
 
 const normaSans = DM_Sans({
@@ -22,9 +23,18 @@ const normaMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+const baseShare = sharePreviewMetadata({
   title: "Acme Org Chart",
-  description: "Organization chart for Acme via Remote.",
+  description:
+    "Explore Acme reporting lines, people, and data health in one workspace connected to Remote.",
+});
+
+export const metadata: Metadata = {
+  ...baseShare,
+  title: {
+    default: "Acme Org Chart",
+    template: "%s · Acme",
+  },
 };
 
 export default function RootLayout({

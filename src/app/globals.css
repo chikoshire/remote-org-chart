@@ -669,3 +669,30 @@
   background: var(--norma-accent-hover);
   transform: translateY(-1px);
 }
+
+/* Org Chart print (GH#105): chart canvas only, no chrome */
+@media print {
+  .skip-link,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .react-flow__controls,
+  .react-flow__minimap,
+  .react-flow__attribution {
+    display: none !important;
+  }
+
+  .react-flow {
+    height: auto !important;
+    min-height: 70vh !important;
+  }
+}
+

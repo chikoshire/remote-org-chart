@@ -20,6 +20,7 @@ import {
   PERSON_OVERRIDES_CHANGED_EVENT,
   applyPersonOverrides,
 } from "@/lib/org/person-overrides";
+import { ORG_UPDATED_EVENT } from "@/lib/org/live-updates";
 import {
   mapCountryHref,
   orgChartOpenDepartmentsHref,
@@ -514,10 +515,16 @@ export function DashboardWorkspace() {
         setPeople(applyPersonOverrides(session.nodes));
       }
     };
+    const onOrgUpdated = () => {
+      void load({ refresh: true });
+    };
     window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
-    return () =>
+    window.addEventListener(ORG_UPDATED_EVENT, onOrgUpdated);
+    return () => {
       window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
-  }, []);
+      window.removeEventListener(ORG_UPDATED_EVENT, onOrgUpdated);
+    };
+  }, [load]);
   const insights = useMemo(
     () => computeDashboardInsights(people, { lastSyncedAt }),
     [lastSyncedAt, people],

@@ -97,6 +97,12 @@ import {
   reportingRelation,
   type ReportingRelation,
 } from "@/lib/org/reporting-distance";
+import {
+  chartExportFilename,
+  downloadDataUrl,
+  exportChartDataUrl,
+} from "@/lib/org/export-chart";
+import { broadcastOrgUpdated } from "@/lib/org/live-updates";
 import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 import { usePrefersReducedMotion } from "@/lib/ui/use-prefers-reduced-motion";
 import {
@@ -304,6 +310,10 @@ function OrgChartInner() {
   const [eventsOpen, setEventsOpen] = useState(false);
   const [eventsToken, setEventsToken] = useState(0);
   const [liveUpdates, setLiveUpdates] = useState(() => readLiveDefault());
+  const [liveStreamOk, setLiveStreamOk] = useState(false);
+  const [liveFlash, setLiveFlash] = useState<string | null>(null);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [sidePanelOpen, setSidePanelOpen] = useState(() => readSidePanelOpen());
   const [openDepartmentMenu, setOpenDepartmentMenu] = useState(false);
   const [remoteConnected, setRemoteConnected] = useState(true);
@@ -317,6 +327,7 @@ function OrgChartInner() {
   const pendingDeepLinkId = useRef<string | null>(null);
   const deepLinkResolved = useRef(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const chartRootRef = useRef<HTMLDivElement>(null);
   const rawRemoteNodesRef = useRef<FlatPerson[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<PersonNodeData>>(
     [],
@@ -610,25 +621,43 @@ function OrgChartInner() {
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
-    if (!liveUpdates || status !== "ready") return;
+    if (!liveUpdates || status !== "ready") {
+      setLiveStreamOk(false);
+      return;
+    }
     if (typeof window === "undefined" || typeof EventSource === "undefined") {
       return;
     }
 
     const source = new EventSource("/api/org-chart/stream");
-    const onUpdated = () => {
+    const onHello = () => setLiveStreamOk(true);
+    const onUpdated = (event: MessageEvent) => {
+      let notifyAt: string | undefined;
+      try {
+        const parsed = JSON.parse(String(event.data)) as { notifyAt?: string };
+        notifyAt = parsed.notifyAt;
+      } catch {
+        // ignore malformed payloads
+      }
+      setLiveFlash("Updated from Remote");
+      broadcastOrgUpdated({ notifyAt });
       setEventsToken((n) => n + 1);
       setSyncLogToken((n) => n + 1);
       void load({ refresh: true });
+      window.setTimeout(() => setLiveFlash(null), 4500);
     };
+    source.addEventListener("hello", onHello);
     source.addEventListener("org-updated", onUpdated);
     source.onerror = () => {
+      setLiveStreamOk(false);
       // Browser will retry; keep Live toggle on.
     };
 
     return () => {
+      source.removeEventListener("hello", onHello);
       source.removeEventListener("org-updated", onUpdated);
       source.close();
+      setLiveStreamOk(false);
     };
   }, [liveUpdates, load, status]);
 
@@ -1154,14 +1183,45 @@ function OrgChartInner() {
     writeSidePanelOpen(open);
   };
 
+  const runExport = useCallback(
+    async (format: "png" | "svg") => {
+      const root = chartRootRef.current;
+      if (!root || exportBusy) return;
+      if (viewMode !== "chart") {
+        setExportError("Switch to Chart view to export an image.");
+        return;
+      }
+      setExportBusy(true);
+      setExportError(null);
+      try {
+        const dataUrl = await exportChartDataUrl(root, format, {
+          reducedMotion,
+          backgroundColor: "#f4f1eb",
+        });
+        downloadDataUrl(dataUrl, chartExportFilename(format));
+      } catch {
+        setExportError("Export failed. Try again after the chart finishes loading.");
+      } finally {
+        setExportBusy(false);
+      }
+    },
+    [exportBusy, reducedMotion, viewMode],
+  );
+
   const statusLine = (
     <p
       role="status"
       aria-live="polite"
-      className="shrink-0 border-t border-norma-border bg-norma-surface/95 px-3 py-1.5 text-[11px] text-norma-ink-muted"
+      className="print:hidden shrink-0 border-t border-norma-border bg-norma-surface/95 px-3 py-1.5 text-[11px] text-norma-ink-muted"
     >
       {statusLabel}
       {filtersAreActive(filters) ? " · filters on" : ""}
+      {liveUpdates
+        ? liveStreamOk
+          ? " · Live"
+          : " · Live connecting…"
+        : ""}
+      {liveFlash ? ` · ${liveFlash}` : ""}
       {isMobile
         ? " · pinch to zoom · drag to pan"
         : " · scroll to zoom · drag to pan"}
@@ -1238,7 +1298,7 @@ function OrgChartInner() {
       className={`flex h-full min-h-0 w-full flex-1 flex-col md:flex-row ${reducedMotion ? "" : "org-chart-enter"}`}
     >
       {sidePanelOpen ? (
-        <aside className="flex w-full max-h-[40dvh] shrink-0 flex-col overflow-hidden border-b border-norma-border bg-norma-surface md:h-full md:max-h-none md:w-96 md:border-b-0 md:border-r">
+        <aside className="print:hidden flex w-full max-h-[40dvh] shrink-0 flex-col overflow-hidden border-b border-norma-border bg-norma-surface md:h-full md:max-h-none md:w-96 md:border-b-0 md:border-r">
           <div className="flex items-center justify-between gap-2 border-b border-norma-border px-3 py-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-norma-ink-subtle">
               Workspace
@@ -1539,8 +1599,50 @@ function OrgChartInner() {
                       });
                     }}
                   >
-                    {liveUpdates ? "Live updates on" : "Live updates off"}
+                    {liveUpdates
+                      ? liveStreamOk
+                        ? "Live updates on · listening"
+                        : "Live updates on · connecting…"
+                      : "Live updates off"}
                   </button>
+                  <div className="flex flex-col gap-1.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-norma-ink-subtle">
+                      Export
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        type="button"
+                        disabled={exportBusy || viewMode !== "chart"}
+                        className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1.5 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
+                        onClick={() => void runExport("png")}
+                      >
+                        {exportBusy ? "Exporting…" : "PNG"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={exportBusy || viewMode !== "chart"}
+                        className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1.5 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian disabled:opacity-50"
+                        onClick={() => void runExport("svg")}
+                      >
+                        SVG
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-norma-sm border border-norma-border bg-norma-surface px-2 py-1.5 text-[11px] font-medium text-norma-ink-muted hover:text-norma-prussian"
+                        onClick={() => window.print()}
+                      >
+                        Print
+                      </button>
+                    </div>
+                    {viewMode !== "chart" ? (
+                      <p className="text-[10px] text-norma-ink-subtle">
+                        Switch to Chart view for PNG/SVG export.
+                      </p>
+                    ) : null}
+                    {exportError ? (
+                      <p className="text-[10px] text-norma-danger">{exportError}</p>
+                    ) : null}
+                  </div>
                   <div
                     className="flex flex-wrap gap-1"
                     role="group"
@@ -1629,13 +1731,13 @@ function OrgChartInner() {
         {!sidePanelOpen ? (
           <button
             type="button"
-            className="absolute left-3 top-3 z-20 rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-semibold text-norma-prussian shadow-norma-md hover:border-norma-royal"
+            className="print:hidden absolute left-3 top-3 z-20 rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-xs font-semibold text-norma-prussian shadow-norma-md hover:border-norma-royal"
             onClick={() => setPanelOpen(true)}
           >
             Show panel
           </button>
         ) : null}
-        <div className="relative min-h-0 flex-1">
+        <div className="relative min-h-0 flex-1" ref={chartRootRef}>
           {filterEmpty ? (
             <ChartEmptyState
               title="No people match these filters"

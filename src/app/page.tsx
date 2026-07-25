@@ -8,12 +8,16 @@ import { MarketingHero } from "@/components/marketing/MarketingHero";
 import { MarketingHowItWorks } from "@/components/marketing/MarketingHowItWorks";
 import { MarketingMarquee } from "@/components/marketing/MarketingMarquee";
 import { MarketingReveal } from "@/components/marketing/MarketingReveal";
+import { sharePreviewMetadata } from "@/lib/seo/share-preview";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = sharePreviewMetadata({
   title: "Acme · People intelligence",
   description:
     "Explore Acme’s reporting lines, people, and data health in one standalone workspace.",
-};
+  path: "/",
+  imagePath: "/marketing/hero-org-chart.png",
+});
+
 
 const SURFACES = [
   {

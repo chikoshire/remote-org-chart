@@ -1096,6 +1096,28 @@ Native bottom-tab shell or PWA install prompts.
 
 ---
 
+## 2026-07-25 — Clear polish backlog (OG, live, export)
+
+**Status:** Accepted  
+
+**Context:**  
+GH#101 / #104 / #105 remained open under the production polish epic.
+
+**Decision:**  
+1. Shared-link previews via `sharePreviewMetadata` (Open Graph + Twitter) on root, marketing home, and login; `NEXT_PUBLIC_SITE_URL` optional override.  
+2. Live updates: SSE hello/status flash, `acme:org-updated` broadcast so Dashboard and People soft-refresh with the chart.  
+3. Print/export: Tools → PNG/SVG (html-to-image) + Print with print CSS that hides chrome.
+
+**Consequences:**  
+- Crawlers get large-image cards for the public Workers URL.  
+- Live toggle remains opt-in; when on, other surfaces stay in sync.  
+- Export only from Chart view (Tree/Map print still available via Print).
+
+**Revisit when:**  
+Custom domain for OG, or public unauthenticated person preview cards.
+
+---
+
 ## Template for future entries
 
 
