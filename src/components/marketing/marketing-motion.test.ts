@@ -57,6 +57,11 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(header).not.toContain("github.com");
     expect(header).not.toContain("GitHub");
     expect(header).toContain('label: "Integrations"');
+    expect(header).toContain('aria-label={menuOpen ? "Close menu" : "Open menu"}');
+    expect(header).toContain("md:hidden");
+    expect(header).toContain('if (event.key === "Escape") setMenuOpen(false)');
+    expect(header).toContain("onClick={() => setMenuOpen(false)}");
+    expect(header).toContain("Marketing mobile");
 
     expect(hero).toContain("md:grid-cols-12");
     expect(hero).toContain("/marketing/hero-org-chart.png");
