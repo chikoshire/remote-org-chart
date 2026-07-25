@@ -20,6 +20,11 @@ export type RemoteFetchOptions = {
   path: string;
   searchParams?: Record<string, string | number | undefined>;
   init?: Omit<RequestInit, "headers"> & { headers?: HeadersInit };
+  /**
+   * Override Bearer token (e.g. write-scoped `REMOTE_API_WRITE_TOKEN`).
+   * Defaults to read `REMOTE_API_TOKEN`.
+   */
+  token?: string;
 };
 
 function joinUrl(base: string, path: string): URL {
@@ -50,13 +55,15 @@ export async function remoteFetch<T = unknown>(
     }
   }
 
+  const bearer = options.token?.trim() || env.REMOTE_API_TOKEN;
+
   let response: Response;
   try {
     response = await fetch(url, {
       ...options.init,
       headers: {
         Accept: "application/json",
-        Authorization: `Bearer ${env.REMOTE_API_TOKEN}`,
+        Authorization: `Bearer ${bearer}`,
         ...(options.init?.headers ?? {}),
       },
       cache: "no-store",

@@ -18,10 +18,14 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(page).toContain("MarketingMarquee");
     expect(page).toContain("MarketingHowItWorks");
     expect(hero).toContain("See how Acme is organised");
-    expect(hero).toContain("Reporting lines, people, and data health in one place.");
+    expect(hero).toContain("Reporting lines, people, and data health in one Acme workspace.");
     expect(hero).toContain("live employment data");
-    expect(page).toContain("Built on Remote. No second employee database.");
-    expect(page).not.toContain("HRIS");
+    expect(page).toContain("Acme product. HRIS connected.");
+    expect(page).toContain("standalone organisational intelligence app");
+    expect(page).toContain("Remote integration");
+    expect(page).not.toContain("Powered by Remote");
+    expect(page).not.toContain("Built on Remote");
+    expect(page).not.toContain("Organisational intelligence on Remote");
     expect(page).not.toContain("github.com");
     expect(page).not.toContain("GitHub");
     expect(page).not.toContain("developer.remote.com");
@@ -29,6 +33,22 @@ describe("marketing remote.com structure + real screenshots", () => {
     expect(page).not.toMatch(/\u2014|\u2013/);
     expect(hero).not.toMatch(/\u2014|\u2013/);
     expect(page).not.toContain("MarketingProductMock");
+    expect(page).not.toContain("interview");
+    expect(page).not.toContain("demo credentials");
+    expect(page).not.toContain("sandbox");
+    expect(page).toContain("Ready to explore Acme?");
+    expect(page).toContain("HRIS integration");
+    expect(page).toContain("Try now");
+
+    const marquee = readFileSync(
+      join(process.cwd(), "src/components/marketing/MarketingMarquee.tsx"),
+      "utf8",
+    );
+    expect(marquee).not.toContain("sandbox");
+    expect(marquee).not.toContain("Sandbox");
+    expect(marquee).toContain("Organisational intelligence");
+    expect(marquee).not.toContain("on Remote");
+    expect(marquee).toContain("HRIS integration");
 
     const header = readFileSync(
       join(process.cwd(), "src/components/marketing/MarketingHeader.tsx"),
@@ -36,7 +56,7 @@ describe("marketing remote.com structure + real screenshots", () => {
     );
     expect(header).not.toContain("github.com");
     expect(header).not.toContain("GitHub");
-    expect(header).toContain('label: "Remote"');
+    expect(header).toContain('label: "Integrations"');
 
     expect(hero).toContain("md:grid-cols-12");
     expect(hero).toContain("/marketing/hero-org-chart.png");

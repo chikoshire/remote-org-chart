@@ -102,6 +102,8 @@ export function PersonProfileView({ personId }: { personId: string }) {
   const [managerQuery, setManagerQuery] = useState("");
   const [editManagerId, setEditManagerId] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [hasLocalEdits, setHasLocalEdits] = useState(false);
 
   useEffect(() => {
@@ -252,21 +254,118 @@ export function PersonProfileView({ personId }: { personId: string }) {
     return hits.slice(0, 8);
   }, [managerQuery, people, personId]);
 
-  const saveProfileEdits = useCallback(() => {
-    writePersonOverride(personId, {
+  const saveProfileEdits = useCallback(async () => {
+    setSaveBusy(true);
+    setSaveMessage(null);
+    const nextValues = {
       jobTitle: editTitle.trim() || null,
       department: editDepartment.trim() || null,
       country: editCountry.trim() || null,
       managerEmploymentId: editManagerId,
-    });
-    setHasLocalEdits(true);
-    setSavedFlash(true);
-    window.setTimeout(() => setSavedFlash(false), 1600);
+    };
+
+    try {
+      const res = await fetch(`/api/people/${encodeURIComponent(personId)}`, {
+        method: "PATCH",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(nextValues),
+      });
+      const body = (await res.json()) as {
+        ok?: boolean;
+        message?: string;
+        persisted?: string[];
+        localOnly?: string[];
+        notes?: Record<string, string>;
+        values?: typeof nextValues;
+      };
+
+      if (!res.ok || !body.ok) {
+        // Config / hard failure: still keep local overlays so the demo stays usable.
+        writePersonOverride(personId, nextValues);
+        setHasLocalEdits(true);
+        setSaveMessage(
+          body.message ??
+            "Couldn’t reach Remote write API. Changes saved locally in this browser.",
+        );
+        setSavedFlash(true);
+        window.setTimeout(() => setSavedFlash(false), 2000);
+        return;
+      }
+
+      const persisted = new Set(body.persisted ?? []);
+      const localOnly = new Set(body.localOnly ?? []);
+      const values = body.values ?? nextValues;
+
+      // Overlays only for fields Remote rejected.
+      const overlay: {
+        jobTitle?: string | null;
+        department?: string | null;
+        country?: string | null;
+        managerEmploymentId?: string | null;
+      } = {};
+      if (localOnly.has("jobTitle")) overlay.jobTitle = values.jobTitle;
+      if (localOnly.has("department")) overlay.department = values.department;
+      if (localOnly.has("country")) overlay.country = values.country;
+      if (localOnly.has("managerEmploymentId")) {
+        overlay.managerEmploymentId = values.managerEmploymentId;
+      }
+
+      // Replace overlays: keep only fields Remote rejected.
+      clearPersonOverride(personId);
+      if (Object.keys(overlay).length > 0) {
+        writePersonOverride(personId, overlay);
+        setHasLocalEdits(true);
+      } else {
+        setHasLocalEdits(false);
+      }
+
+      // Optimistic session snapshot update so Chart/People/Health see it immediately.
+      const session = readSessionOrgPayload() as OrgChartResponse | null;
+      if (session?.ok && session.nodes?.length) {
+        const nodes = session.nodes.map((n) =>
+          n.id === personId
+            ? {
+                ...n,
+                jobTitle: values.jobTitle,
+                department: values.department,
+                country: values.country,
+                managerEmploymentId: values.managerEmploymentId,
+              }
+            : n,
+        );
+        writeSessionOrgPayload({ ...session, nodes });
+        setPeople(applyPersonOverrides(nodes));
+      }
+
+      const remoteBits =
+        persisted.size > 0
+          ? `Saved to Remote: ${[...persisted].join(", ")}.`
+          : "Nothing written to Remote.";
+      const localBits =
+        localOnly.size > 0
+          ? ` Local overlay: ${[...localOnly].join(", ")}.`
+          : "";
+      const noteBits = body.notes
+        ? ` ${Object.values(body.notes).filter(Boolean).join(" ")}`
+        : "";
+      setSaveMessage(`${remoteBits}${localBits}${noteBits}`.trim());
+      setSavedFlash(true);
+      window.setTimeout(() => setSavedFlash(false), 2000);
+    } catch {
+      writePersonOverride(personId, nextValues);
+      setHasLocalEdits(true);
+      setSaveMessage(
+        "Network error while writing to Remote. Changes saved locally in this browser.",
+      );
+    } finally {
+      setSaveBusy(false);
+    }
   }, [editCountry, editDepartment, editManagerId, editTitle, personId]);
 
   const clearLocalEdits = useCallback(() => {
     clearPersonOverride(personId);
     setHasLocalEdits(false);
+    setSaveMessage(null);
     const session = readSessionOrgPayload() as OrgChartResponse | null;
     if (session?.ok && session.nodes?.length) {
       const raw = session.nodes.find((n) => n.id === personId);
@@ -427,7 +526,9 @@ export function PersonProfileView({ personId }: { personId: string }) {
                 Fix profile data
               </h2>
               <p className="mt-1 text-sm text-norma-ink-muted">
-                Fill gaps flagged in Data Health. Changes stay in this browser.
+                Department and manager write back to Remote when a write token is
+                configured. Job title and country often stay as local overlays on
+                active employments (Remote requires a contract amendment).
               </p>
             </div>
             {missingProfileFields({
@@ -543,10 +644,15 @@ export function PersonProfileView({ personId }: { personId: string }) {
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={saveProfileEdits}
-              className="norma-cta px-4 py-2 text-sm"
+              onClick={() => void saveProfileEdits()}
+              disabled={saveBusy}
+              className="norma-cta px-4 py-2 text-sm disabled:opacity-60"
             >
-              {savedFlash ? "Saved locally" : "Save local edits"}
+              {saveBusy
+                ? "Saving…"
+                : savedFlash
+                  ? "Saved"
+                  : "Save to Remote"}
             </button>
             {hasLocalEdits ? (
               <button
@@ -554,10 +660,15 @@ export function PersonProfileView({ personId }: { personId: string }) {
                 onClick={clearLocalEdits}
                 className="rounded-norma-sm border border-norma-border bg-norma-surface px-4 py-2 text-sm font-medium text-norma-ink-muted hover:text-norma-ink"
               >
-                Clear local edits
+                Clear local overlays
               </button>
             ) : null}
           </div>
+          {saveMessage ? (
+            <p className="mt-3 text-xs leading-relaxed text-norma-ink-muted">
+              {saveMessage}
+            </p>
+          ) : null}
         </section>
 
         <section className="bloom-enter bloom-enter-delay-2 norma-glass rounded-norma-lg border border-norma-border/80 p-5 shadow-norma-sm md:p-6">

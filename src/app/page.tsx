@@ -12,7 +12,7 @@ import { MarketingReveal } from "@/components/marketing/MarketingReveal";
 export const metadata: Metadata = {
   title: "Acme · People intelligence",
   description:
-    "Explore Acme’s reporting lines, people, and data health in one place. Powered by Remote.",
+    "Explore Acme’s reporting lines, people, and data health in one standalone workspace.",
 };
 
 const SURFACES = [
@@ -126,7 +126,7 @@ export default function MarketingHomePage() {
                         {surface.line}
                       </p>
                       <span className="mt-6 inline-flex items-center gap-2 text-base font-semibold text-norma-ink">
-                        Open in app
+                        Try now
                         <span
                           aria-hidden
                           className="transition group-hover:translate-x-1"
@@ -159,16 +159,16 @@ export default function MarketingHomePage() {
               <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-norma-border/80 bg-white/80 px-4 py-2 shadow-norma-sm backdrop-blur">
                 <RemoteMark className="h-5 w-auto" />
                 <span className="text-sm font-medium text-norma-ink-muted">
-                  Powered by Remote
+                  Remote integration
                 </span>
               </div>
               <h2 className="font-[family-name:var(--font-norma-display)] text-4xl tracking-tight text-norma-ink md:text-[3.15rem] md:leading-[1.08]">
-                Built on Remote. No second employee database.
+                Acme product. HRIS connected.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-norma-ink-muted md:text-xl">
-                Employments and managers come from the Remote sandbox API. This
-                app turns that graph into chart, tree, map, and people views,
-                without inventing another source of truth.
+                Acme Org Chart is a standalone organisational intelligence app.
+                It integrates with Remote for employments and reporting lines,
+                then turns that graph into chart, tree, map, and people views.
               </p>
             </MarketingReveal>
             <MarketingReveal delayMs={120}>
@@ -176,7 +176,7 @@ export default function MarketingHomePage() {
                 href="/login"
                 className="norma-cta min-h-12 shrink-0 px-9 text-base"
               >
-                Open the workspace
+                Try now
               </Link>
             </MarketingReveal>
           </div>
@@ -189,12 +189,12 @@ export default function MarketingHomePage() {
                 Ready to explore Acme?
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-lg text-norma-ink-muted">
-                Log in with the demo credentials shared for your interview, then
-                walk Chart, Tree, Map, and People on live Remote sandbox data.
+                Open Chart, Tree, Map, and People in one workspace. Live org
+                structure, connected through your HRIS integration.
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <Link href="/login" className="norma-cta min-h-12 px-9 text-base">
-                  Log in
+                  Try now
                 </Link>
                 <a
                   href="#product"

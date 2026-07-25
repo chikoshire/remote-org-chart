@@ -79,8 +79,8 @@ function LoginForm() {
         {submitting ? "Signing in…" : "Log in"}
       </button>
       <p className="text-xs leading-relaxed text-norma-ink-muted">
-        Use the demo credentials shared with your interview invite. Remote API
-        tokens stay on the server and never appear in this form.
+        Sign in with your Acme account. Integration credentials stay on the
+        server and never appear in this form.
       </p>
     </form>
   );

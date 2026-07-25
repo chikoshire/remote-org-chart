@@ -1,4 +1,4 @@
-/** Local person field overlays (read-only Remote token cannot PATCH employments). */
+/** Local person field overlays (fallback when Remote rejects a write). */
 
 import { buildOrgForest, flattenOrgForest } from "@/lib/org/build-forest";
 import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";

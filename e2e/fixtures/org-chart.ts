@@ -152,5 +152,5 @@ export const orgChartErrorFixture = {
   ok: false as const,
   code: "unauthorized",
   message:
-    "Remote sandbox rejected the token. Confirm the read-only sandbox key still works, then retry.",
+    "Remote rejected the API token. Check the connection in Settings, then retry.",
 };

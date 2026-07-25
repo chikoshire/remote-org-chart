@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AcmeLogo } from "@/components/brand/AcmeLogo";
 import { HelpChatWidget } from "@/components/help/HelpChatWidget";
 import { CommandBar } from "@/components/shell/CommandBar";
+import { ProductTour } from "@/components/tour/ProductTour";
 
 type ProductShellProps = {
   children: ReactNode;
@@ -20,7 +21,6 @@ const PRIMARY_NAV = [
     match: (p: string) => p === "/app" || p === "/",
   },
   { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
-  { href: "/help", label: "Help", match: (p: string) => p === "/help" || p.startsWith("/help/") },
 ] as const;
 
 function navClass(active: boolean) {
@@ -33,8 +33,13 @@ function navClass(active: boolean) {
 
 export function ProductShellInner({ children, status }: ProductShellProps) {
   const pathname = usePathname();
+  const helpActive = pathname === "/help" || pathname.startsWith("/help/");
+  const healthActive =
+    pathname === "/settings/data-health" ||
+    pathname.startsWith("/settings/data-health/");
   const settingsActive =
-    pathname === "/settings" || pathname.startsWith("/settings/");
+    (pathname === "/settings" || pathname.startsWith("/settings/")) &&
+    !healthActive;
 
   return (
     <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-norma-canvas">
@@ -51,6 +56,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
         <nav
           className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:gap-1.5"
           aria-label="Primary"
+          data-tour="primary-nav"
         >
           {PRIMARY_NAV.map((item) => {
             const active = item.match(pathname);
@@ -66,8 +72,26 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             );
           })}
         </nav>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
           <CommandBar />
+          <Link
+            href="/settings/data-health"
+            className={navClass(healthActive)}
+            aria-current={healthActive ? "page" : undefined}
+            title="Data Health"
+            data-tour="health"
+          >
+            Health
+          </Link>
+          <Link
+            href="/help"
+            className={navClass(helpActive)}
+            aria-current={helpActive ? "page" : undefined}
+            title="Help"
+            data-tour="help"
+          >
+            Help
+          </Link>
           <Link
             href="/settings"
             className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
@@ -78,6 +102,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             aria-label="Settings"
             aria-current={settingsActive ? "page" : undefined}
             title="Settings"
+            data-tour="settings"
           >
             <svg
               aria-hidden
@@ -98,6 +123,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       <main
         id="main-content"
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+        data-tour="main"
       >
         <div
           aria-hidden
@@ -111,6 +137,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           {children}
         </div>
         <HelpChatWidget />
+        <ProductTour />
       </main>
       <footer
         role="contentinfo"

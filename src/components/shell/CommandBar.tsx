@@ -192,6 +192,7 @@ export function CommandBar() {
         className="hidden min-w-[17rem] items-center gap-3 rounded-full border border-norma-border bg-norma-surface-muted/90 px-4 py-3 text-left text-[0.95rem] text-norma-ink-muted hover:border-norma-ink/25 hover:text-norma-ink md:inline-flex lg:min-w-[22rem]"
         aria-label="Open command palette"
         title="Jump anywhere (⌘K)"
+        data-tour="command-search"
       >
         <svg
           aria-hidden
