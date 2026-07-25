@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  canonicalCountryCode,
+  countrySelectOptions,
   formatCountryLabel,
   resolveCountryCode,
   sortCountryCodesByLabel,
@@ -11,6 +13,24 @@ describe("formatCountryLabel", () => {
     expect(formatCountryLabel("GBR")).toBe("United Kingdom");
     expect(formatCountryLabel("HKG")).toBe("Hong Kong");
     expect(formatCountryLabel(null)).toBeNull();
+  });
+});
+
+describe("canonicalCountryCode", () => {
+  it("prefers alpha-3 codes and accepts full names", () => {
+    expect(canonicalCountryCode("GB")).toBe("GBR");
+    expect(canonicalCountryCode("United Kingdom")).toBe("GBR");
+    expect(canonicalCountryCode("gbr")).toBe("GBR");
+  });
+});
+
+describe("countrySelectOptions", () => {
+  it("lists unique full-name labels", () => {
+    const options = countrySelectOptions();
+    expect(options.some((o) => o.label === "United Kingdom" && o.code === "GBR")).toBe(
+      true,
+    );
+    expect(options.every((o) => o.label.length > 2)).toBe(true);
   });
 });
 

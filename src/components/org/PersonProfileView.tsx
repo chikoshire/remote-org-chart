@@ -21,7 +21,11 @@ import {
   writePersonOverride,
 } from "@/lib/org/person-overrides";
 import type { PersonProfilePayload } from "@/lib/remote/person-profile";
-import { formatCountryLabel } from "@/lib/ui/format-country";
+import {
+  canonicalCountryCode,
+  countrySelectOptions,
+  formatCountryLabel,
+} from "@/lib/ui/format-country";
 import {
   personNameMorphName,
   withViewTransition,
@@ -200,7 +204,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
     setHasLocalEdits(hasPersonOverride(personId));
     setEditTitle(person?.jobTitle?.trim() || "");
     setEditDepartment(person?.department?.trim() || "");
-    setEditCountry(person?.country?.trim() || "");
+    setEditCountry(canonicalCountryCode(person?.country) || "");
     setEditManagerId(person?.managerEmploymentId ?? null);
     setManagerQuery("");
   }, [person, personId]);
@@ -254,13 +258,15 @@ export function PersonProfileView({ personId }: { personId: string }) {
     return hits.slice(0, 8);
   }, [managerQuery, people, personId]);
 
+  const countryOptions = useMemo(() => countrySelectOptions(), []);
+
   const saveProfileEdits = useCallback(async () => {
     setSaveBusy(true);
     setSaveMessage(null);
     const nextValues = {
       jobTitle: editTitle.trim() || null,
       department: editDepartment.trim() || null,
-      country: editCountry.trim() || null,
+      country: canonicalCountryCode(editCountry) || null,
       managerEmploymentId: editManagerId,
     };
 
@@ -371,7 +377,7 @@ export function PersonProfileView({ personId }: { personId: string }) {
       const raw = session.nodes.find((n) => n.id === personId);
       setEditTitle(raw?.jobTitle?.trim() || "");
       setEditDepartment(raw?.department?.trim() || "");
-      setEditCountry(raw?.country?.trim() || "");
+      setEditCountry(canonicalCountryCode(raw?.country) || "");
       setEditManagerId(raw?.managerEmploymentId ?? null);
       setPeople(applyPersonOverrides(session.nodes));
     }
@@ -425,8 +431,9 @@ export function PersonProfileView({ personId }: { personId: string }) {
   const department =
     profile?.department?.trim() || person?.department?.trim() || null;
   const countryLabel =
-    formatCountryLabel(profile?.countryName ?? profile?.country) ||
-    formatCountryLabel(person?.country);
+    formatCountryLabel(person?.country) ||
+    formatCountryLabel(profile?.country) ||
+    formatCountryLabel(profile?.countryName);
   const avatarUrl = profile?.avatarUrl ?? person?.avatarUrl ?? null;
   const managerId = profile?.managerEmploymentId ?? person?.managerEmploymentId;
   const managerFromOrg = managerId ? byId.get(managerId) : null;
@@ -571,13 +578,24 @@ export function PersonProfileView({ personId }: { personId: string }) {
               <span className="text-xs font-medium text-norma-ink-subtle">
                 Country
               </span>
-              <input
+              <select
                 value={editCountry}
                 onChange={(e) => setEditCountry(e.target.value)}
                 className="mt-1 w-full rounded-norma-md border border-norma-border bg-norma-surface px-3 py-2 text-sm text-norma-ink outline-none focus:border-norma-royal"
-                placeholder="e.g. Portugal or PT"
-                autoComplete="off"
-              />
+              >
+                <option value="">Not set</option>
+                {editCountry &&
+                !countryOptions.some((opt) => opt.code === editCountry) ? (
+                  <option value={editCountry}>
+                    {formatCountryLabel(editCountry) || editCountry}
+                  </option>
+                ) : null}
+                {countryOptions.map((opt) => (
+                  <option key={opt.code} value={opt.code}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 

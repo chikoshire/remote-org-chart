@@ -55,8 +55,49 @@ export function formatCountryLabel(
   code: string | null | undefined,
 ): string | null {
   if (!code?.trim()) return null;
-  const key = code.trim().toUpperCase();
-  return COUNTRY_LABELS[key] ?? code.trim();
+  const trimmed = code.trim();
+  const key = trimmed.toUpperCase();
+  if (COUNTRY_LABELS[key]) return COUNTRY_LABELS[key];
+  // Already a full name (or unknown string): return as-is without uppercasing.
+  return trimmed;
+}
+
+/**
+ * Prefer a stable storage code (usually ISO alpha-3) for a label or code input.
+ */
+export function canonicalCountryCode(
+  value: string | null | undefined,
+): string | null {
+  if (!value?.trim()) return null;
+  const trimmed = value.trim();
+  const upper = trimmed.toUpperCase();
+  if (COUNTRY_LABELS[upper]) {
+    const label = COUNTRY_LABELS[upper];
+    let best = upper;
+    for (const [code, mapped] of Object.entries(COUNTRY_LABELS)) {
+      if (mapped === label && code.length >= best.length) best = code;
+    }
+    return best;
+  }
+  const lower = trimmed.toLowerCase();
+  for (const [code, label] of Object.entries(COUNTRY_LABELS)) {
+    if (label.toLowerCase() === lower) return canonicalCountryCode(code);
+  }
+  return trimmed;
+}
+
+/** Unique countries for profile / filter selects (label shown, code stored). */
+export function countrySelectOptions(): Array<{ code: string; label: string }> {
+  const byLabel = new Map<string, string>();
+  for (const [code, label] of Object.entries(COUNTRY_LABELS)) {
+    const existing = byLabel.get(label);
+    if (!existing || code.length > existing.length) {
+      byLabel.set(label, code);
+    }
+  }
+  return [...byLabel.entries()]
+    .map(([label, code]) => ({ code, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 /**

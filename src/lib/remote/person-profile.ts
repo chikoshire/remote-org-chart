@@ -1,5 +1,6 @@
 import { countryToString, type EmploymentDetail } from "@/lib/remote/employment-schema";
 import { extractProfilePicture } from "@/lib/ui/avatar";
+import { formatCountryLabel } from "@/lib/ui/format-country";
 
 /**
  * Public-safe person profile fields for the full profile page.
@@ -38,9 +39,10 @@ function countryNameFrom(
   country: EmploymentDetail["country"],
 ): string | null {
   if (country == null) return null;
-  if (typeof country === "string") return country;
+  if (typeof country === "string") return formatCountryLabel(country) ?? country;
   const name = country.name ?? country.code ?? country.iso_code;
-  return typeof name === "string" ? name : null;
+  if (typeof name !== "string") return null;
+  return formatCountryLabel(name) ?? name;
 }
 
 function readNestedString(
