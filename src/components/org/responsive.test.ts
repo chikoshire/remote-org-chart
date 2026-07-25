@@ -27,4 +27,11 @@ describe("responsive org chart chrome", () => {
     expect(canvas).toContain('position="bottom-left"');
     expect(canvas).toContain('isMobile ? "compact" : density');
   });
+
+  it("ships live update flash and chart export controls", () => {
+    expect(canvas).toContain("broadcastOrgUpdated");
+    expect(canvas).toContain('runExport("png")');
+    expect(canvas).toContain("window.print()");
+    expect(canvas).toContain("Live connecting");
+  });
 });

@@ -51,7 +51,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="norma-glass flex h-14 shrink-0 items-center gap-2 border-b border-norma-border/80 px-3 text-norma-ink sm:gap-3 md:h-[4.25rem] md:gap-6 md:px-7"
+        className="norma-glass print:hidden flex h-14 shrink-0 items-center gap-2 border-b border-norma-border/80 px-3 text-norma-ink sm:gap-3 md:h-[4.25rem] md:gap-6 md:px-7"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
           <AcmeLogo
@@ -147,7 +147,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </main>
       <footer
         role="contentinfo"
-        className="norma-glass flex h-8 shrink-0 items-center border-t border-norma-border/80 px-4 text-xs text-norma-ink-muted md:px-7"
+        className="norma-glass print:hidden flex h-8 shrink-0 items-center border-t border-norma-border/80 px-4 text-xs text-norma-ink-muted md:px-7"
       >
         {status ?? <span>Acme · Connected to Remote</span>}
       </footer>

@@ -22,6 +22,7 @@ import {
   PERSON_OVERRIDES_CHANGED_EVENT,
   applyPersonOverrides,
 } from "@/lib/org/person-overrides";
+import { ORG_UPDATED_EVENT } from "@/lib/org/live-updates";
 import { withViewTransition } from "@/lib/ui/motion";
 import { consumeReturnScrollIfMatching } from "@/lib/ui/profile-return";
 import {
@@ -144,10 +145,16 @@ export function PeopleWorkspace() {
         setPeople(applyPersonOverrides(session.nodes));
       }
     };
+    const onOrgUpdated = () => {
+      void load();
+    };
     window.addEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
-    return () =>
+    window.addEventListener(ORG_UPDATED_EVENT, onOrgUpdated);
+    return () => {
       window.removeEventListener(PERSON_OVERRIDES_CHANGED_EVENT, onOverrides);
-  }, []);
+      window.removeEventListener(ORG_UPDATED_EVENT, onOrgUpdated);
+    };
+  }, [load]);
   const directoryPeople: DirectoryPerson[] = useMemo(() => {
     const byId = new Map(people.map((p) => [p.id, p]));
     return people.map((p) => {
