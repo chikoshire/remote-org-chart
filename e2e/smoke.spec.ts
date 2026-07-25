@@ -82,18 +82,15 @@ test.describe("org chart smoke", () => {
     ).toBeVisible();
 
     await page.getByRole("link", { name: "Settings" }).click();
-    await expect(page).toHaveURL(/\/settings/);
+    await expect(page).toHaveURL(/\/settings\/?$/);
     await expect(
       page.getByRole("heading", { name: "Preferences", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("navigation", { name: "Settings sections" }),
-    ).toBeVisible();
+    ).toHaveCount(0);
 
-    await page
-      .getByRole("navigation", { name: "Settings sections" })
-      .getByRole("link", { name: "Data Health" })
-      .click();
+    await page.getByRole("link", { name: "Health" }).click();
     await expect(page).toHaveURL(/\/settings\/data-health/);
     await expect(
       page.getByRole("heading", { name: "Data Health", exact: true }),

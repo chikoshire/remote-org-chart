@@ -1,6 +1,6 @@
 # Data Health
 
-Trust view for reporting edges and thin profiles. Open it from the **Health** control in the header (between search and Settings), or via Settings → Data Health (`/settings/data-health`).
+Trust view for reporting edges and thin profiles. Open it from the **Health** control in the header (between search and Help / Settings).
 
 {{shot:data-health}}
 

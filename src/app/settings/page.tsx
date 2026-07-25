@@ -6,7 +6,6 @@ import { ProductShell } from "@/components/shell/ProductShell";
 import { ProductPageFrame } from "@/components/shell/ProductPageFrame";
 import { RemoteConnectWizard } from "@/components/settings/RemoteConnectWizard";
 import { DensityPreview } from "@/components/settings/DensityPreview";
-import { SettingsChrome } from "@/components/settings/SettingsChrome";
 import { RemoteMark } from "@/components/brand/RemoteMark";
 import type { ChartDensity } from "@/lib/org/collapse";
 import {
@@ -97,8 +96,7 @@ export default function SettingsPage() {
 
   return (
     <ProductShell status={<span>Preferences</span>}>
-      <SettingsChrome>
-        <ProductPageFrame>
+      <ProductPageFrame>
           <div>
             <h1 className="font-[family-name:var(--font-norma-display)] text-2xl font-semibold tracking-tight text-norma-prussian md:text-3xl">
               Preferences
@@ -335,7 +333,6 @@ export default function SettingsPage() {
             </div>
           </section>
         </ProductPageFrame>
-      </SettingsChrome>
     </ProductShell>
   );
 }

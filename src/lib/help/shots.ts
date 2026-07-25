@@ -201,7 +201,7 @@ export const HELP_SHOTS: Record<string, HelpShotProps> = {
         x: 18,
         y: 14,
         label: "1",
-        caption: "Settings subnav — Preferences and Data Health.",
+        caption: "Settings header — Preferences, connection, and session only.",
         pointer: "nw",
       },
       {
