@@ -1614,12 +1614,19 @@ function OrgChartInner() {
                     <div
                       className={`mt-2 rounded-norma-sm border px-2 py-1.5 ${
                         compareResult.tone === "ok"
-                          ? "border-norma-border bg-norma-surface"
-                          : "border-norma-border bg-norma-highlight-soft/80"
+                          ? "border-norma-border bg-norma-surface text-norma-prussian"
+                          : "border-amber-300/80 bg-amber-50 text-amber-950"
                       }`}
+                      role={compareResult.tone === "ok" ? "status" : "alert"}
                     >
                       <p className="font-semibold">{compareResult.title}</p>
-                      <p className="mt-0.5 text-norma-ink-muted">
+                      <p
+                        className={`mt-0.5 ${
+                          compareResult.tone === "ok"
+                            ? "text-norma-ink-muted"
+                            : "text-amber-900/80"
+                        }`}
+                      >
                         {compareResult.detail}
                       </p>
                     </div>

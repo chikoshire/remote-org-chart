@@ -110,6 +110,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             title="Settings"
             data-tour="settings"
           >
+            <span className="sr-only">Settings</span>
             <svg
               aria-hidden
               viewBox="0 0 24 24"

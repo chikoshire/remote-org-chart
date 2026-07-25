@@ -112,6 +112,7 @@ export function PersonNodeCard({
             className={`truncate font-[family-name:var(--font-norma-display)] font-semibold tracking-tight text-norma-ink ${
               compact ? "text-[13px]" : "text-base leading-snug"
             }`}
+            title={name}
             style={
               morphActive && id
                 ? { viewTransitionName: personNameMorphName(id) }
@@ -125,13 +126,17 @@ export function PersonNodeCard({
             className={`mt-1 truncate text-norma-ink-muted ${
               compact ? "text-[11px]" : "text-sm leading-relaxed"
             }`}
+            title={titleLabel}
           >
             {titleLabel}
           </p>
           {!compact ? (
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {department?.trim() ? (
-                <span className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-xs font-medium text-norma-ink">
+                <span
+                  className="max-w-full truncate rounded-norma-sm bg-norma-surface-muted px-2 py-0.5 text-xs font-medium text-norma-ink"
+                  title={department.trim()}
+                >
                   {department.trim()}
                 </span>
               ) : (
@@ -140,7 +145,10 @@ export function PersonNodeCard({
                 </span>
               )}
               {countryLabel ? (
-                <span className="truncate text-xs text-norma-ink-subtle">
+                <span
+                  className="truncate text-xs text-norma-ink-subtle"
+                  title={countryLabel}
+                >
                   {countryLabel}
                 </span>
               ) : (

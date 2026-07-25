@@ -248,9 +248,9 @@ export default function SettingsPage() {
                     }}
                   />
                   <span>
-                    Auto-refresh when Remote sends updates
+                    Auto-refresh org chart from live Remote events
                     <span className="mt-0.5 block text-xs font-normal text-norma-ink-muted">
-                      Useful when Remote sends updates
+                      Turns Live on by default when you open the chart
                     </span>
                   </span>
                 </label>
