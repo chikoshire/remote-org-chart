@@ -1139,6 +1139,32 @@ Moving Data Health to `/app/health` for a cleaner path.
 
 ---
 
+## 2026-07-25 — Faster cold org-chart rebuilds
+
+**Status:** Accepted  
+
+**Context:**  
+Cold `/api/org-chart?refresh=1` took ~16s. Remote detail GETs are ~0.5s each; Workers Free allows only 6 concurrent outbound connections per invocation. Fan-out via `WORKER_SELF` was effectively serializing sibling batches, so the parent collapsed to ~6 connections (~13s of Remote time).
+
+**Decision:**  
+1. Dedicated Worker `remote-org-chart-enrich` (`ORG_ENRICH` binding) so each batch gets its own Free-plan connection pool.  
+2. Same-URL self-`fetch` is blocked (1042); same-app `WORKER_SELF` stays as fallback only.  
+3. Shrink batches to 12; run up to 6 sibling batches at once.  
+4. Do not gate fan-out on `NODE_ENV` — use the binding whenever it exists (OpenNext).  
+5. Parallelize employment list pagination.  
+6. Prefetch `/api/org-chart` from marketing + login so KV is usually warm before demo login.  
+7. Document assumptions/limitations in README (list omits managers; Workers Free caps; 1h KV TTL).
+
+**Consequences:**  
+- Cold rebuild dropped from ~16s (in-process / serialized) to ~9s with `ORG_ENRICH`.  
+- Prefetch + 1h KV TTL make interviewer path rarely cold (~200ms cache hits).  
+- Deploy with `npm run deploy:all` (enrich Worker + app).
+
+**Revisit when:**  
+Remote exposes manager IDs on the list endpoint, or Workers Free connection limits rise.
+
+---
+
 ## Template for future entries
 
 

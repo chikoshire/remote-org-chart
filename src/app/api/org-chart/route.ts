@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { RemoteApiError } from "@/lib/remote/client";
 import { getRemoteEnv } from "@/lib/remote/env";
-import { fetchEmploymentsForOrgChart } from "@/lib/remote/employments";
+import {
+  fetchEmploymentsForOrgChart,
+  getOrgEnrichTarget,
+} from "@/lib/remote/employments";
 import { buildOrgForest, flattenOrgForest } from "@/lib/org";
 import {
   readOrgChartSnapshot,
@@ -24,6 +27,7 @@ export const runtime = "nodejs";
  */
 export async function GET(request: Request) {
   const startedAt = new Date().toISOString();
+  const startedMs = Date.now();
   const url = new URL(request.url);
   const forceRefresh = url.searchParams.get("refresh") === "1";
 
@@ -54,6 +58,7 @@ export async function GET(request: Request) {
     }
 
     const env = getRemoteEnv();
+    const enrichTarget = getOrgEnrichTarget();
     const records = await fetchEmploymentsForOrgChart({
       statusPolicy: "active_only",
       fanOut: {
@@ -90,6 +95,8 @@ export async function GET(request: Request) {
       ...snapshot,
       cached: false,
       source: "remote",
+      enrichTarget,
+      buildMs: Date.now() - startedMs,
     });
   } catch (err) {
     const message =

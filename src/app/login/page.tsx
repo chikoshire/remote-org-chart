@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginPageClient } from "@/components/auth/LoginPageClient";
+import { OrgChartPrefetch } from "@/components/marketing/OrgChartPrefetch";
 import { sharePreviewMetadata } from "@/lib/seo/share-preview";
 
 export const metadata: Metadata = sharePreviewMetadata({
@@ -10,5 +11,10 @@ export const metadata: Metadata = sharePreviewMetadata({
 });
 
 export default function LoginPage() {
-  return <LoginPageClient />;
+  return (
+    <>
+      <OrgChartPrefetch />
+      <LoginPageClient />
+    </>
+  );
 }

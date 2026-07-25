@@ -8,6 +8,7 @@ import { MarketingHero } from "@/components/marketing/MarketingHero";
 import { MarketingHowItWorks } from "@/components/marketing/MarketingHowItWorks";
 import { MarketingMarquee } from "@/components/marketing/MarketingMarquee";
 import { MarketingReveal } from "@/components/marketing/MarketingReveal";
+import { OrgChartPrefetch } from "@/components/marketing/OrgChartPrefetch";
 import { sharePreviewMetadata } from "@/lib/seo/share-preview";
 
 export const metadata: Metadata = sharePreviewMetadata({
@@ -62,6 +63,7 @@ const SURFACES = [
 export default function MarketingHomePage() {
   return (
     <div className="relative flex min-h-[100dvh] flex-col overflow-x-hidden bg-norma-canvas text-norma-ink">
+      <OrgChartPrefetch />
       <MarketingHeader />
 
       <main className="relative z-10 flex-1">

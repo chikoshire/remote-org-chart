@@ -16,11 +16,20 @@ export type EmploymentStatusPolicy = "active_only" | "all";
 /**
  * Workers Free allows 50 subrequests per invocation. List pages are cheap;
  * per-employment detail GETs are not - fan out in batches under this size.
+ *
+ * Keep batches small so each sibling finishes in few concurrent waves
+ * (ceil(batch / ENRICH_DETAIL_CONCURRENCY)), and run many siblings in parallel.
  */
-export const ENRICH_BATCH_SIZE = 40;
+export const ENRICH_BATCH_SIZE = 12;
 
-/** Workers also cap simultaneous outbound connections at 6. */
+/** Workers Free caps simultaneous outbound connections at 6 per invocation. */
 export const ENRICH_DETAIL_CONCURRENCY = 6;
+
+/**
+ * How many enrich-batch sibling invocations the parent runs at once.
+ * Each sibling gets its own connection budget against Remote.
+ */
+export const ENRICH_FANOUT_CONCURRENCY = 6;
 
 export type EnrichFanOut = {
   /** Public origin of this Worker (e.g. https://….workers.dev). Fallback for non-binding fetch. */
@@ -33,15 +42,42 @@ type WorkerSelfFetcher = {
   fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 };
 
-function getWorkerSelfBinding(): WorkerSelfFetcher | null {
+function getEnrichFetcher(): {
+  fetcher: WorkerSelfFetcher;
+  endpoint: string;
+  via: "ORG_ENRICH" | "WORKER_SELF";
+} | null {
   try {
     const { env } = getCloudflareContext();
-    const binding = (env as { WORKER_SELF?: WorkerSelfFetcher }).WORKER_SELF;
-    if (binding && typeof binding.fetch === "function") return binding;
+    const enrich = (env as { ORG_ENRICH?: WorkerSelfFetcher }).ORG_ENRICH;
+    if (enrich && typeof enrich.fetch === "function") {
+      return {
+        fetcher: enrich,
+        endpoint: "https://org-enrich/enrich-batch",
+        via: "ORG_ENRICH",
+      };
+    }
+    const self = (env as { WORKER_SELF?: WorkerSelfFetcher }).WORKER_SELF;
+    if (self && typeof self.fetch === "function") {
+      return {
+        fetcher: self,
+        endpoint: "https://worker-self/api/org-chart/enrich-batch",
+        via: "WORKER_SELF",
+      };
+    }
     return null;
   } catch {
     return null;
   }
+}
+
+/** Which Cloudflare binding will handle enrich fan-out (for diagnostics). */
+export function getOrgEnrichTarget(): "ORG_ENRICH" | "WORKER_SELF" | "in_process" {
+  return getEnrichFetcher()?.via ?? "in_process";
+}
+
+function getWorkerSelfBinding(): WorkerSelfFetcher | null {
+  return getEnrichFetcher()?.fetcher ?? null;
 }
 
 export type FetchEmploymentsOptions = {
@@ -110,9 +146,15 @@ export async function fetchAllEmploymentListItems(
   const totalPages = first.data.total_pages ?? 1;
   const pages = [first.data.employments];
 
-  for (let page = 2; page <= totalPages; page += 1) {
-    const next = await fetchEmploymentPage(page, pageSize);
-    pages.push(next.data.employments);
+  if (totalPages > 1) {
+    const rest = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        fetchEmploymentPage(i + 2, pageSize),
+      ),
+    );
+    for (const next of rest) {
+      pages.push(next.data.employments);
+    }
   }
 
   const flat = pages.flat();
@@ -153,9 +195,9 @@ export async function enrichEmploymentsWithManagers(
 }
 
 /**
- * Fan out detail enrichment to `/api/org-chart/enrich-batch` so each Worker
- * invocation stays under the free-plan subrequest cap (~50).
- * Prefer the WORKER_SELF service binding (new invocation budget per batch).
+ * Fan out detail enrichment across sibling Workers so each batch keeps a full
+ * Free-plan outbound budget (6). Prefer the dedicated `ORG_ENRICH` service;
+ * fall back to same-app `WORKER_SELF` → `/api/org-chart/enrich-batch`.
  */
 export async function enrichEmploymentsViaFanOut(
   listItems: EmploymentListItem[],
@@ -164,13 +206,23 @@ export async function enrichEmploymentsViaFanOut(
   const batches = chunkArray(listItems, ENRICH_BATCH_SIZE);
   if (batches.length === 0) return [];
 
-  const self = getWorkerSelfBinding();
-  const publicEndpoint = `${fanOut.origin.replace(/\/+$/, "")}/api/org-chart/enrich-batch`;
-  // Service bindings need an absolute URL; host is ignored for routing.
-  const bindingEndpoint = "https://worker-self/api/org-chart/enrich-batch";
+  const target = getEnrichFetcher();
+  if (!target) {
+    throw new RemoteApiError({
+      ok: false,
+      code: "config",
+      message:
+        "ORG_ENRICH / WORKER_SELF binding missing; cannot fan out enrich batches on Cloudflare",
+    });
+  }
 
-  const parts = await Promise.all(
-    batches.map(async (items) => {
+  // Satisfy lint: fanOut.origin reserved for non-binding diagnostics.
+  void fanOut.origin;
+
+  const parts = await mapPool(
+    batches,
+    ENRICH_FANOUT_CONCURRENCY,
+    async (items) => {
       const init: RequestInit = {
         method: "POST",
         headers: {
@@ -182,10 +234,7 @@ export async function enrichEmploymentsViaFanOut(
         cache: "no-store",
       };
 
-      const response = self
-        ? await self.fetch(bindingEndpoint, init)
-        : await fetch(publicEndpoint, init);
-
+      const response = await target.fetcher.fetch(target.endpoint, init);
       const text = await response.text();
       let parsed: {
         ok?: boolean;
@@ -198,7 +247,7 @@ export async function enrichEmploymentsViaFanOut(
         throw new RemoteApiError({
           ok: false,
           code: "upstream",
-          message: `Enrich batch non-JSON (${response.status}) via ${self ? "WORKER_SELF" : publicEndpoint}: ${text.slice(0, 160)}`,
+          message: `Enrich batch non-JSON (${response.status}) via ${target.via}: ${text.slice(0, 160)}`,
           status: response.status,
         });
       }
@@ -213,7 +262,7 @@ export async function enrichEmploymentsViaFanOut(
       }
 
       return parsed.records;
-    }),
+    },
   );
 
   return parts.flat();
@@ -226,13 +275,9 @@ export async function fetchEmploymentsForOrgChart(
   const concurrency =
     options.detailConcurrency ?? ENRICH_DETAIL_CONCURRENCY;
 
-  // Fan-out needs a real Worker self binding. Local `next dev` may expose a
-  // stub WORKER_SELF whose fetch cannot parse Request URLs - stay in-process.
-  if (
-    options.fanOut &&
-    process.env.NODE_ENV === "production" &&
-    getWorkerSelfBinding()
-  ) {
+  // Prefer Cloudflare enrich fan-out whenever the binding exists. Do not gate
+  // on NODE_ENV — OpenNext Workers always need the binding path for speed.
+  if (options.fanOut && getEnrichFetcher()) {
     return enrichEmploymentsViaFanOut(list, options.fanOut);
   }
 

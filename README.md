@@ -14,10 +14,10 @@ Demo login credentials are shared **separately** with the interview team (privat
 | Login | Demo credentials (shared privately) → `/app/dashboard` |
 | Product shell | Dashboard · Org Chart · People · header Health / Help / Settings |
 | `/api/health/remote` | `{ "ok": true, "remote": "reachable", … }` |
-| `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** ~15m; cold build ~15-25s |
+| `/api/org-chart` | Hierarchy JSON (emails stripped); **KV-cached** (1h TTL); cold rebuild ~8–10s via enrich Worker |
 | `/api/org-chart?refresh=1` | Bypass cache, rewrite snapshot from Remote |
 
-> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** on Org Chart, Dashboard, or Data Health to force a rebuild.
+> First load of `/api/org-chart` fans out employment detail fetches (list responses omit manager IDs). Give it a moment on a cold Worker. Later loads usually hit **Cloudflare KV** (`lastSyncedAt` in the UI). Use **Refresh from Remote** on Org Chart, Dashboard, or Data Health to force a rebuild. Marketing and login pages prefetch `/api/org-chart` so the snapshot is often warm before you enter the app.
 
 ### Product screenshots
 
@@ -141,7 +141,20 @@ Browser  →  Next.js /api/*  →  gateway.remote-sandbox.com
 
 **Data note:** `GET /v1/employments` list items do **not** include manager fields. Hierarchy requires `GET /v1/employments/:id` per active employment.
 
-**Cloudflare Free constraint:** Workers allow **50 subrequests** per invocation. Production fans enrichment through a `WORKER_SELF` service binding into `/api/org-chart/enrich-batch` (batches of 40), gated by `x-org-enrich-secret` (same value as the server token. Never exposed to the browser).
+**Cloudflare Free constraint:** Workers allow **50 subrequests** and **6 concurrent outbound connections** per invocation. Production fans enrichment to a dedicated Worker (`remote-org-chart-enrich` via `ORG_ENRICH`, batches of 12, up to 6 siblings) so each batch gets its own connection pool. Gated by `x-org-enrich-secret` (same value as the server token. Never exposed to the browser).
+
+---
+
+## Assumptions and limitations
+
+| Assumption / limit | Why it matters |
+|--------------------|----------------|
+| `GET /v1/employments` list items omit manager fields | Hierarchy needs `GET /v1/employments/:id` per active employment (~149 in Acme sandbox) |
+| Workers Free: 6 concurrent outbound connections / 50 subrequests per invocation | Cold rebuilds fan out to dedicated `remote-org-chart-enrich` Worker (`ORG_ENRICH`); same-URL self-fetch is blocked (error 1042) |
+| KV snapshot cache (1h TTL) | Normal loads and marketing/login prefetch are usually cache hits; `?refresh=1` forces a full Remote rebuild |
+| Demo login ≠ Remote token | App session cookie is separate; `REMOTE_API_TOKEN` stays server-side only |
+| No second employee database | Remote sandbox remains source of truth; overlays/writes use optional `REMOTE_API_WRITE_TOKEN` when set |
+| Repo ships without demo passwords | Credentials are Wrangler / `.env.local` only — shared privately with interviewers |
 
 ---
 
@@ -187,13 +200,15 @@ Supabase is **off** by default. Remote is the source of truth. Stretch ideas for
 ## Deploy (Cloudflare)
 
 ```bash
-# One-time: wrangler login, then set the secret
+# One-time: wrangler login, then set secrets on both Workers
 npx wrangler secret put REMOTE_API_TOKEN
+npx wrangler secret put REMOTE_API_TOKEN -c workers/org-enrich/wrangler.jsonc
 
-npm run deploy
+npm run deploy:all   # enrich Worker + OpenNext app
+# or: npm run deploy:enrich && npm run deploy
 ```
 
-`wrangler.jsonc` sets `REMOTE_API_BASE_URL` and the `WORKER_SELF` service binding.  
+`wrangler.jsonc` sets `REMOTE_API_BASE_URL`, `ORG_ENRICH` → `remote-org-chart-enrich`, and `WORKER_SELF`.  
 Public URL pattern: `https://remote-org-chart.<account>.workers.dev`
 
 ---
