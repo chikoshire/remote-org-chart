@@ -319,6 +319,8 @@ function OrgChartInner() {
   const [remoteConnected, setRemoteConnected] = useState(true);
   const [viewMode, setViewMode] = useState<"chart" | "tree" | "map">("chart");
   const [mapFocusCountry, setMapFocusCountry] = useState<string | null>(null);
+  /** False until React Flow has nodes + an initial fit — hides blank beige flash. */
+  const [layoutReady, setLayoutReady] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -428,6 +430,7 @@ function OrgChartInner() {
       setRefreshing(true);
     } else if (!silent) {
       setStatus("loading");
+      setLayoutReady(false);
       setErrorMessage(null);
       setErrorRetryable(true);
       setWarnings([]);
@@ -497,6 +500,7 @@ function OrgChartInner() {
         // Default: full tree expanded; people can collapse branches themselves.
         setCollapsedIds(new Set());
         initialFitDone.current = false;
+        setLayoutReady(false);
       }
       if (isRefresh) setSyncLogToken((n) => n + 1);
     } catch (err) {
@@ -550,6 +554,7 @@ function OrgChartInner() {
       hasReadyData.current = true;
       setCollapsedIds(new Set());
       initialFitDone.current = false;
+      setLayoutReady(false);
       setStatus("ready");
       void load({ silent: true });
       return;
@@ -729,6 +734,12 @@ function OrgChartInner() {
     status === "ready" &&
     filtersAreActive(filters) &&
     filteredForest.length === 0;
+
+  const canvasBuilding =
+    status === "ready" &&
+    viewMode === "chart" &&
+    !filterEmpty &&
+    !layoutReady;
 
   const relation = useMemo((): ReportingRelation | null => {
     if (!compareMode || !compareA || !compareB) return null;
@@ -943,6 +954,18 @@ function OrgChartInner() {
   }, [fitView, reducedMotion, relation]);
 
   useEffect(() => {
+    if (status !== "ready") {
+      setLayoutReady(false);
+      return;
+    }
+    // Tree / map don't need React Flow measurement — unblock as soon as forest exists.
+    if (viewMode !== "chart") {
+      if (forestRoots.length > 0) setLayoutReady(true);
+      return;
+    }
+  }, [forestRoots.length, status, viewMode]);
+
+  useEffect(() => {
     if (status !== "ready" || nodes.length === 0 || initialFitDone.current) {
       return;
     }
@@ -976,6 +999,7 @@ function OrgChartInner() {
         minZoom: isMobile ? 0.45 : 0.75,
         duration: reducedMotion ? 0 : 420,
       });
+      setLayoutReady(true);
     };
 
     requestAnimationFrame(() => {
@@ -1133,6 +1157,9 @@ function OrgChartInner() {
     if (status === "loading") return "Loading org chart…";
     if (status === "error") return "Org chart error";
     if (status === "empty") return "Empty org chart";
+    if (status === "ready" && viewMode === "chart" && !layoutReady) {
+      return "Building chart…";
+    }
     const synced = lastSyncedAt
       ? ` · updated ${new Date(lastSyncedAt).toLocaleString()}`
       : "";
@@ -1141,10 +1168,12 @@ function OrgChartInner() {
     }${synced}${refreshing ? " · refreshing…" : ""}`;
   }, [
     lastSyncedAt,
+    layoutReady,
     meta,
     refreshing,
     selectedId,
     status,
+    viewMode,
   ]);
 
   const personDrawer =
@@ -1770,51 +1799,62 @@ function OrgChartInner() {
               focusCountry={mapFocusCountry}
             />
           ) : (
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              nodeTypes={nodeTypes}
-              edgeTypes={edgeTypes}
-              onNodeClick={onNodeClick}
-              onPaneClick={onPaneClick}
-              fitView={false}
-              minZoom={0.15}
-              maxZoom={1.6}
-              proOptions={{ hideAttribution: true }}
-              nodesConnectable={false}
-              nodesFocusable
-              edgesFocusable={false}
-              deleteKeyCode={null}
-              // Scroll = zoom (Map parity). Drag pans; trackpad pinch still zooms.
-              panOnScroll={false}
-              panOnDrag
-              zoomOnScroll
-              zoomOnPinch
-              zoomOnDoubleClick={!isMobile}
-              selectionOnDrag={false}
-              preventScrolling
-              className="h-full w-full bg-transparent"
-              aria-label="Interactive organization chart. Scroll to zoom, drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
-            >
-              <Background color="#d7e0e3" gap={isMobile ? 18 : 24} size={1.1} />
-              <Controls
-                showInteractive={false}
-                position="bottom-left"
-                className={isMobile ? "!m-2 !mb-14" : undefined}
-                aria-label="Chart zoom controls"
-              />
-              {!isMobile ? (
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor={() => "#121212"}
-                  maskColor="rgb(26 26 26 / 0.08)"
-                  aria-label="Organization chart overview map"
+            <>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                onNodeClick={onNodeClick}
+                onPaneClick={onPaneClick}
+                fitView={false}
+                minZoom={0.15}
+                maxZoom={1.6}
+                proOptions={{ hideAttribution: true }}
+                nodesConnectable={false}
+                nodesFocusable
+                edgesFocusable={false}
+                deleteKeyCode={null}
+                // Scroll = zoom (Map parity). Drag pans; trackpad pinch still zooms.
+                panOnScroll={false}
+                panOnDrag
+                zoomOnScroll
+                zoomOnPinch
+                zoomOnDoubleClick={!isMobile}
+                selectionOnDrag={false}
+                preventScrolling
+                className="h-full w-full bg-transparent"
+                aria-label="Interactive organization chart. Scroll to zoom, drag to pan, plus and minus to zoom, Enter on a focused person to highlight their reporting path."
+                aria-busy={canvasBuilding}
+              >
+                <Background color="#d7e0e3" gap={isMobile ? 18 : 24} size={1.1} />
+                <Controls
+                  showInteractive={false}
+                  position="bottom-left"
+                  className={isMobile ? "!m-2 !mb-14" : undefined}
+                  aria-label="Chart zoom controls"
                 />
+                {!isMobile ? (
+                  <MiniMap
+                    pannable
+                    zoomable
+                    nodeColor={() => "#121212"}
+                    maskColor="rgb(26 26 26 / 0.08)"
+                    aria-label="Organization chart overview map"
+                  />
+                ) : null}
+              </ReactFlow>
+              {canvasBuilding ? (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-norma-canvas/95">
+                  <ChartLoadingState
+                    title="Building chart…"
+                    description="Laying out people and reporting lines. This usually takes a moment."
+                  />
+                </div>
               ) : null}
-            </ReactFlow>
+            </>
           )}
           {personDrawer}
         </div>

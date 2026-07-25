@@ -19,3 +19,18 @@ describe("ChartStateSurfaces", () => {
     expect(src).not.toContain("animate-spin");
   });
 });
+
+const canvas = readFileSync(
+  join(process.cwd(), "src/components/org/OrgChartCanvas.tsx"),
+  "utf8",
+);
+
+describe("chart empty flash (#126)", () => {
+  it("keeps a building overlay until the first fitView completes", () => {
+    expect(canvas).toContain("layoutReady");
+    expect(canvas).toContain("canvasBuilding");
+    expect(canvas).toContain("Building chart…");
+    expect(canvas).toContain("setLayoutReady(true)");
+    expect(canvas).toContain('aria-busy={canvasBuilding}');
+  });
+});
