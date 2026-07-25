@@ -124,7 +124,7 @@ export function HelpChatWidget() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-10 right-4 z-40 flex flex-col items-end gap-3 md:bottom-12 md:right-6">
+    <div className="pointer-events-none fixed bottom-20 right-3 z-40 flex flex-col items-end gap-3 md:bottom-12 md:right-6">
       {open ? (
         <section
           aria-labelledby={titleId}

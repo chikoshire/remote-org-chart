@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { PersonAvatar } from "@/components/org/PersonAvatar";
 import type { OrgChartPayloadNode } from "@/lib/org/layout-flow";
 import { formatCountryLabel } from "@/lib/ui/format-country";
+import { MOBILE_MAX_WIDTH, useMediaQuery } from "@/lib/ui/use-media-query";
 
 type OrgTreeListProps = {
   roots: OrgChartPayloadNode[];
@@ -284,6 +285,7 @@ function HorizontalBranch({
 
 /** Left-to-right reporting tree - secondary to React Flow chart. */
 export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
+  const isMobile = useMediaQuery(MOBILE_MAX_WIDTH);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [density, setDensity] = useState<TreeDensity>("comfortable");
   const [seeded, setSeeded] = useState(false);
@@ -294,6 +296,10 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
     setExpanded(new Set(collectExpandableIds(roots)));
     setSeeded(true);
   }, [roots]);
+
+  useEffect(() => {
+    if (isMobile) setDensity("compact");
+  }, [isMobile]);
 
   const toggle = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -346,7 +352,7 @@ export function OrgTreeList({ roots, selectedId, onSelect }: OrgTreeListProps) {
             left to right hierarchy
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex max-w-full flex-nowrap items-center gap-2.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div
             className="flex rounded-full border border-norma-border bg-white p-1 shadow-norma-sm"
             role="group"

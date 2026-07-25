@@ -19,27 +19,29 @@ const PAD = 8;
 
 function readTargetRect(target: string | undefined): SpotlightRect | null {
   if (!target || typeof document === "undefined") return null;
-  const el = document.querySelector<HTMLElement>(`[data-tour="${target}"]`);
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  if (r.width < 2 && r.height < 2) return null;
-  return {
-    top: Math.max(0, r.top - PAD),
-    left: Math.max(0, r.left - PAD),
-    width: r.width + PAD * 2,
-    height: r.height + PAD * 2,
-  };
+  const els = document.querySelectorAll<HTMLElement>(`[data-tour="${target}"]`);
+  for (const el of els) {
+    const r = el.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    return {
+      top: Math.max(0, r.top - PAD),
+      left: Math.max(0, r.left - PAD),
+      width: r.width + PAD * 2,
+      height: r.height + PAD * 2,
+    };
+  }
+  return null;
 }
 
 function tooltipPlacement(rect: SpotlightRect | null): {
   top: number;
   left: number;
 } {
-  const cardW = 320;
-  const cardH = 180;
   const margin = 16;
   const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
   const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+  const cardW = Math.min(320, vw - margin * 2);
+  const cardH = 180;
 
   if (!rect) {
     return {

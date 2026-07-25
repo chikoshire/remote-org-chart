@@ -1073,6 +1073,29 @@ We want a multi-page deep tour (Chart filters, Compare) or remote-synced “seen
 
 ---
 
+## 2026-07-25 — Mobile chart density + site-wide phone chrome
+
+**Status:** Accepted  
+
+**Context:**  
+GH#106 / TUXX-1622: phone org chart was cramped (side panel open by default, comfortable nodes, Help FAB over zoom). Marketing lacked a mobile nav. Command palette had no phone affordance.
+
+**Decision:**  
+1. Default side panel closed below `md` when unset; cap open panel at `40dvh` with internal scroll.  
+2. Force compact React Flow / Tree density on mobile; safer initial fit padding/zoom.  
+3. Mobile search icon, tighter header pills, Help FAB raised, zoom controls bottom-left.  
+4. Marketing hamburger, stacked hero CTAs; People/Settings drawers and density preview stack on small widths.  
+5. Settings Keyboard shortcuts sheet + product tour restart (covers GH#102 scope lightly).
+
+**Consequences:**  
+- Phone chart starts with maximum canvas height.  
+- Desktop prefs unchanged; density toggle still saved for desktop.
+
+**Revisit when:**  
+Native bottom-tab shell or PWA install prompts.
+
+---
+
 ## Template for future entries
 
 

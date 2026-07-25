@@ -18,27 +18,30 @@ export function MarketingHero() {
       />
       <div className="marketing-grain pointer-events-none absolute inset-0 opacity-25" />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-16 md:grid-cols-12 md:gap-10 md:px-8 md:pb-28 md:pt-24">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-12 md:grid-cols-12 md:gap-10 md:px-8 md:pb-28 md:pt-24">
         <div className="marketing-hero-copy md:col-span-5">
           <AcmeLogo
             withWordmark
-            className="origin-left scale-[1.15]"
-            markClassName="!h-10 !w-10"
+            className="origin-left scale-[1.05] md:scale-[1.15]"
+            markClassName="!h-9 !w-9 md:!h-10 md:!w-10"
           />
-          <h1 className="marketing-hero-title mt-10 font-[family-name:var(--font-norma-display)] text-[clamp(2.85rem,6vw,4.25rem)] leading-[1.02] tracking-tight text-norma-ink">
+          <h1 className="marketing-hero-title mt-8 font-[family-name:var(--font-norma-display)] text-[clamp(2.35rem,8vw,4.25rem)] leading-[1.05] tracking-tight text-norma-ink md:mt-10 md:leading-[1.02]">
             See how Acme is organised
           </h1>
-          <p className="marketing-hero-copy mt-6 max-w-md text-lg leading-relaxed text-norma-ink-muted md:text-xl md:leading-relaxed">
+          <p className="marketing-hero-copy mt-5 max-w-md text-base leading-relaxed text-norma-ink-muted md:mt-6 md:text-xl md:leading-relaxed">
             Reporting lines, people, and data health in one Acme workspace.
             Connected to your HRIS so the chart stays close to live employment data.
           </p>
-          <div className="marketing-hero-cta mt-11 flex flex-wrap items-center gap-4">
-            <Link href="/login" className="norma-cta min-h-12 px-8 text-base">
+          <div className="marketing-hero-cta mt-8 flex w-full flex-col gap-3 sm:mt-11 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <Link
+              href="/login"
+              className="norma-cta inline-flex min-h-12 w-full items-center justify-center px-8 text-base sm:w-auto"
+            >
               Log in to the app
             </Link>
             <a
               href="#product"
-              className="inline-flex min-h-12 items-center rounded-full border border-norma-ink/20 bg-white/80 px-7 text-base font-medium text-norma-ink transition hover:border-norma-ink/40"
+              className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-norma-ink/20 bg-white/80 px-7 text-base font-medium text-norma-ink transition hover:border-norma-ink/40 sm:w-auto"
             >
               See how it works
             </a>

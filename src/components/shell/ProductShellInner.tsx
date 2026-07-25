@@ -23,8 +23,11 @@ const PRIMARY_NAV = [
   { href: "/app/people", label: "People", match: (p: string) => p.startsWith("/app/people") },
 ] as const;
 
-function navClass(active: boolean) {
-  return `whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] font-medium transition md:px-5 ${
+function navClass(active: boolean, compact = false) {
+  const pad = compact
+    ? "px-2.5 py-1.5 text-xs md:px-5 md:py-2 md:text-[0.95rem]"
+    : "px-3 py-1.5 text-sm md:px-5 md:py-2 md:text-[0.95rem]";
+  return `whitespace-nowrap rounded-full font-medium transition ${pad} ${
     active
       ? "bg-norma-ink text-norma-ink-inverse shadow-norma-sm"
       : "text-norma-ink-muted hover:bg-norma-surface-muted/80 hover:text-norma-ink"
@@ -48,13 +51,16 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
       </a>
       <header
         role="banner"
-        className="norma-glass flex h-16 shrink-0 items-center gap-4 border-b border-norma-border/80 px-4 text-norma-ink md:h-[4.25rem] md:gap-6 md:px-7"
+        className="norma-glass flex h-14 shrink-0 items-center gap-2 border-b border-norma-border/80 px-3 text-norma-ink sm:gap-3 md:h-[4.25rem] md:gap-6 md:px-7"
       >
         <Link href="/app/dashboard" className="flex min-w-0 shrink-0 items-center">
-          <AcmeLogo withWordmark className="origin-left scale-105" />
+          <AcmeLogo
+            withWordmark
+            className="origin-left scale-95 md:scale-105"
+          />
         </Link>
         <nav
-          className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:gap-1.5"
+          className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] md:gap-1.5 [&::-webkit-scrollbar]:hidden"
           aria-label="Primary"
           data-tour="primary-nav"
         >
@@ -72,11 +78,11 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
             );
           })}
         </nav>
-        <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
+        <div className="flex shrink-0 items-center gap-1 md:gap-2">
           <CommandBar />
           <Link
             href="/settings/data-health"
-            className={navClass(healthActive)}
+            className={navClass(healthActive, true)}
             aria-current={healthActive ? "page" : undefined}
             title="Data Health"
             data-tour="health"
@@ -85,7 +91,7 @@ export function ProductShellInner({ children, status }: ProductShellProps) {
           </Link>
           <Link
             href="/help"
-            className={navClass(helpActive)}
+            className={navClass(helpActive, true)}
             aria-current={helpActive ? "page" : undefined}
             title="Help"
             data-tour="help"
