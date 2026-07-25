@@ -522,7 +522,9 @@ export function PersonProfileView({ personId }: { personId: string }) {
             role="status"
             className="bloom-enter rounded-norma-md border border-norma-border bg-norma-highlight-soft/80 px-4 py-2.5 text-sm text-norma-prussian"
           >
-            Showing local corrections on this device (not written to Remote).
+            Showing local overlays for fields Remote could not accept (usually
+            title or country on active employments). Department and manager may
+            still have written back via Save to Remote.
           </p>
         ) : null}
 

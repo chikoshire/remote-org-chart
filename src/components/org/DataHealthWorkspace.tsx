@@ -323,8 +323,11 @@ export function DataHealthWorkspace() {
               Cycles, missing managers, and thin profiles · synced {syncedLabel}
               {refreshing ? " · refreshing…" : ""}. Open{" "}
               <span className="font-medium text-norma-ink">Fix in profile</span>{" "}
-              to fill missing fields on the People page (saved locally on this
-              device, not written back to Remote).
+              to edit missing fields.{" "}
+              <span className="font-medium text-norma-ink">Save to Remote</span>{" "}
+              writes department and manager when a write token is configured;
+              job title and country often stay as local browser overlays on
+              active employments.
             </p>
             {refreshError ? (
               <p className="mt-2 text-sm text-norma-danger" role="alert">
